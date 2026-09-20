@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>Barber POS</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <main class="app">
+
+    <!-- =========================
+         หน้าเลือกช่าง
+    ========================== -->
+    <section
+      id="barberPage"
+      class="page"
+    >
+
+      <div class="page-header">
+        <h1>เลือกชื่อช่าง</h1>
+
+        <p>
+          เลือกชื่อของคุณเพื่อเริ่มบันทึกรายการ
+        </p>
+      </div>
+
+      <div
+        id="barberList"
+        class="barber-grid"
+      ></div>
+
+    </section>
+
+
+    <!-- =========================
+         หน้าเลือกบริการ
+    ========================== -->
+    <section
+      id="servicePage"
+      class="page hidden"
+    >
+
+      <button
+        id="backButton"
+        class="back-button"
+        type="button"
+      >
+        ← กลับ
+      </button>
+
+
+      <div class="page-header">
+
+        <p class="selected-label">
+          ช่างที่เลือก
+        </p>
+
+        <h1 id="selectedBarberName">
+          -
+        </h1>
+
+        <p>
+          เลือกบริการที่ทำให้ลูกค้า
+        </p>
+
+      </div>
+
+
+      <div
+        id="serviceList"
+        class="service-list"
+      ></div>
+
+    </section>
+
+  </main>
+
+
+  <script
+    type="module"
+    src="app.js"
+  ></script>
+
+</body>
+</html>
