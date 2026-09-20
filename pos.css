@@ -27,10 +27,10 @@ body {
 }
 
 body.modal-open {
-  overflow: hidden;
-
   height: 100vh;
   height: 100dvh;
+
+  overflow: hidden;
 }
 
 button {
@@ -266,6 +266,10 @@ button {
   font-size: 18px;
 }
 
+.summary-row strong {
+  flex-shrink: 0;
+}
+
 .empty-summary {
   margin: 0;
 
@@ -279,8 +283,8 @@ button {
 .summary-total {
   display: flex;
 
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 
   margin-top: 18px;
 
@@ -298,7 +302,7 @@ button {
 
 
 /* ========================================
-   BUTTONS
+   MAIN BUTTONS
 ======================================== */
 
 .confirm-button,
@@ -327,11 +331,8 @@ button {
   margin-top: 24px;
 }
 
-.confirm-button:disabled,
-.qr-paid-button:disabled {
+.confirm-button:disabled {
   background: #d5d5d5;
-
-  color: #888888;
 
   cursor: not-allowed;
 }
@@ -342,7 +343,7 @@ button {
 
 
 /* ========================================
-   BACK
+   BACK BUTTON
 ======================================== */
 
 .back-button {
@@ -452,9 +453,13 @@ button {
   background: #f4f5f7;
 
   box-shadow:
-    0 24px 70px
-    rgba(0, 0, 0, 0.22);
+    0 24px 70px rgba(0, 0, 0, 0.22);
 }
+
+
+/* ========================================
+   PAYMENT HEADER
+======================================== */
 
 .payment-header {
   text-align: center;
@@ -502,6 +507,11 @@ button {
     );
 }
 
+
+/* ========================================
+   PAYMENT CARDS
+======================================== */
+
 .payment-card {
   width: 100%;
   height: 100%;
@@ -547,16 +557,13 @@ button {
   cursor: pointer;
 
   box-shadow:
-    0 5px 18px
-    rgba(0, 0, 0, 0.05);
+    0 5px 18px rgba(0, 0, 0, 0.05);
 }
 
 .payment-card:active {
-  transform:
-    scale(0.985);
+  transform: scale(0.985);
 
-  border-color:
-    #222222;
+  border-color: #222222;
 }
 
 .payment-card-icon {
@@ -612,6 +619,11 @@ button {
   font-weight: 700;
 }
 
+
+/* ========================================
+   PAYMENT BACK
+======================================== */
+
 .cancel-payment-button {
   width: 100%;
 
@@ -623,7 +635,6 @@ button {
     );
 
   border: none;
-
   border-radius: 14px;
 
   background: #e7e7e7;
@@ -638,7 +649,7 @@ button {
 
 
 /* ========================================
-   QR PAGE
+   TRUE MONEY QR PAGE
 ======================================== */
 
 .qr-wrapper {
@@ -673,16 +684,13 @@ button {
 
   padding: 24px;
 
-  border:
-    1px solid #e5e5e5;
-
+  border: 1px solid #e5e5e5;
   border-radius: 24px;
 
   background: #ffffff;
 
   box-shadow:
-    0 6px 22px
-    rgba(0, 0, 0, 0.05);
+    0 6px 22px rgba(0, 0, 0, 0.05);
 
   text-align: center;
 }
@@ -704,10 +712,10 @@ button {
 
 
 /* ========================================
-   PROMPTPAY QR
+   TRUE MONEY QR AREA
 ======================================== */
 
-.promptpay-qr {
+.truemoney-qr-area {
   display: flex;
 
   align-items: center;
@@ -720,75 +728,73 @@ button {
 
   margin: 0 auto 20px;
 
-  padding: 14px;
+  padding: 16px;
 
-  border:
-    1px solid #eeeeee;
-
-  border-radius: 18px;
+  border: 1px solid #eeeeee;
+  border-radius: 20px;
 
   background: #ffffff;
 }
 
-.promptpay-qr img,
-.promptpay-qr canvas {
+.truemoney-qr-image {
   display: block;
 
-  width: 100% !important;
-  max-width: 280px;
+  width: 100%;
+  max-width: 270px;
 
-  height: auto !important;
+  height: auto;
 
-  aspect-ratio: 1 / 1;
+  object-fit: contain;
 }
 
 
 /* ========================================
-   QR RECEIVER
+   QR PLACEHOLDER
 ======================================== */
 
-.qr-receiver {
+.truemoney-qr-placeholder {
   display: flex;
 
+  flex-direction: column;
+
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 
-  gap: 15px;
+  gap: 12px;
 
-  padding: 10px 0;
+  width: 100%;
+  min-height: 240px;
 
-  border-bottom:
-    1px solid #eeeeee;
+  padding: 20px;
 
-  font-size: 16px;
+  border: 2px dashed #d6d6d6;
+  border-radius: 16px;
 
-  text-align: left;
+  color: #666666;
 }
 
-.qr-receiver span {
-  color: #777777;
+.truemoney-qr-placeholder strong {
+  font-size: 20px;
+
+  color: #222222;
 }
 
-.qr-receiver strong {
-  text-align: right;
+.truemoney-qr-placeholder span {
+  font-size: 14px;
+
+  color: #999999;
 }
 
+.qr-placeholder-icon {
+  width: 80px;
+  height: 80px;
 
-/* ========================================
-   QR ERROR
-======================================== */
+  color: #444444;
+}
 
-.qr-error {
-  margin-bottom: 18px;
-
-  padding: 14px;
-
-  border-radius: 12px;
-
-  background: #eeeeee;
-
-  font-size: 15px;
-  font-weight: 600;
+.qr-placeholder-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 
@@ -797,9 +803,7 @@ button {
 ======================================== */
 
 .slip-check-card {
-  margin:
-    20px
-    0;
+  margin: 20px 0;
 
   padding: 16px;
 
@@ -906,16 +910,13 @@ button {
 
   padding: 24px;
 
-  border:
-    1px solid #e5e5e5;
-
+  border: 1px solid #e5e5e5;
   border-radius: 22px;
 
   background: #ffffff;
 
   box-shadow:
-    0 5px 18px
-    rgba(0, 0, 0, 0.05);
+    0 5px 18px rgba(0, 0, 0, 0.05);
 
   text-align: left;
 }
@@ -952,6 +953,12 @@ button {
   background: #eeeeee;
 }
 
+.success-service-list {
+  display: flex;
+
+  flex-direction: column;
+}
+
 .success-total-row {
   font-size: 21px;
 }
@@ -974,9 +981,7 @@ button {
    MOBILE
 ======================================== */
 
-@media (
-  max-width: 600px
-) {
+@media (max-width: 600px) {
 
   .app {
     padding:
@@ -992,8 +997,7 @@ button {
 
 
   .barber-grid {
-    grid-template-columns:
-      1fr;
+    grid-template-columns: 1fr;
   }
 
 
@@ -1022,6 +1026,8 @@ button {
   }
 
 
+  /* PAYMENT */
+
   .payment-modal {
     padding:
       max(
@@ -1035,6 +1041,8 @@ button {
       );
   }
 
+
+  /* QR */
 
   .qr-header h1 {
     font-size: 26px;
@@ -1053,7 +1061,7 @@ button {
   }
 
 
-  .promptpay-qr {
+  .truemoney-qr-area {
     max-width: 280px;
 
     min-height: 250px;
@@ -1062,9 +1070,13 @@ button {
   }
 
 
-  .promptpay-qr img,
-  .promptpay-qr canvas {
-    max-width: 250px;
+  .truemoney-qr-image {
+    max-width: 245px;
+  }
+
+
+  .truemoney-qr-placeholder {
+    min-height: 220px;
   }
 
 
@@ -1074,6 +1086,8 @@ button {
     font-size: 17px;
   }
 
+
+  /* SUCCESS */
 
   .success-wrapper {
     padding-top: 20px;
@@ -1104,9 +1118,7 @@ button {
    จอเตี้ย
 ======================================== */
 
-@media (
-  max-height: 700px
-) {
+@media (max-height: 700px) {
 
   .payment-dialog {
     gap: 7px;
@@ -1160,6 +1172,69 @@ button {
     min-height: 42px;
 
     font-size: 15px;
+  }
+
+}
+
+
+/* ========================================
+   จอเตี้ยมาก
+======================================== */
+
+@media (max-height: 560px) {
+
+  .payment-dialog {
+    gap: 5px;
+
+    padding: 8px 12px;
+  }
+
+
+  .payment-header h2 {
+    font-size: 16px;
+  }
+
+
+  .payment-header p {
+    display: none;
+  }
+
+
+  .payment-header strong {
+    font-size: 21px;
+  }
+
+
+  .payment-card {
+    gap: 3px;
+
+    padding: 5px 10px;
+  }
+
+
+  .payment-card-icon {
+    width: 58px;
+    height: 40px;
+  }
+
+
+  .payment-card-icon.qr-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+
+  .payment-card-title {
+    font-size: 16px;
+  }
+
+
+  .cancel-payment-button {
+    min-height: 36px;
+
+    padding: 5px 12px;
+
+    font-size: 14px;
   }
 
 }
