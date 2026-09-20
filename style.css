@@ -148,7 +148,7 @@ button {
 
   padding: 20px 24px;
 
-  border: 1px solid #e6e6e6;
+  border: 2px solid transparent;
   border-radius: 18px;
 
   background: #ffffff;
@@ -162,7 +162,9 @@ button {
 
   transition:
     transform 0.15s ease,
-    box-shadow 0.15s ease;
+    box-shadow 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
 .service-button:hover {
@@ -175,6 +177,60 @@ button {
 .service-button:active {
   transform: scale(0.99);
 }
+
+
+/* รายการที่ถูกเลือก */
+
+.service-button.selected {
+  border-color: #222222;
+
+  background: #f1f1f1;
+}
+
+
+/* ฝั่งซ้ายของรายการ */
+
+.service-left {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+}
+
+
+/* ช่องเครื่องหมายถูก */
+
+.service-check {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  flex-shrink: 0;
+
+  border: 2px solid #cccccc;
+  border-radius: 8px;
+
+  font-size: 18px;
+  font-weight: bold;
+}
+
+
+/* ช่องเมื่อเลือกแล้ว */
+
+.service-button.selected
+.service-check {
+  border-color: #222222;
+
+  background: #222222;
+
+  color: #ffffff;
+}
+
 
 .service-name {
   font-size: 21px;
