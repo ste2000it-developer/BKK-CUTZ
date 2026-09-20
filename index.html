@@ -12,7 +12,7 @@
 
   <link
     rel="stylesheet"
-    href="pos.css?v=8"
+    href="pos.css?v=9"
   >
 </head>
 
@@ -30,7 +30,9 @@
 
       <div class="page-header">
 
-        <h1>เลือกชื่อช่าง</h1>
+        <h1>
+          เลือกชื่อช่าง
+        </h1>
 
         <p>
           เลือกชื่อของคุณเพื่อเริ่มบันทึกรายการ
@@ -81,7 +83,6 @@
       </div>
 
 
-      <!-- รายการบริการ -->
       <div
         id="serviceList"
         class="service-list"
@@ -138,7 +139,218 @@
 
 
     <!-- ========================================
-         หน้าบันทึกรายการสำเร็จ
+         หน้า QR
+    ========================================= -->
+    <section
+      id="qrPage"
+      class="page hidden"
+    >
+
+      <div class="qr-wrapper">
+
+        <button
+          id="qrBackButton"
+          class="back-button qr-back-button"
+          type="button"
+        >
+          ← กลับ
+        </button>
+
+
+        <div class="qr-header">
+
+          <h1>
+            สแกนเพื่อชำระเงิน
+          </h1>
+
+          <p>
+            ให้ลูกค้าสแกน QR Code ด้านล่าง
+          </p>
+
+        </div>
+
+
+        <div class="qr-payment-card">
+
+          <p class="qr-amount-label">
+            ยอดที่ต้องชำระ
+          </p>
+
+          <div
+            id="qrTotal"
+            class="qr-total"
+          >
+            0 บาท
+          </div>
+
+
+          <!--
+            QR จำลองสำหรับทดสอบ Flow เท่านั้น
+            ยังไม่สามารถใช้ชำระเงินจริง
+          -->
+          <div class="qr-code-box">
+
+            <svg
+              class="qr-code"
+              viewBox="0 0 210 210"
+              aria-label="QR ทดสอบ"
+            >
+
+              <rect
+                width="210"
+                height="210"
+                fill="white"
+              />
+
+
+              <!-- มุมซ้ายบน -->
+              <rect
+                x="10"
+                y="10"
+                width="60"
+                height="60"
+                fill="black"
+              />
+
+              <rect
+                x="20"
+                y="20"
+                width="40"
+                height="40"
+                fill="white"
+              />
+
+              <rect
+                x="30"
+                y="30"
+                width="20"
+                height="20"
+                fill="black"
+              />
+
+
+              <!-- มุมขวาบน -->
+              <rect
+                x="140"
+                y="10"
+                width="60"
+                height="60"
+                fill="black"
+              />
+
+              <rect
+                x="150"
+                y="20"
+                width="40"
+                height="40"
+                fill="white"
+              />
+
+              <rect
+                x="160"
+                y="30"
+                width="20"
+                height="20"
+                fill="black"
+              />
+
+
+              <!-- มุมซ้ายล่าง -->
+              <rect
+                x="10"
+                y="140"
+                width="60"
+                height="60"
+                fill="black"
+              />
+
+              <rect
+                x="20"
+                y="150"
+                width="40"
+                height="40"
+                fill="white"
+              />
+
+              <rect
+                x="30"
+                y="160"
+                width="20"
+                height="20"
+                fill="black"
+              />
+
+
+              <!-- pattern ตรงกลาง -->
+              <rect x="90" y="20" width="10" height="10" fill="black" />
+              <rect x="110" y="20" width="10" height="10" fill="black" />
+
+              <rect x="80" y="40" width="20" height="10" fill="black" />
+              <rect x="110" y="40" width="20" height="10" fill="black" />
+
+              <rect x="80" y="70" width="10" height="20" fill="black" />
+              <rect x="100" y="70" width="20" height="10" fill="black" />
+              <rect x="130" y="80" width="10" height="20" fill="black" />
+
+              <rect x="20" y="90" width="20" height="10" fill="black" />
+              <rect x="50" y="80" width="10" height="20" fill="black" />
+
+              <rect x="70" y="100" width="20" height="10" fill="black" />
+              <rect x="100" y="90" width="10" height="30" fill="black" />
+              <rect x="120" y="100" width="30" height="10" fill="black" />
+
+              <rect x="160" y="90" width="20" height="10" fill="black" />
+              <rect x="190" y="80" width="10" height="30" fill="black" />
+
+              <rect x="80" y="130" width="10" height="30" fill="black" />
+              <rect x="100" y="130" width="20" height="10" fill="black" />
+              <rect x="130" y="120" width="10" height="20" fill="black" />
+
+              <rect x="150" y="130" width="30" height="10" fill="black" />
+              <rect x="190" y="130" width="10" height="20" fill="black" />
+
+              <rect x="90" y="160" width="20" height="10" fill="black" />
+              <rect x="120" y="150" width="10" height="30" fill="black" />
+
+              <rect x="150" y="160" width="10" height="20" fill="black" />
+              <rect x="170" y="150" width="30" height="10" fill="black" />
+
+              <rect x="80" y="190" width="30" height="10" fill="black" />
+              <rect x="120" y="180" width="20" height="20" fill="black" />
+              <rect x="150" y="190" width="20" height="10" fill="black" />
+              <rect x="180" y="180" width="20" height="20" fill="black" />
+
+            </svg>
+
+          </div>
+
+
+          <div class="qr-test-label">
+            QR ทดสอบ
+          </div>
+
+          <p class="qr-test-note">
+            ยังไม่สามารถใช้ชำระเงินจริง
+          </p>
+
+
+          <button
+            id="qrPaidButton"
+            class="qr-paid-button"
+            type="button"
+          >
+            ชำระแล้ว
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ========================================
+         หน้าสำเร็จ
     ========================================= -->
     <section
       id="successPage"
@@ -161,9 +373,6 @@
         </p>
 
 
-        <!-- ========================================
-             รายละเอียดรายการ
-        ========================================= -->
         <div class="success-card">
 
           <div class="success-info-row">
@@ -264,9 +473,7 @@
       </div>
 
 
-      <!-- ========================================
-           เงินสด
-      ========================================= -->
+      <!-- เงินสด -->
       <button
         id="cashPaymentButton"
         class="payment-card"
@@ -300,22 +507,6 @@
               stroke-width="5"
             />
 
-            <path
-              d="M14 22 C24 22 28 18 30 13"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="4"
-              stroke-linecap="round"
-            />
-
-            <path
-              d="M86 48 C76 48 72 52 70 57"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="4"
-              stroke-linecap="round"
-            />
-
           </svg>
 
         </span>
@@ -328,9 +519,7 @@
       </button>
 
 
-      <!-- ========================================
-           สแกนจ่าย
-      ========================================= -->
+      <!-- สแกนจ่าย -->
       <button
         id="scanPaymentButton"
         class="payment-card"
@@ -349,106 +538,60 @@
               y="8"
               width="30"
               height="30"
-              rx="2"
               fill="none"
               stroke="currentColor"
               stroke-width="6"
             />
-
-            <rect
-              x="17"
-              y="17"
-              width="12"
-              height="12"
-              fill="currentColor"
-            />
-
 
             <rect
               x="62"
               y="8"
               width="30"
               height="30"
-              rx="2"
               fill="none"
               stroke="currentColor"
               stroke-width="6"
             />
-
-            <rect
-              x="71"
-              y="17"
-              width="12"
-              height="12"
-              fill="currentColor"
-            />
-
 
             <rect
               x="8"
               y="62"
               width="30"
               height="30"
-              rx="2"
               fill="none"
               stroke="currentColor"
               stroke-width="6"
             />
 
             <rect
-              x="17"
-              y="71"
-              width="12"
-              height="12"
-              fill="currentColor"
-            />
-
-
-            <rect
-              x="52"
-              y="52"
+              x="55"
+              y="55"
               width="10"
               height="10"
               fill="currentColor"
             />
 
             <rect
-              x="70"
-              y="52"
-              width="10"
+              x="75"
+              y="55"
+              width="17"
               height="10"
               fill="currentColor"
             />
 
             <rect
-              x="52"
-              y="70"
+              x="55"
+              y="75"
               width="10"
-              height="10"
+              height="17"
               fill="currentColor"
             />
 
             <rect
-              x="68"
-              y="68"
-              width="24"
-              height="8"
-              fill="currentColor"
-            />
-
-            <rect
-              x="84"
-              y="76"
-              width="8"
-              height="16"
-              fill="currentColor"
-            />
-
-            <rect
-              x="52"
-              y="84"
-              width="22"
-              height="8"
+              x="75"
+              y="75"
+              width="17"
+              height="17"
               fill="currentColor"
             />
 
@@ -479,7 +622,7 @@
 
   <script
     type="module"
-    src="app.js?v=8"
+    src="app.js?v=9"
   ></script>
 
 </body>
