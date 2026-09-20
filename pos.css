@@ -12,6 +12,7 @@ html {
 
 body {
   margin: 0;
+
   min-height: 100vh;
 
   font-family:
@@ -155,11 +156,6 @@ button {
 
   box-shadow:
     0 5px 18px rgba(0, 0, 0, 0.05);
-
-  transition:
-    transform 0.15s ease,
-    border-color 0.15s ease,
-    background 0.15s ease;
 }
 
 .service-button:active {
@@ -171,11 +167,6 @@ button {
 
   background: #f1f1f1;
 }
-
-
-/* ========================================
-   SERVICE CONTENT
-======================================== */
 
 .service-left {
   display: flex;
@@ -216,8 +207,6 @@ button {
 .service-name {
   font-size: 21px;
   font-weight: 600;
-
-  text-align: left;
 }
 
 .service-price {
@@ -231,7 +220,7 @@ button {
 
 
 /* ========================================
-   SUMMARY CARD
+   SUMMARY
 ======================================== */
 
 .summary-card {
@@ -254,22 +243,11 @@ button {
   margin: 0 0 20px;
 
   font-size: 24px;
-  font-weight: 700;
-}
-
-
-/* ========================================
-   SUMMARY LIST
-======================================== */
-
-.summary-list {
-  width: 100%;
 }
 
 .summary-row {
   display: flex;
 
-  align-items: center;
   justify-content: space-between;
 
   gap: 20px;
@@ -281,12 +259,6 @@ button {
   font-size: 18px;
 }
 
-.summary-row span:last-child {
-  flex-shrink: 0;
-
-  font-weight: 600;
-}
-
 .empty-summary {
   margin: 0;
 
@@ -294,23 +266,14 @@ button {
 
   color: #999999;
 
-  font-size: 17px;
-
   text-align: center;
 }
-
-
-/* ========================================
-   TOTAL
-======================================== */
 
 .summary-total {
   display: flex;
 
-  align-items: center;
   justify-content: space-between;
-
-  gap: 20px;
+  align-items: center;
 
   margin-top: 18px;
 
@@ -319,14 +282,10 @@ button {
   border-top: 2px solid #eeeeee;
 
   font-size: 20px;
-  font-weight: 600;
 }
 
 .summary-total strong {
-  flex-shrink: 0;
-
   font-size: 26px;
-  font-weight: 700;
 }
 
 
@@ -335,14 +294,11 @@ button {
 ======================================== */
 
 .confirm-button {
-  display: block;
-
   width: 100%;
+
   min-height: 60px;
 
   margin-top: 24px;
-
-  padding: 15px 20px;
 
   border: none;
   border-radius: 14px;
@@ -357,16 +313,8 @@ button {
   cursor: pointer;
 }
 
-.confirm-button:active {
-  transform: scale(0.99);
-}
-
 .confirm-button:disabled {
   background: #d5d5d5;
-
-  color: #ffffff;
-
-  cursor: not-allowed;
 }
 
 
@@ -380,11 +328,8 @@ button {
   padding: 10px 14px;
 
   border: none;
-  border-radius: 10px;
 
   background: transparent;
-
-  color: #444444;
 
   font-size: 17px;
 
@@ -393,7 +338,7 @@ button {
 
 
 /* ========================================
-   PAYMENT MODAL
+   PAYMENT SCREEN
 ======================================== */
 
 .payment-modal {
@@ -408,7 +353,7 @@ button {
   align-items: center;
   justify-content: center;
 
-  padding: 20px;
+  padding: 22px;
 }
 
 .payment-backdrop {
@@ -417,7 +362,7 @@ button {
   inset: 0;
 
   background:
-    rgba(0, 0, 0, 0.45);
+    rgba(0, 0, 0, 0.48);
 }
 
 .payment-dialog {
@@ -428,55 +373,55 @@ button {
   width: 100%;
   max-width: 520px;
 
-  padding: 30px;
+  max-height: calc(100vh - 44px);
 
-  border-radius: 24px;
+  overflow-y: auto;
 
-  background: #ffffff;
+  padding: 28px;
+
+  border-radius: 28px;
+
+  background: #f4f5f7;
 
   box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.20);
-
-  text-align: center;
-}
-
-.payment-dialog h2 {
-  margin: 0 0 22px;
-
-  font-size: 28px;
-  font-weight: 700;
-}
-
-.payment-total-label {
-  margin: 0 0 4px;
-
-  color: #888888;
-
-  font-size: 16px;
-}
-
-.payment-total {
-  margin-bottom: 26px;
-
-  font-size: 36px;
-  font-weight: 700;
+    0 24px 70px rgba(0, 0, 0, 0.22);
 }
 
 
 /* ========================================
-   PAYMENT OPTIONS
+   PAYMENT HEADER
 ======================================== */
 
-.payment-options {
-  display: grid;
+.payment-header {
+  margin-bottom: 22px;
 
-  grid-template-columns:
-    repeat(2, minmax(0, 1fr));
-
-  gap: 14px;
+  text-align: center;
 }
 
-.payment-button {
+.payment-header h2 {
+  margin: 0 0 14px;
+
+  font-size: 26px;
+}
+
+.payment-header p {
+  margin: 0 0 4px;
+
+  color: #888888;
+
+  font-size: 15px;
+}
+
+.payment-header strong {
+  font-size: 32px;
+}
+
+
+/* ========================================
+   PAYMENT CARD
+======================================== */
+
+.payment-card {
   display: flex;
 
   flex-direction: column;
@@ -484,59 +429,97 @@ button {
   align-items: center;
   justify-content: center;
 
-  gap: 12px;
+  gap: 18px;
 
-  min-height: 150px;
+  width: 100%;
 
-  padding: 20px;
+  min-height: 220px;
+
+  margin-bottom: 20px;
+
+  padding: 30px 20px;
 
   border: 2px solid #e5e5e5;
-  border-radius: 18px;
+  border-radius: 26px;
 
   background: #ffffff;
 
   color: #222222;
 
   cursor: pointer;
+
+  box-shadow:
+    0 6px 22px rgba(0, 0, 0, 0.05);
+
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
-.payment-button:active {
+.payment-card:active {
   transform: scale(0.98);
 
-  background: #f3f3f3;
+  border-color: #222222;
+
+  background: #f0f0f0;
 }
 
-.payment-button:disabled {
+.payment-card:disabled {
   opacity: 0.5;
 
   cursor: not-allowed;
 }
 
-.payment-icon {
-  font-size: 42px;
+
+/* ========================================
+   PAYMENT ICON
+======================================== */
+
+.payment-card-icon {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 130px;
+  height: 95px;
 }
 
-.payment-name {
-  font-size: 21px;
+.payment-card-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.payment-card-icon.qr-icon {
+  width: 105px;
+  height: 105px;
+}
+
+
+/* ========================================
+   PAYMENT TITLE
+======================================== */
+
+.payment-card-title {
+  font-size: 28px;
   font-weight: 700;
 }
 
 
 /* ========================================
-   CANCEL PAYMENT
+   PAYMENT CANCEL
 ======================================== */
 
 .cancel-payment-button {
   width: 100%;
 
-  min-height: 50px;
-
-  margin-top: 18px;
+  min-height: 54px;
 
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
 
-  background: #eeeeee;
+  background: #e7e7e7;
 
   color: #555555;
 
@@ -544,12 +527,6 @@ button {
   font-weight: 600;
 
   cursor: pointer;
-}
-
-.cancel-payment-button:disabled {
-  opacity: 0.5;
-
-  cursor: not-allowed;
 }
 
 
@@ -576,25 +553,13 @@ button {
   }
 
 
-  .page-header {
-    margin-bottom: 26px;
-  }
-
-
   .page-header h1 {
     font-size: 28px;
   }
 
 
-  .page-header p {
-    font-size: 16px;
-  }
-
-
   .barber-grid {
     grid-template-columns: 1fr;
-
-    gap: 14px;
   }
 
 
@@ -605,122 +570,81 @@ button {
   }
 
 
-  .service-list {
-    gap: 14px;
-  }
-
-
   .service-button {
     min-height: 82px;
 
     padding: 18px;
-
-    border-radius: 18px;
   }
 
 
-  .service-left {
-    gap: 12px;
-  }
-
-
-  .service-check {
-    width: 27px;
-    height: 27px;
-  }
-
-
-  .service-name {
-    font-size: 19px;
-  }
-
-
+  .service-name,
   .service-price {
-    margin-left: 12px;
-
     font-size: 19px;
   }
 
 
   .summary-card {
-    margin-top: 26px;
-
     padding: 20px;
-
-    border-radius: 18px;
-  }
-
-
-  .summary-card h2 {
-    margin-bottom: 16px;
-
-    font-size: 22px;
-  }
-
-
-  .summary-row {
-    font-size: 17px;
-  }
-
-
-  .summary-total {
-    font-size: 18px;
-  }
-
-
-  .summary-total strong {
-    font-size: 23px;
-  }
-
-
-  .confirm-button {
-    min-height: 58px;
-
-    font-size: 19px;
   }
 
 
   /* Payment */
 
+  .payment-modal {
+    padding: 14px;
+  }
+
+
   .payment-dialog {
-    padding: 24px 18px;
+    max-height:
+      calc(100vh - 28px);
+
+    padding: 20px;
+
+    border-radius: 24px;
+  }
+
+
+  .payment-header {
+    margin-bottom: 18px;
+  }
+
+
+  .payment-header h2 {
+    font-size: 22px;
+  }
+
+
+  .payment-header strong {
+    font-size: 28px;
+  }
+
+
+  .payment-card {
+    min-height: 180px;
+
+    margin-bottom: 14px;
+
+    padding: 24px 15px;
 
     border-radius: 22px;
   }
 
 
-  .payment-dialog h2 {
+  .payment-card-icon {
+    width: 110px;
+    height: 80px;
+  }
+
+
+  .payment-card-icon.qr-icon {
+    width: 90px;
+    height: 90px;
+  }
+
+
+  .payment-card-title {
     font-size: 24px;
-  }
-
-
-  .payment-total {
-    font-size: 32px;
-  }
-
-
-  .payment-options {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-
-    gap: 10px;
-  }
-
-
-  .payment-button {
-    min-height: 130px;
-
-    padding: 16px 10px;
-  }
-
-
-  .payment-icon {
-    font-size: 36px;
-  }
-
-
-  .payment-name {
-    font-size: 18px;
   }
 
 }
