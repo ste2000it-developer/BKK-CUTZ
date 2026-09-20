@@ -245,10 +245,6 @@ button {
   font-size: 24px;
 }
 
-.summary-list {
-  width: 100%;
-}
-
 .summary-row {
   display: flex;
 
@@ -295,15 +291,15 @@ button {
 
 
 /* ========================================
-   CONFIRM
+   BUTTONS
 ======================================== */
 
-.confirm-button {
+.confirm-button,
+.home-button,
+.qr-paid-button {
   width: 100%;
 
   min-height: 60px;
-
-  margin-top: 24px;
 
   padding: 15px 20px;
 
@@ -320,10 +316,18 @@ button {
   cursor: pointer;
 }
 
+.confirm-button {
+  margin-top: 24px;
+}
+
 .confirm-button:disabled {
   background: #d5d5d5;
 
   cursor: not-allowed;
+}
+
+.home-button {
+  margin-top: 24px;
 }
 
 
@@ -385,7 +389,8 @@ button {
   width: 100%;
   max-width: 520px;
 
-  max-height: calc(100vh - 44px);
+  max-height:
+    calc(100vh - 44px);
 
   overflow-y: auto;
 
@@ -398,11 +403,6 @@ button {
   box-shadow:
     0 24px 70px rgba(0, 0, 0, 0.22);
 }
-
-
-/* ========================================
-   PAYMENT HEADER
-======================================== */
 
 .payment-header {
   margin-bottom: 22px;
@@ -427,11 +427,6 @@ button {
 .payment-header strong {
   font-size: 32px;
 }
-
-
-/* ========================================
-   PAYMENT CARD
-======================================== */
 
 .payment-card {
   display: flex;
@@ -495,11 +490,6 @@ button {
   font-weight: 700;
 }
 
-
-/* ========================================
-   CANCEL PAYMENT
-======================================== */
-
 .cancel-payment-button {
   width: 100%;
 
@@ -520,7 +510,125 @@ button {
 
 
 /* ========================================
-   SUCCESS PAGE
+   QR PAGE
+======================================== */
+
+.qr-wrapper {
+  width: 100%;
+  max-width: 560px;
+
+  margin: 0 auto;
+}
+
+.qr-back-button {
+  margin-bottom: 15px;
+}
+
+.qr-header {
+  margin-bottom: 24px;
+
+  text-align: center;
+}
+
+.qr-header h1 {
+  margin: 0 0 8px;
+
+  font-size: 32px;
+}
+
+.qr-header p {
+  margin: 0;
+
+  color: #777777;
+
+  font-size: 17px;
+}
+
+.qr-payment-card {
+  width: 100%;
+
+  padding: 28px;
+
+  border: 1px solid #e5e5e5;
+  border-radius: 24px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 6px 22px rgba(0, 0, 0, 0.05);
+
+  text-align: center;
+}
+
+.qr-amount-label {
+  margin: 0 0 5px;
+
+  color: #888888;
+
+  font-size: 16px;
+}
+
+.qr-total {
+  margin-bottom: 24px;
+
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.qr-code-box {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  max-width: 300px;
+
+  margin: 0 auto;
+
+  padding: 20px;
+
+  border: 1px solid #eeeeee;
+  border-radius: 18px;
+
+  background: #ffffff;
+}
+
+.qr-code {
+  display: block;
+
+  width: 100%;
+  height: auto;
+}
+
+.qr-test-label {
+  display: inline-block;
+
+  margin-top: 18px;
+
+  padding: 6px 12px;
+
+  border-radius: 999px;
+
+  background: #eeeeee;
+
+  color: #555555;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.qr-test-note {
+  margin: 8px 0 24px;
+
+  color: #999999;
+
+  font-size: 14px;
+}
+
+
+/* ========================================
+   SUCCESS
 ======================================== */
 
 .success-wrapper {
@@ -533,9 +641,6 @@ button {
 
   text-align: center;
 }
-
-
-/* เครื่องหมายสำเร็จ */
 
 .success-icon {
   display: flex;
@@ -558,14 +663,10 @@ button {
   font-weight: 700;
 }
 
-
-/* หัวข้อ */
-
 .success-title {
   margin: 0 0 8px;
 
   font-size: 32px;
-  font-weight: 700;
 }
 
 .success-subtitle {
@@ -575,9 +676,6 @@ button {
 
   font-size: 17px;
 }
-
-
-/* กล่องรายละเอียด */
 
 .success-card {
   width: 100%;
@@ -594,9 +692,6 @@ button {
 
   text-align: left;
 }
-
-
-/* แถวข้อมูล */
 
 .success-info-row,
 .success-service-row {
@@ -622,12 +717,7 @@ button {
   flex-shrink: 0;
 
   color: #222222;
-
-  font-weight: 700;
 }
-
-
-/* เส้นแบ่ง */
 
 .success-divider {
   height: 1px;
@@ -637,17 +727,11 @@ button {
   background: #eeeeee;
 }
 
-
-/* รายการบริการ */
-
 .success-service-list {
   display: flex;
 
   flex-direction: column;
 }
-
-
-/* ยอดรวม */
 
 .success-total-row {
   font-size: 21px;
@@ -655,37 +739,6 @@ button {
 
 .success-total-row strong {
   font-size: 25px;
-}
-
-
-/* ========================================
-   HOME BUTTON
-======================================== */
-
-.home-button {
-  width: 100%;
-
-  min-height: 62px;
-
-  margin-top: 24px;
-
-  padding: 15px 20px;
-
-  border: none;
-  border-radius: 15px;
-
-  background: #222222;
-
-  color: #ffffff;
-
-  font-size: 20px;
-  font-weight: 700;
-
-  cursor: pointer;
-}
-
-.home-button:active {
-  transform: scale(0.99);
 }
 
 
@@ -755,22 +808,9 @@ button {
 
 
   .payment-dialog {
-    max-height:
-      calc(100vh - 28px);
-
     padding: 20px;
 
     border-radius: 24px;
-  }
-
-
-  .payment-header h2 {
-    font-size: 22px;
-  }
-
-
-  .payment-header strong {
-    font-size: 28px;
   }
 
 
@@ -785,20 +825,41 @@ button {
   }
 
 
-  .payment-card-icon {
-    width: 110px;
-    height: 80px;
-  }
-
-
-  .payment-card-icon.qr-icon {
-    width: 90px;
-    height: 90px;
-  }
-
-
   .payment-card-title {
     font-size: 24px;
+  }
+
+
+  /* QR */
+
+  .qr-header h1 {
+    font-size: 27px;
+  }
+
+
+  .qr-payment-card {
+    padding: 20px;
+
+    border-radius: 20px;
+  }
+
+
+  .qr-total {
+    font-size: 32px;
+  }
+
+
+  .qr-code-box {
+    max-width: 270px;
+
+    padding: 18px;
+  }
+
+
+  .qr-paid-button {
+    min-height: 58px;
+
+    font-size: 19px;
   }
 
 
@@ -813,8 +874,6 @@ button {
     width: 78px;
     height: 78px;
 
-    margin-bottom: 18px;
-
     font-size: 42px;
   }
 
@@ -824,40 +883,8 @@ button {
   }
 
 
-  .success-subtitle {
-    margin-bottom: 24px;
-
-    font-size: 16px;
-  }
-
-
   .success-card {
     padding: 20px;
-
-    border-radius: 20px;
-  }
-
-
-  .success-info-row,
-  .success-service-row {
-    font-size: 17px;
-  }
-
-
-  .success-total-row {
-    font-size: 19px;
-  }
-
-
-  .success-total-row strong {
-    font-size: 23px;
-  }
-
-
-  .home-button {
-    min-height: 60px;
-
-    font-size: 19px;
   }
 
 }
