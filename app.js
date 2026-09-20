@@ -1,10 +1,22 @@
+import {
+  PROMPTPAY_ID,
+  PROMPTPAY_RECEIVER_NAME
+} from "./shop-config.js";
+
+
+import {
+  createPromptPayPayload,
+  maskPromptPayId
+} from "./promptpay.js";
+
+
+
 // ========================================
 // ข้อมูลจำลอง
-//
-// ตอนนี้ยังไม่เชื่อม Firebase
 // ========================================
 
 const barbers = [
+
   {
     id: "barber-001",
     name: "ช่างเอ"
@@ -24,10 +36,12 @@ const barbers = [
     id: "barber-004",
     name: "ช่างดี"
   }
+
 ];
 
 
 const services = [
+
   {
     id: "service-001",
     name: "ตัดผม",
@@ -51,7 +65,9 @@ const services = [
     name: "ตัด + สระ",
     price: 200
   }
+
 ];
+
 
 
 // ========================================
@@ -59,157 +75,267 @@ const services = [
 // ========================================
 
 const barberPage =
-  document.getElementById("barberPage");
+  document.getElementById(
+    "barberPage"
+  );
+
 
 const servicePage =
-  document.getElementById("servicePage");
+  document.getElementById(
+    "servicePage"
+  );
+
 
 const qrPage =
-  document.getElementById("qrPage");
+  document.getElementById(
+    "qrPage"
+  );
+
 
 const successPage =
-  document.getElementById("successPage");
+  document.getElementById(
+    "successPage"
+  );
 
 
 const barberList =
-  document.getElementById("barberList");
+  document.getElementById(
+    "barberList"
+  );
+
 
 const serviceList =
-  document.getElementById("serviceList");
+  document.getElementById(
+    "serviceList"
+  );
+
 
 const summaryList =
-  document.getElementById("summaryList");
+  document.getElementById(
+    "summaryList"
+  );
+
 
 const totalPrice =
-  document.getElementById("totalPrice");
+  document.getElementById(
+    "totalPrice"
+  );
 
 
 const selectedBarberName =
-  document.getElementById("selectedBarberName");
+  document.getElementById(
+    "selectedBarberName"
+  );
 
 
 const backButton =
-  document.getElementById("backButton");
+  document.getElementById(
+    "backButton"
+  );
+
 
 const confirmButton =
-  document.getElementById("confirmButton");
+  document.getElementById(
+    "confirmButton"
+  );
+
 
 const homeButton =
-  document.getElementById("homeButton");
+  document.getElementById(
+    "homeButton"
+  );
+
 
 
 // ========================================
-// PAYMENT
+// Payment
 // ========================================
 
 const paymentModal =
-  document.getElementById("paymentModal");
+  document.getElementById(
+    "paymentModal"
+  );
+
 
 const paymentTotal =
-  document.getElementById("paymentTotal");
+  document.getElementById(
+    "paymentTotal"
+  );
+
 
 const cashPaymentButton =
-  document.getElementById("cashPaymentButton");
+  document.getElementById(
+    "cashPaymentButton"
+  );
+
 
 const scanPaymentButton =
-  document.getElementById("scanPaymentButton");
+  document.getElementById(
+    "scanPaymentButton"
+  );
+
 
 const cancelPaymentButton =
-  document.getElementById("cancelPaymentButton");
+  document.getElementById(
+    "cancelPaymentButton"
+  );
+
 
 
 // ========================================
-// QR
+// PromptPay QR
 // ========================================
 
 const qrTotal =
-  document.getElementById("qrTotal");
+  document.getElementById(
+    "qrTotal"
+  );
+
 
 const qrPaidButton =
-  document.getElementById("qrPaidButton");
+  document.getElementById(
+    "qrPaidButton"
+  );
+
 
 const qrBackButton =
-  document.getElementById("qrBackButton");
+  document.getElementById(
+    "qrBackButton"
+  );
+
+
+const promptPayQrCode =
+  document.getElementById(
+    "promptPayQrCode"
+  );
+
+
+const qrReceiverName =
+  document.getElementById(
+    "qrReceiverName"
+  );
+
+
+const qrPromptPayId =
+  document.getElementById(
+    "qrPromptPayId"
+  );
+
+
+const qrError =
+  document.getElementById(
+    "qrError"
+  );
+
 
 
 // ========================================
-// SUCCESS
+// Success
 // ========================================
 
 const successBarberName =
-  document.getElementById("successBarberName");
+  document.getElementById(
+    "successBarberName"
+  );
+
 
 const successServiceList =
-  document.getElementById("successServiceList");
+  document.getElementById(
+    "successServiceList"
+  );
+
 
 const successTotal =
-  document.getElementById("successTotal");
+  document.getElementById(
+    "successTotal"
+  );
+
 
 const successPaymentMethod =
-  document.getElementById("successPaymentMethod");
+  document.getElementById(
+    "successPaymentMethod"
+  );
+
 
 
 // ========================================
-// STATE
+// State
 // ========================================
 
-let selectedBarber = null;
+let selectedBarber =
+  null;
+
 
 const selectedServices =
   new Set();
 
 
+
 // ========================================
-// แสดงรายชื่อช่าง
+// รายชื่อช่าง
 // ========================================
 
 function renderBarbers() {
 
-  barberList.innerHTML = "";
+  barberList.innerHTML =
+    "";
 
 
-  barbers.forEach((barber) => {
+  barbers.forEach(
+    (barber) => {
 
-    const button =
-      document.createElement("button");
-
-    button.type =
-      "button";
-
-    button.className =
-      "barber-button";
-
-    button.textContent =
-      barber.name;
+      const button =
+        document.createElement(
+          "button"
+        );
 
 
-    button.addEventListener(
-      "click",
-      () => {
-
-        selectBarber(barber);
-
-      }
-    );
+      button.type =
+        "button";
 
 
-    barberList.appendChild(
-      button
-    );
+      button.className =
+        "barber-button";
 
-  });
+
+      button.textContent =
+        barber.name;
+
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          selectBarber(
+            barber
+          );
+
+        }
+      );
+
+
+      barberList.appendChild(
+        button
+      );
+
+    }
+  );
 
 }
+
 
 
 // ========================================
 // เลือกช่าง
 // ========================================
 
-function selectBarber(barber) {
+function selectBarber(
+  barber
+) {
 
   selectedBarber =
     barber;
+
 
   selectedServices.clear();
 
@@ -233,6 +359,7 @@ function selectBarber(barber) {
 }
 
 
+
 // ========================================
 // ซ่อนทุกหน้า
 // ========================================
@@ -243,19 +370,23 @@ function hideAllPages() {
     "hidden"
   );
 
+
   servicePage.classList.add(
     "hidden"
   );
 
+
   qrPage.classList.add(
     "hidden"
   );
+
 
   successPage.classList.add(
     "hidden"
   );
 
 }
+
 
 
 // ========================================
@@ -268,78 +399,87 @@ function renderServices() {
     "";
 
 
-  services.forEach((service) => {
+  services.forEach(
+    (service) => {
 
-    const button =
-      document.createElement("button");
-
-    button.type =
-      "button";
-
-    button.className =
-      "service-button";
+      const button =
+        document.createElement(
+          "button"
+        );
 
 
-    const isSelected =
-      selectedServices.has(
-        service.id
-      );
+      button.type =
+        "button";
 
 
-    if (isSelected) {
-
-      button.classList.add(
-        "selected"
-      );
-
-    }
+      button.className =
+        "service-button";
 
 
-    button.innerHTML = `
-      <span class="service-left">
-
-        <span class="service-check">
-          ${isSelected ? "✓" : ""}
-        </span>
-
-        <span class="service-name">
-          ${service.name}
-        </span>
-
-      </span>
-
-      <span class="service-price">
-        ${service.price.toLocaleString("th-TH")} บาท
-      </span>
-    `;
+      const isSelected =
+        selectedServices.has(
+          service.id
+        );
 
 
-    button.addEventListener(
-      "click",
-      () => {
+      if (isSelected) {
 
-        toggleService(
-          service
+        button.classList.add(
+          "selected"
         );
 
       }
-    );
 
 
-    serviceList.appendChild(
-      button
-    );
+      button.innerHTML = `
+        <span class="service-left">
 
-  });
+          <span class="service-check">
+            ${isSelected ? "✓" : ""}
+          </span>
+
+          <span class="service-name">
+            ${service.name}
+          </span>
+
+        </span>
+
+        <span class="service-price">
+          ${service.price.toLocaleString("th-TH")} บาท
+        </span>
+      `;
+
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          toggleService(
+            service
+          );
+
+        }
+      );
+
+
+      serviceList.appendChild(
+        button
+      );
+
+    }
+  );
 
 }
 
 
+
 // ========================================
-// เลือก / ยกเลิกบริการ
+// เลือกบริการ
 // ========================================
 
-function toggleService(service) {
+function toggleService(
+  service
+) {
 
   if (
     selectedServices.has(
@@ -367,6 +507,7 @@ function toggleService(service) {
 }
 
 
+
 // ========================================
 // ดึงบริการที่เลือก
 // ========================================
@@ -383,23 +524,26 @@ function getSelectedServiceList() {
 }
 
 
+
 // ========================================
-// คำนวณยอดรวม
+// รวมยอด
 // ========================================
 
 function calculateTotal() {
 
-  return getSelectedServiceList().reduce(
-    (sum, service) =>
-      sum + service.price,
-    0
-  );
+  return getSelectedServiceList()
+    .reduce(
+      (sum, service) =>
+        sum + service.price,
+      0
+    );
 
 }
 
 
+
 // ========================================
-// SUMMARY
+// Summary
 // ========================================
 
 function renderSummary() {
@@ -482,8 +626,9 @@ function renderSummary() {
 }
 
 
+
 // ========================================
-// ยืนยันรายการ
+// กดยืนยัน
 // ========================================
 
 confirmButton.addEventListener(
@@ -508,8 +653,9 @@ confirmButton.addEventListener(
 );
 
 
+
 // ========================================
-// เปิดเลือกวิธีชำระเงิน
+// เปิดเลือกการชำระ
 // ========================================
 
 function openPaymentModal() {
@@ -534,8 +680,9 @@ function openPaymentModal() {
 }
 
 
+
 // ========================================
-// ปิดเลือกวิธีชำระเงิน
+// ปิดเลือกการชำระ
 // ========================================
 
 function closePaymentModal() {
@@ -550,6 +697,7 @@ function closePaymentModal() {
   );
 
 }
+
 
 
 // ========================================
@@ -571,6 +719,7 @@ cashPaymentButton.addEventListener(
 );
 
 
+
 // ========================================
 // สแกนจ่าย
 // ========================================
@@ -588,8 +737,9 @@ scanPaymentButton.addEventListener(
 );
 
 
+
 // ========================================
-// กลับจากเลือกวิธีจ่าย
+// กลับจาก Payment
 // ========================================
 
 cancelPaymentButton.addEventListener(
@@ -602,8 +752,130 @@ cancelPaymentButton.addEventListener(
 );
 
 
+
 // ========================================
-// แสดงหน้า QR
+// สร้าง PromptPay QR
+// ========================================
+
+function renderPromptPayQr(
+  amount
+) {
+
+  promptPayQrCode.innerHTML =
+    "";
+
+
+  qrError.classList.add(
+    "hidden"
+  );
+
+
+  qrError.textContent =
+    "";
+
+
+  qrPaidButton.disabled =
+    false;
+
+
+  try {
+
+    if (
+      !PROMPTPAY_ID ||
+      PROMPTPAY_ID.trim() === ""
+    ) {
+
+      throw new Error(
+        "ยังไม่ได้ตั้งค่า PromptPay ของร้าน"
+      );
+
+    }
+
+
+    if (
+      typeof QRCode ===
+      "undefined"
+    ) {
+
+      throw new Error(
+        "โหลดระบบสร้าง QR ไม่สำเร็จ"
+      );
+
+    }
+
+
+    const payload =
+      createPromptPayPayload(
+        PROMPTPAY_ID,
+        amount
+      );
+
+
+    new QRCode(
+      promptPayQrCode,
+      {
+
+        text:
+          payload,
+
+        width:
+          280,
+
+        height:
+          280,
+
+        correctLevel:
+          QRCode.CorrectLevel.M
+
+      }
+    );
+
+
+    qrReceiverName.textContent =
+      PROMPTPAY_RECEIVER_NAME;
+
+
+    qrPromptPayId.textContent =
+      maskPromptPayId(
+        PROMPTPAY_ID
+      );
+
+  } catch (error) {
+
+    console.error(
+      "PromptPay QR Error:",
+      error
+    );
+
+
+    qrError.textContent =
+      error.message;
+
+
+    qrError.classList.remove(
+      "hidden"
+    );
+
+
+    qrReceiverName.textContent =
+      "-";
+
+
+    qrPromptPayId.textContent =
+      "-";
+
+
+    qrPaidButton.disabled =
+      true;
+
+  }
+
+}
+
+
+
+// ========================================
+// หน้า QR
 // ========================================
 
 function showQrPage() {
@@ -614,6 +886,11 @@ function showQrPage() {
 
   qrTotal.textContent =
     `${total.toLocaleString("th-TH")} บาท`;
+
+
+  renderPromptPayQr(
+    total
+  );
 
 
   hideAllPages();
@@ -632,8 +909,9 @@ function showQrPage() {
 }
 
 
+
 // ========================================
-// QR → ชำระแล้ว
+// QR ชำระแล้ว
 // ========================================
 
 qrPaidButton.addEventListener(
@@ -648,8 +926,9 @@ qrPaidButton.addEventListener(
 );
 
 
+
 // ========================================
-// QR → กลับไปเลือกวิธีชำระ
+// QR กลับ
 // ========================================
 
 qrBackButton.addEventListener(
@@ -672,10 +951,11 @@ qrBackButton.addEventListener(
 );
 
 
+
 // ========================================
 // จบรายการ
 //
-// ยังไม่บันทึก Firebase
+// ตอนนี้ยังไม่บันทึก Firebase
 // ========================================
 
 function completeTransaction(
@@ -738,8 +1018,9 @@ function completeTransaction(
 }
 
 
+
 // ========================================
-// หน้าสำเร็จ
+// Success
 // ========================================
 
 function showSuccessPage(
@@ -763,7 +1044,8 @@ function showSuccessPage(
 
 
   successPaymentMethod.textContent =
-    transaction.paymentMethod === "cash"
+    transaction.paymentMethod ===
+      "cash"
       ? "เงินสด"
       : "สแกนจ่าย";
 
@@ -812,6 +1094,7 @@ function showSuccessPage(
 }
 
 
+
 // ========================================
 // กลับหน้าหลัก
 // ========================================
@@ -826,8 +1109,9 @@ homeButton.addEventListener(
 );
 
 
+
 // ========================================
-// RESET
+// Reset
 // ========================================
 
 function resetTransaction() {
@@ -835,10 +1119,15 @@ function resetTransaction() {
   selectedBarber =
     null;
 
+
   selectedServices.clear();
 
 
   closePaymentModal();
+
+
+  promptPayQrCode.innerHTML =
+    "";
 
 
   hideAllPages();
@@ -860,8 +1149,9 @@ function resetTransaction() {
 }
 
 
+
 // ========================================
-// กลับจากหน้าเลือกบริการ
+// กลับจากหน้าบริการ
 // ========================================
 
 backButton.addEventListener(
@@ -874,8 +1164,9 @@ backButton.addEventListener(
 );
 
 
+
 // ========================================
-// START
+// Start
 // ========================================
 
 renderBarbers();
