@@ -10,14 +10,11 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>
-    Barber POS
-  </title>
-
+  <title>BKK-CUTZ POS</title>
 
   <link
     rel="stylesheet"
-    href="pos.css?v=11"
+    href="pos.css?v=12"
   >
 
 </head>
@@ -100,6 +97,10 @@
       ></div>
 
 
+      <!-- ========================================
+           สรุปรายการ
+      ========================================= -->
+
       <div class="summary-card">
 
         <h2>
@@ -148,7 +149,7 @@
 
 
     <!-- ========================================
-         หน้า PromptPay QR
+         หน้า TrueMoney QR
     ========================================= -->
 
     <section
@@ -175,7 +176,7 @@
           </h1>
 
           <p>
-            PromptPay
+            TrueMoney Wallet
           </p>
 
         </div>
@@ -197,51 +198,129 @@
           </div>
 
 
-          <!-- QR จะถูกสร้างตรงนี้ -->
+
+          <!-- ========================================
+               พื้นที่ QR TrueMoney
+          ========================================= -->
 
           <div
-            id="promptPayQrCode"
-            class="promptpay-qr"
-          ></div>
+            id="trueMoneyQrArea"
+            class="truemoney-qr-area"
+          >
 
 
-          <!-- Error -->
+            <!--
+              ตอนมี QR จริง
+              ระบบจะแสดงรูปนี้
+            -->
 
-          <div
-            id="qrError"
-            class="qr-error hidden"
-          ></div>
+            <img
+              id="trueMoneyQrImage"
+              class="truemoney-qr-image hidden"
+              alt="TrueMoney QR"
+            >
 
 
-          <div class="qr-receiver">
+            <!--
+              ตอนนี้ยังไม่มี QR จริง
+            -->
 
-            <span>
-              ผู้รับ
-            </span>
+            <div
+              id="trueMoneyQrPlaceholder"
+              class="truemoney-qr-placeholder"
+            >
 
-            <strong id="qrReceiverName">
-              -
-            </strong>
+              <div class="qr-placeholder-icon">
+
+                <svg
+                  viewBox="0 0 100 100"
+                  aria-hidden="true"
+                >
+
+                  <rect
+                    x="8"
+                    y="8"
+                    width="30"
+                    height="30"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="6"
+                  />
+
+                  <rect
+                    x="62"
+                    y="8"
+                    width="30"
+                    height="30"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="6"
+                  />
+
+                  <rect
+                    x="8"
+                    y="62"
+                    width="30"
+                    height="30"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="6"
+                  />
+
+                  <rect
+                    x="55"
+                    y="55"
+                    width="10"
+                    height="10"
+                    fill="currentColor"
+                  />
+
+                  <rect
+                    x="75"
+                    y="55"
+                    width="17"
+                    height="10"
+                    fill="currentColor"
+                  />
+
+                  <rect
+                    x="55"
+                    y="75"
+                    width="10"
+                    height="17"
+                    fill="currentColor"
+                  />
+
+                  <rect
+                    x="75"
+                    y="75"
+                    width="17"
+                    height="17"
+                    fill="currentColor"
+                  />
+
+                </svg>
+
+              </div>
+
+
+              <strong>
+                QR TrueMoney
+              </strong>
+
+              <span>
+                ยังไม่ได้ตั้งค่า QR จริง
+              </span>
+
+            </div>
 
           </div>
 
 
-          <div class="qr-receiver">
 
-            <span>
-              PromptPay
-            </span>
-
-            <strong id="qrPromptPayId">
-              -
-            </strong>
-
-          </div>
-
-
-          <!-- ==================================
-               เช็กสลิป
-          =================================== -->
+          <!-- ========================================
+               ตรวจสลิป
+          ========================================= -->
 
           <div class="slip-check-card">
 
@@ -249,7 +328,9 @@
               ก่อนกดชำระแล้ว
             </div>
 
+
             <div class="slip-check-item">
+
               <span class="check-dot">
                 ✓
               </span>
@@ -257,6 +338,7 @@
               <span>
                 เช็กยอดเงินให้ตรง
               </span>
+
             </div>
 
 
@@ -295,6 +377,7 @@
           >
             ตรวจสลิปแล้ว — ชำระแล้ว
           </button>
+
 
         </div>
 
@@ -386,6 +469,7 @@
 
           </div>
 
+
         </div>
 
 
@@ -397,6 +481,7 @@
           กลับหน้าหลัก
         </button>
 
+
       </div>
 
     </section>
@@ -407,7 +492,7 @@
 
 
   <!-- ========================================
-       เลือกวิธีชำระ
+       เลือกวิธีชำระเงิน
   ========================================= -->
 
   <div
@@ -487,7 +572,7 @@
 
 
 
-      <!-- สแกน -->
+      <!-- สแกนจ่าย -->
 
       <button
         id="scanPaymentButton"
@@ -594,18 +679,9 @@
 
 
 
-  <!-- ========================================
-       QR CODE LIBRARY
-  ========================================= -->
-
-  <script
-    src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"
-  ></script>
-
-
   <script
     type="module"
-    src="app.js?v=11"
+    src="app.js?v=12"
   ></script>
 
 
