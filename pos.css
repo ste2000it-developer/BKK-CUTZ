@@ -20,7 +20,12 @@ body {
     sans-serif;
 
   background: #f4f5f7;
+
   color: #1f1f1f;
+}
+
+body.modal-open {
+  overflow: hidden;
 }
 
 button {
@@ -326,7 +331,7 @@ button {
 
 
 /* ========================================
-   CONFIRM BUTTON
+   CONFIRM
 ======================================== */
 
 .confirm-button {
@@ -362,13 +367,11 @@ button {
   color: #ffffff;
 
   cursor: not-allowed;
-
-  opacity: 1;
 }
 
 
 /* ========================================
-   BACK BUTTON
+   BACK
 ======================================== */
 
 .back-button {
@@ -386,6 +389,167 @@ button {
   font-size: 17px;
 
   cursor: pointer;
+}
+
+
+/* ========================================
+   PAYMENT MODAL
+======================================== */
+
+.payment-modal {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 1000;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+}
+
+.payment-backdrop {
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    rgba(0, 0, 0, 0.45);
+}
+
+.payment-dialog {
+  position: relative;
+
+  z-index: 1;
+
+  width: 100%;
+  max-width: 520px;
+
+  padding: 30px;
+
+  border-radius: 24px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.20);
+
+  text-align: center;
+}
+
+.payment-dialog h2 {
+  margin: 0 0 22px;
+
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.payment-total-label {
+  margin: 0 0 4px;
+
+  color: #888888;
+
+  font-size: 16px;
+}
+
+.payment-total {
+  margin-bottom: 26px;
+
+  font-size: 36px;
+  font-weight: 700;
+}
+
+
+/* ========================================
+   PAYMENT OPTIONS
+======================================== */
+
+.payment-options {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 14px;
+}
+
+.payment-button {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+
+  min-height: 150px;
+
+  padding: 20px;
+
+  border: 2px solid #e5e5e5;
+  border-radius: 18px;
+
+  background: #ffffff;
+
+  color: #222222;
+
+  cursor: pointer;
+}
+
+.payment-button:active {
+  transform: scale(0.98);
+
+  background: #f3f3f3;
+}
+
+.payment-button:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+.payment-icon {
+  font-size: 42px;
+}
+
+.payment-name {
+  font-size: 21px;
+  font-weight: 700;
+}
+
+
+/* ========================================
+   CANCEL PAYMENT
+======================================== */
+
+.cancel-payment-button {
+  width: 100%;
+
+  min-height: 50px;
+
+  margin-top: 18px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #eeeeee;
+
+  color: #555555;
+
+  font-size: 17px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.cancel-payment-button:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
 }
 
 
@@ -478,10 +642,6 @@ button {
   }
 
 
-  /* ================================
-     SUMMARY MOBILE
-  ================================= */
-
   .summary-card {
     margin-top: 26px;
 
@@ -517,6 +677,50 @@ button {
     min-height: 58px;
 
     font-size: 19px;
+  }
+
+
+  /* Payment */
+
+  .payment-dialog {
+    padding: 24px 18px;
+
+    border-radius: 22px;
+  }
+
+
+  .payment-dialog h2 {
+    font-size: 24px;
+  }
+
+
+  .payment-total {
+    font-size: 32px;
+  }
+
+
+  .payment-options {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+  }
+
+
+  .payment-button {
+    min-height: 130px;
+
+    padding: 16px 10px;
+  }
+
+
+  .payment-icon {
+    font-size: 36px;
+  }
+
+
+  .payment-name {
+    font-size: 18px;
   }
 
 }
