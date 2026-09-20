@@ -1,7 +1,6 @@
 // ================================
 // ข้อมูลจำลอง
 //
-// เซ็ตแรกยังใช้ข้อมูลในไฟล์ก่อน
 // หลังจากนี้เราจะย้ายไป Firebase
 // ================================
 
@@ -79,10 +78,13 @@ const backButton =
 
 
 // ================================
-// ตัวแปรเก็บช่างที่เลือก
+// ข้อมูลที่เลือก
 // ================================
 
 let selectedBarber = null;
+
+// เก็บรายการบริการที่เลือก
+const selectedServices = new Set();
 
 
 // ================================
@@ -132,6 +134,11 @@ function selectBarber(barber) {
 
   selectedBarber = barber;
 
+  // เริ่มลูกค้าคนใหม่
+  // ล้างบริการที่เคยเลือกไว้
+  selectedServices.clear();
+
+
   selectedBarberName.textContent =
     barber.name;
 
@@ -171,9 +178,31 @@ function renderServices() {
       "service-button";
 
 
+    // เช็กว่ารายการนี้ถูกเลือกอยู่หรือไม่
+    const isSelected =
+      selectedServices.has(service.id);
+
+
+    if (isSelected) {
+
+      button.classList.add(
+        "selected"
+      );
+
+    }
+
+
     button.innerHTML = `
-      <span class="service-name">
-        ${service.name}
+      <span class="service-left">
+
+        <span class="service-check">
+          ${isSelected ? "✓" : ""}
+        </span>
+
+        <span class="service-name">
+          ${service.name}
+        </span>
+
       </span>
 
       <span class="service-price">
@@ -186,7 +215,7 @@ function renderServices() {
       "click",
       () => {
 
-        selectService(service);
+        toggleService(service);
 
       }
     );
@@ -200,22 +229,46 @@ function renderServices() {
 
 
 // ================================
-// เมื่อเลือกบริการ
-//
-// ตอนนี้ยังไม่ทำอะไรต่อ
-// รอเรากำหนดขั้นถัดไป
+// เลือก / ยกเลิกบริการ
 // ================================
 
-function selectService(service) {
+function toggleService(service) {
 
+  if (selectedServices.has(service.id)) {
+
+    // ถ้าเลือกอยู่แล้ว
+    // กดอีกครั้ง = ยกเลิก
+    selectedServices.delete(
+      service.id
+    );
+
+  } else {
+
+    // ถ้ายังไม่ได้เลือก
+    // เพิ่มเข้าไป
+    selectedServices.add(
+      service.id
+    );
+
+  }
+
+
+  renderServices();
+
+
+  // เอาไว้ดูค่าทดลองตอนนี้
   console.log(
     "ช่าง:",
     selectedBarber
   );
 
+
   console.log(
-    "บริการ:",
-    service
+    "บริการที่เลือก:",
+    services.filter(
+      (service) =>
+        selectedServices.has(service.id)
+    )
   );
 
 }
@@ -230,6 +283,8 @@ backButton.addEventListener(
   () => {
 
     selectedBarber = null;
+
+    selectedServices.clear();
 
 
     servicePage.classList.add(
