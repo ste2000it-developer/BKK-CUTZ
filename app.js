@@ -64,6 +64,9 @@ const barberPage =
 const servicePage =
   document.getElementById("servicePage");
 
+const qrPage =
+  document.getElementById("qrPage");
+
 const successPage =
   document.getElementById("successPage");
 
@@ -116,6 +119,20 @@ const cancelPaymentButton =
 
 
 // ========================================
+// QR
+// ========================================
+
+const qrTotal =
+  document.getElementById("qrTotal");
+
+const qrPaidButton =
+  document.getElementById("qrPaidButton");
+
+const qrBackButton =
+  document.getElementById("qrBackButton");
+
+
+// ========================================
 // SUCCESS
 // ========================================
 
@@ -156,7 +173,8 @@ function renderBarbers() {
     const button =
       document.createElement("button");
 
-    button.type = "button";
+    button.type =
+      "button";
 
     button.className =
       "barber-button";
@@ -175,7 +193,9 @@ function renderBarbers() {
     );
 
 
-    barberList.appendChild(button);
+    barberList.appendChild(
+      button
+    );
 
   });
 
@@ -188,7 +208,8 @@ function renderBarbers() {
 
 function selectBarber(barber) {
 
-  selectedBarber = barber;
+  selectedBarber =
+    barber;
 
   selectedServices.clear();
 
@@ -197,14 +218,7 @@ function selectBarber(barber) {
     barber.name;
 
 
-  barberPage.classList.add(
-    "hidden"
-  );
-
-
-  successPage.classList.add(
-    "hidden"
-  );
+  hideAllPages();
 
 
   servicePage.classList.remove(
@@ -220,12 +234,38 @@ function selectBarber(barber) {
 
 
 // ========================================
+// ซ่อนทุกหน้า
+// ========================================
+
+function hideAllPages() {
+
+  barberPage.classList.add(
+    "hidden"
+  );
+
+  servicePage.classList.add(
+    "hidden"
+  );
+
+  qrPage.classList.add(
+    "hidden"
+  );
+
+  successPage.classList.add(
+    "hidden"
+  );
+
+}
+
+
+// ========================================
 // แสดงบริการ
 // ========================================
 
 function renderServices() {
 
-  serviceList.innerHTML = "";
+  serviceList.innerHTML =
+    "";
 
 
   services.forEach((service) => {
@@ -278,7 +318,9 @@ function renderServices() {
       "click",
       () => {
 
-        toggleService(service);
+        toggleService(
+          service
+        );
 
       }
     );
@@ -326,7 +368,7 @@ function toggleService(service) {
 
 
 // ========================================
-// รายการบริการที่เลือก
+// ดึงบริการที่เลือก
 // ========================================
 
 function getSelectedServiceList() {
@@ -366,10 +408,13 @@ function renderSummary() {
     getSelectedServiceList();
 
 
-  summaryList.innerHTML = "";
+  summaryList.innerHTML =
+    "";
 
 
-  if (selected.length === 0) {
+  if (
+    selected.length === 0
+  ) {
 
     summaryList.innerHTML = `
       <p class="empty-summary">
@@ -387,6 +432,7 @@ function renderSummary() {
 
 
     return;
+
   }
 
 
@@ -394,7 +440,10 @@ function renderSummary() {
     (service) => {
 
       const row =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       row.className =
         "summary-row";
@@ -511,6 +560,9 @@ cashPaymentButton.addEventListener(
   "click",
   () => {
 
+    closePaymentModal();
+
+
     completeTransaction(
       "cash"
     );
@@ -527,16 +579,17 @@ scanPaymentButton.addEventListener(
   "click",
   () => {
 
-    completeTransaction(
-      "scan"
-    );
+    closePaymentModal();
+
+
+    showQrPage();
 
   }
 );
 
 
 // ========================================
-// กลับจากหน้าเลือกจ่าย
+// กลับจากเลือกวิธีจ่าย
 // ========================================
 
 cancelPaymentButton.addEventListener(
@@ -550,9 +603,79 @@ cancelPaymentButton.addEventListener(
 
 
 // ========================================
+// แสดงหน้า QR
+// ========================================
+
+function showQrPage() {
+
+  const total =
+    calculateTotal();
+
+
+  qrTotal.textContent =
+    `${total.toLocaleString("th-TH")} บาท`;
+
+
+  hideAllPages();
+
+
+  qrPage.classList.remove(
+    "hidden"
+  );
+
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+
+// ========================================
+// QR → ชำระแล้ว
+// ========================================
+
+qrPaidButton.addEventListener(
+  "click",
+  () => {
+
+    completeTransaction(
+      "scan"
+    );
+
+  }
+);
+
+
+// ========================================
+// QR → กลับไปเลือกวิธีชำระ
+// ========================================
+
+qrBackButton.addEventListener(
+  "click",
+  () => {
+
+    qrPage.classList.add(
+      "hidden"
+    );
+
+
+    servicePage.classList.remove(
+      "hidden"
+    );
+
+
+    openPaymentModal();
+
+  }
+);
+
+
+// ========================================
 // จบรายการ
 //
-// ตอนนี้ยังไม่บันทึก Firebase
+// ยังไม่บันทึก Firebase
 // ========================================
 
 function completeTransaction(
@@ -568,7 +691,9 @@ function completeTransaction(
     getSelectedServiceList();
 
 
-  if (selected.length === 0) {
+  if (
+    selected.length === 0
+  ) {
     return;
   }
 
@@ -606,9 +731,6 @@ function completeTransaction(
   );
 
 
-  closePaymentModal();
-
-
   showSuccessPage(
     transaction
   );
@@ -617,21 +739,14 @@ function completeTransaction(
 
 
 // ========================================
-// แสดงหน้าสำเร็จ
+// หน้าสำเร็จ
 // ========================================
 
 function showSuccessPage(
   transaction
 ) {
 
-  servicePage.classList.add(
-    "hidden"
-  );
-
-
-  barberPage.classList.add(
-    "hidden"
-  );
+  hideAllPages();
 
 
   successPage.classList.remove(
@@ -661,7 +776,10 @@ function showSuccessPage(
     (service) => {
 
       const row =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       row.className =
         "success-service-row";
@@ -714,29 +832,16 @@ homeButton.addEventListener(
 
 function resetTransaction() {
 
-  selectedBarber = null;
+  selectedBarber =
+    null;
 
   selectedServices.clear();
 
 
-  paymentModal.classList.add(
-    "hidden"
-  );
+  closePaymentModal();
 
 
-  document.body.classList.remove(
-    "modal-open"
-  );
-
-
-  servicePage.classList.add(
-    "hidden"
-  );
-
-
-  successPage.classList.add(
-    "hidden"
-  );
+  hideAllPages();
 
 
   barberPage.classList.remove(
