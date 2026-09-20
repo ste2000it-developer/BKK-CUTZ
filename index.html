@@ -12,7 +12,7 @@
 
   <link
     rel="stylesheet"
-    href="pos.css"
+    href="pos.css?v=6"
   >
 </head>
 
@@ -80,7 +80,6 @@
       </div>
 
 
-      <!-- รายการบริการ -->
       <div
         id="serviceList"
         class="service-list"
@@ -138,9 +137,85 @@
   </main>
 
 
+  <!-- ========================================
+       เลือกวิธีชำระเงิน
+  ========================================= -->
+  <div
+    id="paymentModal"
+    class="payment-modal hidden"
+  >
+
+    <div class="payment-backdrop"></div>
+
+
+    <div class="payment-dialog">
+
+      <h2>
+        เลือกวิธีชำระเงิน
+      </h2>
+
+      <p class="payment-total-label">
+        ยอดที่ต้องชำระ
+      </p>
+
+      <div
+        id="paymentTotal"
+        class="payment-total"
+      >
+        0 บาท
+      </div>
+
+
+      <div class="payment-options">
+
+        <button
+          id="cashPaymentButton"
+          class="payment-button"
+          type="button"
+        >
+          <span class="payment-icon">
+            💵
+          </span>
+
+          <span class="payment-name">
+            เงินสด
+          </span>
+        </button>
+
+
+        <button
+          id="scanPaymentButton"
+          class="payment-button"
+          type="button"
+        >
+          <span class="payment-icon">
+            📱
+          </span>
+
+          <span class="payment-name">
+            สแกนจ่าย
+          </span>
+        </button>
+
+      </div>
+
+
+      <button
+        id="cancelPaymentButton"
+        class="cancel-payment-button"
+        type="button"
+      >
+        ยกเลิก
+      </button>
+
+    </div>
+
+  </div>
+
+
   <script
     type="module"
-    src="app.js?v=5"
+    src="app.js?v=6"
   ></script>
 
 </body>
