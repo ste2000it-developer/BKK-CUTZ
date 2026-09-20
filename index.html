@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -8,21 +10,28 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Barber POS</title>
+  <title>
+    Barber POS
+  </title>
+
 
   <link
     rel="stylesheet"
-    href="pos.css?v=10"
+    href="pos.css?v=11"
   >
+
 </head>
+
 
 <body>
 
   <main class="app">
 
+
     <!-- ========================================
          หน้าเลือกช่าง
     ========================================= -->
+
     <section
       id="barberPage"
       class="page"
@@ -49,9 +58,11 @@
     </section>
 
 
+
     <!-- ========================================
          หน้าเลือกบริการ
     ========================================= -->
+
     <section
       id="servicePage"
       class="page hidden"
@@ -89,9 +100,6 @@
       ></div>
 
 
-      <!-- ========================================
-           สรุปรายการ
-      ========================================= -->
       <div class="summary-card">
 
         <h2>
@@ -138,9 +146,11 @@
     </section>
 
 
+
     <!-- ========================================
-         หน้า QR
+         หน้า PromptPay QR
     ========================================= -->
+
     <section
       id="qrPage"
       class="page hidden"
@@ -148,9 +158,10 @@
 
       <div class="qr-wrapper">
 
+
         <button
           id="qrBackButton"
-          class="back-button qr-back-button"
+          class="back-button"
           type="button"
         >
           ← กลับ
@@ -164,7 +175,7 @@
           </h1>
 
           <p>
-            ให้ลูกค้าสแกน QR Code ด้านล่าง
+            PromptPay
           </p>
 
         </div>
@@ -172,9 +183,11 @@
 
         <div class="qr-payment-card">
 
+
           <p class="qr-amount-label">
             ยอดที่ต้องชำระ
           </p>
+
 
           <div
             id="qrTotal"
@@ -184,147 +197,95 @@
           </div>
 
 
-          <!-- QR จำลอง -->
-          <div class="qr-code-box">
+          <!-- QR จะถูกสร้างตรงนี้ -->
 
-            <svg
-              class="qr-code"
-              viewBox="0 0 210 210"
-              aria-label="QR ทดสอบ"
-            >
-
-              <rect
-                width="210"
-                height="210"
-                fill="white"
-              />
+          <div
+            id="promptPayQrCode"
+            class="promptpay-qr"
+          ></div>
 
 
-              <rect
-                x="10"
-                y="10"
-                width="60"
-                height="60"
-                fill="black"
-              />
+          <!-- Error -->
 
-              <rect
-                x="20"
-                y="20"
-                width="40"
-                height="40"
-                fill="white"
-              />
-
-              <rect
-                x="30"
-                y="30"
-                width="20"
-                height="20"
-                fill="black"
-              />
+          <div
+            id="qrError"
+            class="qr-error hidden"
+          ></div>
 
 
-              <rect
-                x="140"
-                y="10"
-                width="60"
-                height="60"
-                fill="black"
-              />
+          <div class="qr-receiver">
 
-              <rect
-                x="150"
-                y="20"
-                width="40"
-                height="40"
-                fill="white"
-              />
+            <span>
+              ผู้รับ
+            </span>
 
-              <rect
-                x="160"
-                y="30"
-                width="20"
-                height="20"
-                fill="black"
-              />
-
-
-              <rect
-                x="10"
-                y="140"
-                width="60"
-                height="60"
-                fill="black"
-              />
-
-              <rect
-                x="20"
-                y="150"
-                width="40"
-                height="40"
-                fill="white"
-              />
-
-              <rect
-                x="30"
-                y="160"
-                width="20"
-                height="20"
-                fill="black"
-              />
-
-
-              <rect x="90" y="20" width="10" height="10" fill="black" />
-              <rect x="110" y="20" width="10" height="10" fill="black" />
-
-              <rect x="80" y="40" width="20" height="10" fill="black" />
-              <rect x="110" y="40" width="20" height="10" fill="black" />
-
-              <rect x="80" y="70" width="10" height="20" fill="black" />
-              <rect x="100" y="70" width="20" height="10" fill="black" />
-              <rect x="130" y="80" width="10" height="20" fill="black" />
-
-              <rect x="20" y="90" width="20" height="10" fill="black" />
-              <rect x="50" y="80" width="10" height="20" fill="black" />
-
-              <rect x="70" y="100" width="20" height="10" fill="black" />
-              <rect x="100" y="90" width="10" height="30" fill="black" />
-              <rect x="120" y="100" width="30" height="10" fill="black" />
-
-              <rect x="160" y="90" width="20" height="10" fill="black" />
-              <rect x="190" y="80" width="10" height="30" fill="black" />
-
-              <rect x="80" y="130" width="10" height="30" fill="black" />
-              <rect x="100" y="130" width="20" height="10" fill="black" />
-              <rect x="130" y="120" width="10" height="20" fill="black" />
-
-              <rect x="150" y="130" width="30" height="10" fill="black" />
-              <rect x="190" y="130" width="10" height="20" fill="black" />
-
-              <rect x="90" y="160" width="20" height="10" fill="black" />
-              <rect x="120" y="150" width="10" height="30" fill="black" />
-
-              <rect x="150" y="160" width="10" height="20" fill="black" />
-              <rect x="170" y="150" width="30" height="10" fill="black" />
-
-              <rect x="80" y="190" width="30" height="10" fill="black" />
-              <rect x="120" y="180" width="20" height="20" fill="black" />
-              <rect x="150" y="190" width="20" height="10" fill="black" />
-              <rect x="180" y="180" width="20" height="20" fill="black" />
-
-            </svg>
+            <strong id="qrReceiverName">
+              -
+            </strong>
 
           </div>
 
 
-          <div class="qr-test-label">
-            QR ทดสอบ
+          <div class="qr-receiver">
+
+            <span>
+              PromptPay
+            </span>
+
+            <strong id="qrPromptPayId">
+              -
+            </strong>
+
           </div>
 
-          <p class="qr-test-note">
-            ยังไม่สามารถใช้ชำระเงินจริง
-          </p>
+
+          <!-- ==================================
+               เช็กสลิป
+          =================================== -->
+
+          <div class="slip-check-card">
+
+            <div class="slip-check-title">
+              ก่อนกดชำระแล้ว
+            </div>
+
+            <div class="slip-check-item">
+              <span class="check-dot">
+                ✓
+              </span>
+
+              <span>
+                เช็กยอดเงินให้ตรง
+              </span>
+            </div>
+
+
+            <div class="slip-check-item">
+
+              <span class="check-dot">
+                ✓
+              </span>
+
+              <span>
+                เช็กชื่อผู้รับ
+              </span>
+
+            </div>
+
+
+            <div class="slip-check-item">
+
+              <span class="check-dot">
+                ✓
+              </span>
+
+              <span>
+                เช็กเวลาในสลิป
+              </span>
+
+            </div>
+
+          </div>
 
 
           <button
@@ -332,7 +293,7 @@
             class="qr-paid-button"
             type="button"
           >
-            ชำระแล้ว
+            ตรวจสลิปแล้ว — ชำระแล้ว
           </button>
 
         </div>
@@ -342,15 +303,18 @@
     </section>
 
 
+
     <!-- ========================================
          หน้าสำเร็จ
     ========================================= -->
+
     <section
       id="successPage"
       class="page hidden"
     >
 
       <div class="success-wrapper">
+
 
         <div class="success-icon">
           ✓
@@ -361,12 +325,14 @@
           บันทึกรายการแล้ว
         </h1>
 
+
         <p class="success-subtitle">
           รายการได้รับการยืนยันเรียบร้อย
         </p>
 
 
         <div class="success-card">
+
 
           <div class="success-info-row">
 
@@ -393,7 +359,9 @@
           <div class="success-divider"></div>
 
 
-          <div class="success-info-row success-total-row">
+          <div
+            class="success-info-row success-total-row"
+          >
 
             <span>
               รวมทั้งหมด
@@ -433,12 +401,15 @@
 
     </section>
 
+
   </main>
 
 
+
   <!-- ========================================
-       เลือกวิธีชำระเงิน
+       เลือกวิธีชำระ
   ========================================= -->
+
   <div
     id="paymentModal"
     class="payment-modal hidden"
@@ -449,7 +420,7 @@
 
     <div class="payment-dialog">
 
-      <!-- HEADER -->
+
       <div class="payment-header">
 
         <h2>
@@ -467,7 +438,9 @@
       </div>
 
 
+
       <!-- เงินสด -->
+
       <button
         id="cashPaymentButton"
         class="payment-card"
@@ -513,14 +486,18 @@
       </button>
 
 
-      <!-- สแกนจ่าย -->
+
+      <!-- สแกน -->
+
       <button
         id="scanPaymentButton"
         class="payment-card"
         type="button"
       >
 
-        <span class="payment-card-icon qr-icon">
+        <span
+          class="payment-card-icon qr-icon"
+        >
 
           <svg
             viewBox="0 0 100 100"
@@ -601,7 +578,7 @@
       </button>
 
 
-      <!-- กลับ -->
+
       <button
         id="cancelPaymentButton"
         class="cancel-payment-button"
@@ -610,15 +587,28 @@
         ← กลับ
       </button>
 
+
     </div>
 
   </div>
 
 
+
+  <!-- ========================================
+       QR CODE LIBRARY
+  ========================================= -->
+
   <script
-    type="module"
-    src="app.js?v=10"
+    src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"
   ></script>
 
+
+  <script
+    type="module"
+    src="app.js?v=11"
+  ></script>
+
+
 </body>
+
 </html>
