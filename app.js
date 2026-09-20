@@ -90,7 +90,7 @@ const confirmButton =
 
 
 // ========================================
-// Payment DOM
+// PAYMENT DOM
 // ========================================
 
 const paymentModal =
@@ -110,7 +110,7 @@ const cancelPaymentButton =
 
 
 // ========================================
-// ข้อมูลที่เลือก
+// STATE
 // ========================================
 
 let selectedBarber = null;
@@ -297,7 +297,7 @@ function toggleService(service) {
 
 
 // ========================================
-// ดึงรายการที่เลือก
+// รายการที่เลือก
 // ========================================
 
 function getSelectedServiceList() {
@@ -313,16 +313,12 @@ function getSelectedServiceList() {
 
 
 // ========================================
-// คำนวณยอดรวม
+// คำนวณยอด
 // ========================================
 
 function calculateTotal() {
 
-  const selected =
-    getSelectedServiceList();
-
-
-  return selected.reduce(
+  return getSelectedServiceList().reduce(
     (sum, service) =>
       sum + service.price,
     0
@@ -332,7 +328,7 @@ function calculateTotal() {
 
 
 // ========================================
-// แสดงสรุป
+// SUMMARY
 // ========================================
 
 function renderSummary() {
@@ -405,7 +401,7 @@ function renderSummary() {
 
 
 // ========================================
-// กดยืนยันรายการ
+// ยืนยัน
 // ========================================
 
 confirmButton.addEventListener(
@@ -431,7 +427,7 @@ confirmButton.addEventListener(
 
 
 // ========================================
-// เปิดหน้าต่างเลือกวิธีจ่าย
+// เปิดหน้าเลือกการชำระเงิน
 // ========================================
 
 function openPaymentModal() {
@@ -457,7 +453,7 @@ function openPaymentModal() {
 
 
 // ========================================
-// ปิดหน้าต่างเลือกวิธีจ่าย
+// ปิดหน้าเลือกการชำระเงิน
 // ========================================
 
 function closePaymentModal() {
@@ -496,7 +492,7 @@ cashPaymentButton.addEventListener(
 
 
 // ========================================
-// สแกนจ่าย
+// สแกน
 // ========================================
 
 scanPaymentButton.addEventListener(
@@ -512,7 +508,7 @@ scanPaymentButton.addEventListener(
 
 
 // ========================================
-// ยกเลิกเลือกวิธีจ่าย
+// ยกเลิก
 // ========================================
 
 cancelPaymentButton.addEventListener(
@@ -526,7 +522,7 @@ cancelPaymentButton.addEventListener(
 
 
 // ========================================
-// บันทึกรายการหลังเลือกวิธีจ่าย
+// จบรายการ
 // ========================================
 
 async function completeTransaction(
@@ -609,7 +605,6 @@ async function completeTransaction(
   } catch (error) {
 
     console.error(
-      "บันทึกรายการไม่สำเร็จ:",
       error
     );
 
@@ -632,7 +627,7 @@ async function completeTransaction(
 
 
 // ========================================
-// เปิด / ปิดปุ่มตอนกำลังบันทึก
+// DISABLE PAYMENT
 // ========================================
 
 function setPaymentButtonsDisabled(
@@ -652,7 +647,7 @@ function setPaymentButtonsDisabled(
 
 
 // ========================================
-// ล้างรายการ
+// RESET
 // ========================================
 
 function resetTransaction() {
@@ -688,7 +683,7 @@ function resetTransaction() {
 
 
 // ========================================
-// กลับหน้าเลือกช่าง
+// กลับ
 // ========================================
 
 backButton.addEventListener(
@@ -717,7 +712,7 @@ backButton.addEventListener(
 
 
 // ========================================
-// เริ่มระบบ
+// START
 // ========================================
 
 renderBarbers();
