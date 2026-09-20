@@ -12,7 +12,7 @@
 
   <link
     rel="stylesheet"
-    href="pos.css?v=6"
+    href="pos.css?v=7"
   >
 </head>
 
@@ -37,6 +37,7 @@
         </p>
 
       </div>
+
 
       <div
         id="barberList"
@@ -150,54 +151,221 @@
 
     <div class="payment-dialog">
 
-      <h2>
-        เลือกวิธีชำระเงิน
-      </h2>
+      <div class="payment-header">
 
-      <p class="payment-total-label">
-        ยอดที่ต้องชำระ
-      </p>
+        <h2>
+          เลือกวิธีชำระเงิน
+        </h2>
 
-      <div
-        id="paymentTotal"
-        class="payment-total"
+        <p>
+          ยอดที่ต้องชำระ
+        </p>
+
+        <strong id="paymentTotal">
+          0 บาท
+        </strong>
+
+      </div>
+
+
+      <!-- ========================================
+           เงินสด
+      ========================================= -->
+      <button
+        id="cashPaymentButton"
+        class="payment-card"
+        type="button"
       >
-        0 บาท
-      </div>
+
+        <span class="payment-card-icon">
+
+          <svg
+            viewBox="0 0 100 70"
+            aria-hidden="true"
+          >
+
+            <rect
+              x="5"
+              y="8"
+              width="90"
+              height="54"
+              rx="8"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="5"
+            />
+
+            <circle
+              cx="50"
+              cy="35"
+              r="14"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="5"
+            />
+
+            <path
+              d="M14 22 C24 22 28 18 30 13"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="4"
+              stroke-linecap="round"
+            />
+
+            <path
+              d="M86 48 C76 48 72 52 70 57"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="4"
+              stroke-linecap="round"
+            />
+
+          </svg>
+
+        </span>
 
 
-      <div class="payment-options">
+        <span class="payment-card-title">
+          เงินสด
+        </span>
 
-        <button
-          id="cashPaymentButton"
-          class="payment-button"
-          type="button"
-        >
-          <span class="payment-icon">
-            💵
-          </span>
-
-          <span class="payment-name">
-            เงินสด
-          </span>
-        </button>
+      </button>
 
 
-        <button
-          id="scanPaymentButton"
-          class="payment-button"
-          type="button"
-        >
-          <span class="payment-icon">
-            📱
-          </span>
+      <!-- ========================================
+           สแกนจ่าย
+      ========================================= -->
+      <button
+        id="scanPaymentButton"
+        class="payment-card"
+        type="button"
+      >
 
-          <span class="payment-name">
-            สแกนจ่าย
-          </span>
-        </button>
+        <span class="payment-card-icon qr-icon">
 
-      </div>
+          <svg
+            viewBox="0 0 100 100"
+            aria-hidden="true"
+          >
+
+            <rect
+              x="8"
+              y="8"
+              width="30"
+              height="30"
+              rx="2"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="6"
+            />
+
+            <rect
+              x="17"
+              y="17"
+              width="12"
+              height="12"
+              fill="currentColor"
+            />
+
+
+            <rect
+              x="62"
+              y="8"
+              width="30"
+              height="30"
+              rx="2"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="6"
+            />
+
+            <rect
+              x="71"
+              y="17"
+              width="12"
+              height="12"
+              fill="currentColor"
+            />
+
+
+            <rect
+              x="8"
+              y="62"
+              width="30"
+              height="30"
+              rx="2"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="6"
+            />
+
+            <rect
+              x="17"
+              y="71"
+              width="12"
+              height="12"
+              fill="currentColor"
+            />
+
+
+            <rect
+              x="52"
+              y="52"
+              width="10"
+              height="10"
+              fill="currentColor"
+            />
+
+            <rect
+              x="70"
+              y="52"
+              width="10"
+              height="10"
+              fill="currentColor"
+            />
+
+            <rect
+              x="52"
+              y="70"
+              width="10"
+              height="10"
+              fill="currentColor"
+            />
+
+            <rect
+              x="68"
+              y="68"
+              width="24"
+              height="8"
+              fill="currentColor"
+            />
+
+            <rect
+              x="84"
+              y="76"
+              width="8"
+              height="16"
+              fill="currentColor"
+            />
+
+            <rect
+              x="52"
+              y="84"
+              width="22"
+              height="8"
+              fill="currentColor"
+            />
+
+          </svg>
+
+        </span>
+
+
+        <span class="payment-card-title">
+          สแกนจ่าย
+        </span>
+
+      </button>
 
 
       <button
@@ -205,7 +373,7 @@
         class="cancel-payment-button"
         type="button"
       >
-        ยกเลิก
+        ← กลับ
       </button>
 
     </div>
@@ -215,7 +383,7 @@
 
   <script
     type="module"
-    src="app.js?v=6"
+    src="app.js?v=7"
   ></script>
 
 </body>
