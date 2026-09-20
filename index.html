@@ -12,7 +12,7 @@
 
   <link
     rel="stylesheet"
-    href="pos.css?v=7"
+    href="pos.css?v=8"
   >
 </head>
 
@@ -81,6 +81,7 @@
       </div>
 
 
+      <!-- รายการบริการ -->
       <div
         id="serviceList"
         class="service-list"
@@ -129,6 +130,101 @@
           disabled
         >
           ยืนยันรายการ
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ========================================
+         หน้าบันทึกรายการสำเร็จ
+    ========================================= -->
+    <section
+      id="successPage"
+      class="page hidden"
+    >
+
+      <div class="success-wrapper">
+
+        <div class="success-icon">
+          ✓
+        </div>
+
+
+        <h1 class="success-title">
+          บันทึกรายการแล้ว
+        </h1>
+
+        <p class="success-subtitle">
+          รายการได้รับการยืนยันเรียบร้อย
+        </p>
+
+
+        <!-- ========================================
+             รายละเอียดรายการ
+        ========================================= -->
+        <div class="success-card">
+
+          <div class="success-info-row">
+
+            <span>
+              ช่าง
+            </span>
+
+            <strong id="successBarberName">
+              -
+            </strong>
+
+          </div>
+
+
+          <div class="success-divider"></div>
+
+
+          <div
+            id="successServiceList"
+            class="success-service-list"
+          ></div>
+
+
+          <div class="success-divider"></div>
+
+
+          <div class="success-info-row success-total-row">
+
+            <span>
+              รวมทั้งหมด
+            </span>
+
+            <strong id="successTotal">
+              0 บาท
+            </strong>
+
+          </div>
+
+
+          <div class="success-info-row">
+
+            <span>
+              ชำระด้วย
+            </span>
+
+            <strong id="successPaymentMethod">
+              -
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <button
+          id="homeButton"
+          class="home-button"
+          type="button"
+        >
+          กลับหน้าหลัก
         </button>
 
       </div>
@@ -383,7 +479,7 @@
 
   <script
     type="module"
-    src="app.js?v=7"
+    src="app.js?v=8"
   ></script>
 
 </body>
