@@ -5,9 +5,6 @@ import {
 
 // ========================================
 // ข้อมูลจำลอง
-//
-// ต่อไปข้อมูลพวกนี้ก็สามารถย้าย
-// ไปอ่านจาก Firebase ได้
 // ========================================
 
 const barbers = [
@@ -93,6 +90,26 @@ const confirmButton =
 
 
 // ========================================
+// Payment DOM
+// ========================================
+
+const paymentModal =
+  document.getElementById("paymentModal");
+
+const paymentTotal =
+  document.getElementById("paymentTotal");
+
+const cashPaymentButton =
+  document.getElementById("cashPaymentButton");
+
+const scanPaymentButton =
+  document.getElementById("scanPaymentButton");
+
+const cancelPaymentButton =
+  document.getElementById("cancelPaymentButton");
+
+
+// ========================================
 // ข้อมูลที่เลือก
 // ========================================
 
@@ -100,6 +117,8 @@ let selectedBarber = null;
 
 const selectedServices =
   new Set();
+
+let isSaving = false;
 
 
 // ========================================
@@ -386,85 +405,250 @@ function renderSummary() {
 
 
 // ========================================
-// ยืนยันรายการ
+// กดยืนยันรายการ
 // ========================================
 
 confirmButton.addEventListener(
   "click",
-  async () => {
+  () => {
 
     if (!selectedBarber) {
       return;
     }
 
 
-    const selected =
-      getSelectedServiceList();
-
-
-    if (selected.length === 0) {
+    if (
+      selectedServices.size === 0
+    ) {
       return;
     }
 
 
-    const total =
-      calculateTotal();
-
-
-    const transaction = {
-
-      barberId:
-        selectedBarber.id,
-
-      barberName:
-        selectedBarber.name,
-
-      services:
-        selected,
-
-      total:
-        total,
-
-      createdAt:
-        new Date().toISOString()
-
-    };
-
-
-    try {
-
-      // =============================
-      // ส่งให้ firebase.js จัดการ
-      // =============================
-
-      await saveTransaction(
-        transaction
-      );
-
-
-      alert(
-        `ยืนยันรายการเรียบร้อย\n\n${selectedBarber.name}\nยอดรวม ${total.toLocaleString("th-TH")} บาท`
-      );
-
-
-      resetTransaction();
-
-    } catch (error) {
-
-      console.error(
-        "บันทึกรายการไม่สำเร็จ:",
-        error
-      );
-
-
-      alert(
-        "บันทึกรายการไม่สำเร็จ"
-      );
-
-    }
+    openPaymentModal();
 
   }
 );
+
+
+// ========================================
+// เปิดหน้าต่างเลือกวิธีจ่าย
+// ========================================
+
+function openPaymentModal() {
+
+  const total =
+    calculateTotal();
+
+
+  paymentTotal.textContent =
+    `${total.toLocaleString("th-TH")} บาท`;
+
+
+  paymentModal.classList.remove(
+    "hidden"
+  );
+
+
+  document.body.classList.add(
+    "modal-open"
+  );
+
+}
+
+
+// ========================================
+// ปิดหน้าต่างเลือกวิธีจ่าย
+// ========================================
+
+function closePaymentModal() {
+
+  if (isSaving) {
+    return;
+  }
+
+
+  paymentModal.classList.add(
+    "hidden"
+  );
+
+
+  document.body.classList.remove(
+    "modal-open"
+  );
+
+}
+
+
+// ========================================
+// เงินสด
+// ========================================
+
+cashPaymentButton.addEventListener(
+  "click",
+  async () => {
+
+    await completeTransaction(
+      "cash"
+    );
+
+  }
+);
+
+
+// ========================================
+// สแกนจ่าย
+// ========================================
+
+scanPaymentButton.addEventListener(
+  "click",
+  async () => {
+
+    await completeTransaction(
+      "scan"
+    );
+
+  }
+);
+
+
+// ========================================
+// ยกเลิกเลือกวิธีจ่าย
+// ========================================
+
+cancelPaymentButton.addEventListener(
+  "click",
+  () => {
+
+    closePaymentModal();
+
+  }
+);
+
+
+// ========================================
+// บันทึกรายการหลังเลือกวิธีจ่าย
+// ========================================
+
+async function completeTransaction(
+  paymentMethod
+) {
+
+  if (isSaving) {
+    return;
+  }
+
+
+  if (!selectedBarber) {
+    return;
+  }
+
+
+  const selected =
+    getSelectedServiceList();
+
+
+  if (selected.length === 0) {
+    return;
+  }
+
+
+  const total =
+    calculateTotal();
+
+
+  const transaction = {
+
+    barberId:
+      selectedBarber.id,
+
+    barberName:
+      selectedBarber.name,
+
+    services:
+      selected,
+
+    total:
+      total,
+
+    paymentMethod:
+      paymentMethod,
+
+    createdAt:
+      new Date().toISOString()
+
+  };
+
+
+  try {
+
+    isSaving = true;
+
+    setPaymentButtonsDisabled(
+      true
+    );
+
+
+    await saveTransaction(
+      transaction
+    );
+
+
+    const paymentText =
+      paymentMethod === "cash"
+        ? "เงินสด"
+        : "สแกนจ่าย";
+
+
+    alert(
+      `บันทึกรายการเรียบร้อย\n\n${selectedBarber.name}\n${paymentText}\nยอดรวม ${total.toLocaleString("th-TH")} บาท`
+    );
+
+
+    resetTransaction();
+
+  } catch (error) {
+
+    console.error(
+      "บันทึกรายการไม่สำเร็จ:",
+      error
+    );
+
+
+    alert(
+      "บันทึกรายการไม่สำเร็จ"
+    );
+
+  } finally {
+
+    isSaving = false;
+
+    setPaymentButtonsDisabled(
+      false
+    );
+
+  }
+
+}
+
+
+// ========================================
+// เปิด / ปิดปุ่มตอนกำลังบันทึก
+// ========================================
+
+function setPaymentButtonsDisabled(
+  disabled
+) {
+
+  cashPaymentButton.disabled =
+    disabled;
+
+  scanPaymentButton.disabled =
+    disabled;
+
+  cancelPaymentButton.disabled =
+    disabled;
+
+}
 
 
 // ========================================
@@ -476,6 +660,16 @@ function resetTransaction() {
   selectedBarber = null;
 
   selectedServices.clear();
+
+
+  paymentModal.classList.add(
+    "hidden"
+  );
+
+
+  document.body.classList.remove(
+    "modal-open"
+  );
 
 
   servicePage.classList.add(
@@ -494,7 +688,7 @@ function resetTransaction() {
 
 
 // ========================================
-// กลับ
+// กลับหน้าเลือกช่าง
 // ========================================
 
 backButton.addEventListener(
