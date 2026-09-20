@@ -200,7 +200,8 @@ button {
   font-weight: 700;
 }
 
-.service-button.selected .service-check {
+.service-button.selected
+.service-check {
   border-color: #222222;
 
   background: #222222;
@@ -259,7 +260,8 @@ button {
 
   padding: 14px 0;
 
-  border-bottom: 1px solid #eeeeee;
+  border-bottom:
+    1px solid #eeeeee;
 
   font-size: 18px;
 }
@@ -284,7 +286,8 @@ button {
 
   padding-top: 20px;
 
-  border-top: 2px solid #eeeeee;
+  border-top:
+    2px solid #eeeeee;
 
   font-size: 20px;
 }
@@ -295,7 +298,7 @@ button {
 
 
 /* ========================================
-   MAIN BUTTONS
+   BUTTONS
 ======================================== */
 
 .confirm-button,
@@ -324,8 +327,11 @@ button {
   margin-top: 24px;
 }
 
-.confirm-button:disabled {
+.confirm-button:disabled,
+.qr-paid-button:disabled {
   background: #d5d5d5;
+
+  color: #888888;
 
   cursor: not-allowed;
 }
@@ -395,20 +401,12 @@ button {
     rgba(0, 0, 0, 0.48);
 }
 
-
-/* ========================================
-   PAYMENT DIALOG
-======================================== */
-
 .payment-dialog {
   position: relative;
 
   z-index: 1;
 
-  width: min(
-    520px,
-    100%
-  );
+  width: min(520px, 100%);
 
   height:
     min(
@@ -418,13 +416,6 @@ button {
         - max(20px, env(safe-area-inset-top))
         - max(20px, env(safe-area-inset-bottom))
       )
-    );
-
-  max-height:
-    calc(
-      100dvh
-      - max(20px, env(safe-area-inset-top))
-      - max(20px, env(safe-area-inset-bottom))
     );
 
   display: grid;
@@ -461,17 +452,11 @@ button {
   background: #f4f5f7;
 
   box-shadow:
-    0 24px 70px rgba(0, 0, 0, 0.22);
+    0 24px 70px
+    rgba(0, 0, 0, 0.22);
 }
 
-
-/* ========================================
-   PAYMENT HEADER
-======================================== */
-
 .payment-header {
-  min-height: 0;
-
   text-align: center;
 }
 
@@ -491,8 +476,6 @@ button {
       2.7dvh,
       26px
     );
-
-  line-height: 1.15;
 }
 
 .payment-header p {
@@ -517,14 +500,7 @@ button {
       4dvh,
       34px
     );
-
-  line-height: 1.1;
 }
-
-
-/* ========================================
-   PAYMENT CARDS
-======================================== */
 
 .payment-card {
   width: 100%;
@@ -547,8 +523,6 @@ button {
       16px
     );
 
-  margin: 0;
-
   padding:
     clamp(
       10px,
@@ -556,7 +530,8 @@ button {
       20px
     );
 
-  border: 2px solid #e5e5e5;
+  border:
+    2px solid #e5e5e5;
 
   border-radius:
     clamp(
@@ -572,21 +547,17 @@ button {
   cursor: pointer;
 
   box-shadow:
-    0 5px 18px rgba(0, 0, 0, 0.05);
+    0 5px 18px
+    rgba(0, 0, 0, 0.05);
 }
 
 .payment-card:active {
-  transform: scale(0.985);
+  transform:
+    scale(0.985);
 
-  border-color: #222222;
-
-  background: #f1f1f1;
+  border-color:
+    #222222;
 }
-
-
-/* ========================================
-   PAYMENT ICON
-======================================== */
 
 .payment-card-icon {
   display: flex;
@@ -607,13 +578,9 @@ button {
       8.5dvh,
       84px
     );
-
-  flex-shrink: 1;
 }
 
 .payment-card-icon svg {
-  display: block;
-
   width: 100%;
   height: 100%;
 }
@@ -634,14 +601,7 @@ button {
     );
 }
 
-
-/* ========================================
-   PAYMENT TITLE
-======================================== */
-
 .payment-card-title {
-  flex-shrink: 0;
-
   font-size:
     clamp(
       19px,
@@ -650,14 +610,7 @@ button {
     );
 
   font-weight: 700;
-
-  line-height: 1.1;
 }
-
-
-/* ========================================
-   PAYMENT BACK
-======================================== */
 
 .cancel-payment-button {
   width: 100%;
@@ -669,36 +622,15 @@ button {
       54px
     );
 
-  margin: 0;
-
-  padding:
-    clamp(
-      8px,
-      1.4dvh,
-      13px
-    )
-    16px;
-
   border: none;
 
-  border-radius:
-    clamp(
-      11px,
-      1.8dvh,
-      14px
-    );
+  border-radius: 14px;
 
   background: #e7e7e7;
 
   color: #555555;
 
-  font-size:
-    clamp(
-      15px,
-      2dvh,
-      17px
-    );
-
+  font-size: 17px;
   font-weight: 600;
 
   cursor: pointer;
@@ -716,20 +648,16 @@ button {
   margin: 0 auto;
 }
 
-.qr-back-button {
-  margin-bottom: 15px;
-}
-
 .qr-header {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 
   text-align: center;
 }
 
 .qr-header h1 {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
 
-  font-size: 32px;
+  font-size: 30px;
 }
 
 .qr-header p {
@@ -743,21 +671,24 @@ button {
 .qr-payment-card {
   width: 100%;
 
-  padding: 28px;
+  padding: 24px;
 
-  border: 1px solid #e5e5e5;
+  border:
+    1px solid #e5e5e5;
+
   border-radius: 24px;
 
   background: #ffffff;
 
   box-shadow:
-    0 6px 22px rgba(0, 0, 0, 0.05);
+    0 6px 22px
+    rgba(0, 0, 0, 0.05);
 
   text-align: center;
 }
 
 .qr-amount-label {
-  margin: 0 0 5px;
+  margin: 0 0 4px;
 
   color: #888888;
 
@@ -765,61 +696,158 @@ button {
 }
 
 .qr-total {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 
   font-size: 36px;
   font-weight: 700;
 }
 
-.qr-code-box {
+
+/* ========================================
+   PROMPTPAY QR
+======================================== */
+
+.promptpay-qr {
   display: flex;
 
   align-items: center;
   justify-content: center;
 
   width: 100%;
-  max-width: 300px;
+  max-width: 310px;
 
-  margin: 0 auto;
+  min-height: 280px;
 
-  padding: 20px;
+  margin: 0 auto 20px;
 
-  border: 1px solid #eeeeee;
+  padding: 14px;
+
+  border:
+    1px solid #eeeeee;
+
   border-radius: 18px;
 
   background: #ffffff;
 }
 
-.qr-code {
+.promptpay-qr img,
+.promptpay-qr canvas {
   display: block;
 
-  width: 100%;
-  height: auto;
+  width: 100% !important;
+  max-width: 280px;
+
+  height: auto !important;
+
+  aspect-ratio: 1 / 1;
 }
 
-.qr-test-label {
-  display: inline-block;
 
-  margin-top: 18px;
+/* ========================================
+   QR RECEIVER
+======================================== */
 
-  padding: 6px 12px;
+.qr-receiver {
+  display: flex;
 
-  border-radius: 999px;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 10px 0;
+
+  border-bottom:
+    1px solid #eeeeee;
+
+  font-size: 16px;
+
+  text-align: left;
+}
+
+.qr-receiver span {
+  color: #777777;
+}
+
+.qr-receiver strong {
+  text-align: right;
+}
+
+
+/* ========================================
+   QR ERROR
+======================================== */
+
+.qr-error {
+  margin-bottom: 18px;
+
+  padding: 14px;
+
+  border-radius: 12px;
 
   background: #eeeeee;
 
-  color: #555555;
+  font-size: 15px;
+  font-weight: 600;
+}
 
-  font-size: 14px;
+
+/* ========================================
+   SLIP CHECK
+======================================== */
+
+.slip-check-card {
+  margin:
+    20px
+    0;
+
+  padding: 16px;
+
+  border-radius: 16px;
+
+  background: #f4f5f7;
+
+  text-align: left;
+}
+
+.slip-check-title {
+  margin-bottom: 12px;
+
+  font-size: 17px;
   font-weight: 700;
 }
 
-.qr-test-note {
-  margin: 8px 0 24px;
+.slip-check-item {
+  display: flex;
 
-  color: #999999;
+  align-items: center;
 
-  font-size: 14px;
+  gap: 10px;
+
+  margin-top: 8px;
+
+  font-size: 15px;
+}
+
+.check-dot {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 22px;
+  height: 22px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #222222;
+
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 700;
 }
 
 
@@ -878,13 +906,16 @@ button {
 
   padding: 24px;
 
-  border: 1px solid #e5e5e5;
+  border:
+    1px solid #e5e5e5;
+
   border-radius: 22px;
 
   background: #ffffff;
 
   box-shadow:
-    0 5px 18px rgba(0, 0, 0, 0.05);
+    0 5px 18px
+    rgba(0, 0, 0, 0.05);
 
   text-align: left;
 }
@@ -911,8 +942,6 @@ button {
 .success-info-row strong,
 .success-service-row strong {
   flex-shrink: 0;
-
-  color: #222222;
 }
 
 .success-divider {
@@ -921,12 +950,6 @@ button {
   margin: 10px 0;
 
   background: #eeeeee;
-}
-
-.success-service-list {
-  display: flex;
-
-  flex-direction: column;
 }
 
 .success-total-row {
@@ -951,7 +974,9 @@ button {
    MOBILE
 ======================================== */
 
-@media (max-width: 600px) {
+@media (
+  max-width: 600px
+) {
 
   .app {
     padding:
@@ -967,7 +992,8 @@ button {
 
 
   .barber-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns:
+      1fr;
   }
 
 
@@ -996,53 +1022,27 @@ button {
   }
 
 
-  /* ====================================
-     PAYMENT MOBILE
-  ==================================== */
-
   .payment-modal {
     padding:
-      max(8px, env(safe-area-inset-top))
+      max(
+        8px,
+        env(safe-area-inset-top)
+      )
       10px
-      max(8px, env(safe-area-inset-bottom));
-  }
-
-
-  .payment-dialog {
-    width: 100%;
-
-    height:
-      calc(
-        100dvh
-        - max(16px, env(safe-area-inset-top))
-        - max(16px, env(safe-area-inset-bottom))
-      );
-
-    padding:
-      clamp(
-        12px,
-        2dvh,
-        18px
-      );
-
-    border-radius:
-      clamp(
-        18px,
-        2.6dvh,
-        24px
+      max(
+        8px,
+        env(safe-area-inset-bottom)
       );
   }
 
-
-  /* QR */
 
   .qr-header h1 {
-    font-size: 27px;
+    font-size: 26px;
   }
 
 
   .qr-payment-card {
-    padding: 20px;
+    padding: 18px;
 
     border-radius: 20px;
   }
@@ -1053,21 +1053,27 @@ button {
   }
 
 
-  .qr-code-box {
-    max-width: 270px;
+  .promptpay-qr {
+    max-width: 280px;
 
-    padding: 18px;
+    min-height: 250px;
+
+    padding: 12px;
+  }
+
+
+  .promptpay-qr img,
+  .promptpay-qr canvas {
+    max-width: 250px;
   }
 
 
   .qr-paid-button {
     min-height: 58px;
 
-    font-size: 19px;
+    font-size: 17px;
   }
 
-
-  /* Success */
 
   .success-wrapper {
     padding-top: 20px;
@@ -1095,18 +1101,17 @@ button {
 
 
 /* ========================================
-   จอที่เตี้ย
-   เช่นมือถือเปิดผ่าน Safari
+   จอเตี้ย
 ======================================== */
 
-@media (max-height: 700px) {
+@media (
+  max-height: 700px
+) {
 
   .payment-dialog {
     gap: 7px;
 
     padding: 11px 14px;
-
-    border-radius: 20px;
   }
 
 
@@ -1131,8 +1136,6 @@ button {
     gap: 5px;
 
     padding: 7px 12px;
-
-    border-radius: 16px;
   }
 
 
@@ -1156,72 +1159,7 @@ button {
   .cancel-payment-button {
     min-height: 42px;
 
-    padding: 7px 14px;
-
     font-size: 15px;
-  }
-
-}
-
-
-/* ========================================
-   จอเตี้ยมาก
-======================================== */
-
-@media (max-height: 560px) {
-
-  .payment-dialog {
-    gap: 5px;
-
-    padding: 8px 12px;
-  }
-
-
-  .payment-header h2 {
-    font-size: 16px;
-  }
-
-
-  .payment-header p {
-    display: none;
-  }
-
-
-  .payment-header strong {
-    font-size: 21px;
-  }
-
-
-  .payment-card {
-    gap: 3px;
-
-    padding: 5px 10px;
-  }
-
-
-  .payment-card-icon {
-    width: 58px;
-    height: 40px;
-  }
-
-
-  .payment-card-icon.qr-icon {
-    width: 50px;
-    height: 50px;
-  }
-
-
-  .payment-card-title {
-    font-size: 16px;
-  }
-
-
-  .cancel-payment-button {
-    min-height: 36px;
-
-    padding: 5px 12px;
-
-    font-size: 14px;
   }
 
 }
