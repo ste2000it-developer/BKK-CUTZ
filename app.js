@@ -1,18 +1,27 @@
-import {
-  PROMPTPAY_ID,
-  PROMPTPAY_RECEIVER_NAME
-} from "./shop-config.js";
-
-
-import {
-  createPromptPayPayload,
-  maskPromptPayId
-} from "./promptpay.js";
+// ========================================
+// BKK-CUTZ POS
+//
+// ตอนนี้ยังไม่เชื่อม Firebase
+// และยังไม่เชื่อม TrueMoney API
+// ========================================
 
 
 
 // ========================================
-// ข้อมูลจำลอง
+// QR TrueMoney
+//
+// ตอนนี้เว้นว่างไว้ก่อน
+//
+// ภายหลังถ้ามี QR จริง
+// เราจะใส่ path หรือ URL ตรงนี้
+// ========================================
+
+const TRUE_MONEY_QR_IMAGE = "";
+
+
+
+// ========================================
+// ข้อมูลช่างทดลอง
 // ========================================
 
 const barbers = [
@@ -39,6 +48,11 @@ const barbers = [
 
 ];
 
+
+
+// ========================================
+// บริการทดลอง
+// ========================================
 
 const services = [
 
@@ -71,7 +85,7 @@ const services = [
 
 
 // ========================================
-// DOM
+// PAGE DOM
 // ========================================
 
 const barberPage =
@@ -97,6 +111,11 @@ const successPage =
     "successPage"
   );
 
+
+
+// ========================================
+// BARBER / SERVICE DOM
+// ========================================
 
 const barberList =
   document.getElementById(
@@ -140,15 +159,9 @@ const confirmButton =
   );
 
 
-const homeButton =
-  document.getElementById(
-    "homeButton"
-  );
-
-
 
 // ========================================
-// Payment
+// PAYMENT DOM
 // ========================================
 
 const paymentModal =
@@ -183,7 +196,7 @@ const cancelPaymentButton =
 
 
 // ========================================
-// PromptPay QR
+// TRUE MONEY DOM
 // ========================================
 
 const qrTotal =
@@ -204,33 +217,21 @@ const qrBackButton =
   );
 
 
-const promptPayQrCode =
+const trueMoneyQrImage =
   document.getElementById(
-    "promptPayQrCode"
+    "trueMoneyQrImage"
   );
 
 
-const qrReceiverName =
+const trueMoneyQrPlaceholder =
   document.getElementById(
-    "qrReceiverName"
-  );
-
-
-const qrPromptPayId =
-  document.getElementById(
-    "qrPromptPayId"
-  );
-
-
-const qrError =
-  document.getElementById(
-    "qrError"
+    "trueMoneyQrPlaceholder"
   );
 
 
 
 // ========================================
-// Success
+// SUCCESS DOM
 // ========================================
 
 const successBarberName =
@@ -257,9 +258,15 @@ const successPaymentMethod =
   );
 
 
+const homeButton =
+  document.getElementById(
+    "homeButton"
+  );
+
+
 
 // ========================================
-// State
+// STATE
 // ========================================
 
 let selectedBarber =
@@ -272,7 +279,36 @@ const selectedServices =
 
 
 // ========================================
-// รายชื่อช่าง
+// ซ่อนทุกหน้า
+// ========================================
+
+function hideAllPages() {
+
+  barberPage.classList.add(
+    "hidden"
+  );
+
+
+  servicePage.classList.add(
+    "hidden"
+  );
+
+
+  qrPage.classList.add(
+    "hidden"
+  );
+
+
+  successPage.classList.add(
+    "hidden"
+  );
+
+}
+
+
+
+// ========================================
+// แสดงรายชื่อช่าง
 // ========================================
 
 function renderBarbers() {
@@ -356,34 +392,11 @@ function selectBarber(
 
   renderSummary();
 
-}
 
-
-
-// ========================================
-// ซ่อนทุกหน้า
-// ========================================
-
-function hideAllPages() {
-
-  barberPage.classList.add(
-    "hidden"
-  );
-
-
-  servicePage.classList.add(
-    "hidden"
-  );
-
-
-  qrPage.classList.add(
-    "hidden"
-  );
-
-
-  successPage.classList.add(
-    "hidden"
-  );
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 
 }
 
@@ -474,7 +487,7 @@ function renderServices() {
 
 
 // ========================================
-// เลือกบริการ
+// เลือก / ยกเลิกบริการ
 // ========================================
 
 function toggleService(
@@ -509,7 +522,7 @@ function toggleService(
 
 
 // ========================================
-// ดึงบริการที่เลือก
+// รายการที่เลือก
 // ========================================
 
 function getSelectedServiceList() {
@@ -526,7 +539,7 @@ function getSelectedServiceList() {
 
 
 // ========================================
-// รวมยอด
+// คำนวณยอดรวม
 // ========================================
 
 function calculateTotal() {
@@ -543,7 +556,7 @@ function calculateTotal() {
 
 
 // ========================================
-// Summary
+// สรุปรายการ
 // ========================================
 
 function renderSummary() {
@@ -598,9 +611,9 @@ function renderSummary() {
           ${service.name}
         </span>
 
-        <span>
+        <strong>
           ${service.price.toLocaleString("th-TH")} บาท
-        </span>
+        </strong>
       `;
 
 
@@ -628,7 +641,7 @@ function renderSummary() {
 
 
 // ========================================
-// กดยืนยัน
+// ยืนยันรายการ
 // ========================================
 
 confirmButton.addEventListener(
@@ -655,7 +668,7 @@ confirmButton.addEventListener(
 
 
 // ========================================
-// เปิดเลือกการชำระ
+// เปิดหน้าเลือกวิธีชำระเงิน
 // ========================================
 
 function openPaymentModal() {
@@ -682,7 +695,7 @@ function openPaymentModal() {
 
 
 // ========================================
-// ปิดเลือกการชำระ
+// ปิดหน้าเลือกวิธีชำระเงิน
 // ========================================
 
 function closePaymentModal() {
@@ -739,7 +752,7 @@ scanPaymentButton.addEventListener(
 
 
 // ========================================
-// กลับจาก Payment
+// กลับจากหน้าเลือกการชำระ
 // ========================================
 
 cancelPaymentButton.addEventListener(
@@ -754,128 +767,55 @@ cancelPaymentButton.addEventListener(
 
 
 // ========================================
-// สร้าง PromptPay QR
+// ตั้งค่า QR TrueMoney
 // ========================================
 
-function renderPromptPayQr(
-  amount
-) {
+function renderTrueMoneyQr() {
 
-  promptPayQrCode.innerHTML =
-    "";
+  if (
+    TRUE_MONEY_QR_IMAGE &&
+    TRUE_MONEY_QR_IMAGE.trim() !== ""
+  ) {
 
-
-  qrError.classList.add(
-    "hidden"
-  );
+    trueMoneyQrImage.src =
+      TRUE_MONEY_QR_IMAGE;
 
 
-  qrError.textContent =
-    "";
-
-
-  qrPaidButton.disabled =
-    false;
-
-
-  try {
-
-    if (
-      !PROMPTPAY_ID ||
-      PROMPTPAY_ID.trim() === ""
-    ) {
-
-      throw new Error(
-        "ยังไม่ได้ตั้งค่า PromptPay ของร้าน"
-      );
-
-    }
-
-
-    if (
-      typeof QRCode ===
-      "undefined"
-    ) {
-
-      throw new Error(
-        "โหลดระบบสร้าง QR ไม่สำเร็จ"
-      );
-
-    }
-
-
-    const payload =
-      createPromptPayPayload(
-        PROMPTPAY_ID,
-        amount
-      );
-
-
-    new QRCode(
-      promptPayQrCode,
-      {
-
-        text:
-          payload,
-
-        width:
-          280,
-
-        height:
-          280,
-
-        correctLevel:
-          QRCode.CorrectLevel.M
-
-      }
-    );
-
-
-    qrReceiverName.textContent =
-      PROMPTPAY_RECEIVER_NAME;
-
-
-    qrPromptPayId.textContent =
-      maskPromptPayId(
-        PROMPTPAY_ID
-      );
-
-  } catch (error) {
-
-    console.error(
-      "PromptPay QR Error:",
-      error
-    );
-
-
-    qrError.textContent =
-      error.message;
-
-
-    qrError.classList.remove(
+    trueMoneyQrImage.classList.remove(
       "hidden"
     );
 
 
-    qrReceiverName.textContent =
-      "-";
+    trueMoneyQrPlaceholder.classList.add(
+      "hidden"
+    );
 
 
-    qrPromptPayId.textContent =
-      "-";
-
-
-    qrPaidButton.disabled =
-      true;
+    return;
 
   }
+
+
+  trueMoneyQrImage.removeAttribute(
+    "src"
+  );
+
+
+  trueMoneyQrImage.classList.add(
+    "hidden"
+  );
+
+
+  trueMoneyQrPlaceholder.classList.remove(
+    "hidden"
+  );
 
 }
 
 
 
 // ========================================
-// หน้า QR
+// หน้า QR TrueMoney
 // ========================================
 
 function showQrPage() {
@@ -888,9 +828,7 @@ function showQrPage() {
     `${total.toLocaleString("th-TH")} บาท`;
 
 
-  renderPromptPayQr(
-    total
-  );
+  renderTrueMoneyQr();
 
 
   hideAllPages();
@@ -911,7 +849,7 @@ function showQrPage() {
 
 
 // ========================================
-// QR ชำระแล้ว
+// ตรวจสลิปแล้ว
 // ========================================
 
 qrPaidButton.addEventListener(
@@ -928,7 +866,7 @@ qrPaidButton.addEventListener(
 
 
 // ========================================
-// QR กลับ
+// กลับจากหน้า QR
 // ========================================
 
 qrBackButton.addEventListener(
@@ -1020,12 +958,15 @@ function completeTransaction(
 
 
 // ========================================
-// Success
+// หน้าสำเร็จ
 // ========================================
 
 function showSuccessPage(
   transaction
 ) {
+
+  closePaymentModal();
+
 
   hideAllPages();
 
@@ -1044,8 +985,7 @@ function showSuccessPage(
 
 
   successPaymentMethod.textContent =
-    transaction.paymentMethod ===
-      "cash"
+    transaction.paymentMethod === "cash"
       ? "เงินสด"
       : "สแกนจ่าย";
 
@@ -1111,6 +1051,21 @@ homeButton.addEventListener(
 
 
 // ========================================
+// กลับจากหน้าเลือกบริการ
+// ========================================
+
+backButton.addEventListener(
+  "click",
+  () => {
+
+    resetTransaction();
+
+  }
+);
+
+
+
+// ========================================
 // Reset
 // ========================================
 
@@ -1124,10 +1079,6 @@ function resetTransaction() {
 
 
   closePaymentModal();
-
-
-  promptPayQrCode.innerHTML =
-    "";
 
 
   hideAllPages();
@@ -1151,22 +1102,7 @@ function resetTransaction() {
 
 
 // ========================================
-// กลับจากหน้าบริการ
-// ========================================
-
-backButton.addEventListener(
-  "click",
-  () => {
-
-    resetTransaction();
-
-  }
-);
-
-
-
-// ========================================
-// Start
+// START
 // ========================================
 
 renderBarbers();
