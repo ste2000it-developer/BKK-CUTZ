@@ -245,9 +245,14 @@ button {
   font-size: 24px;
 }
 
+.summary-list {
+  width: 100%;
+}
+
 .summary-row {
   display: flex;
 
+  align-items: center;
   justify-content: space-between;
 
   gap: 20px;
@@ -300,6 +305,8 @@ button {
 
   margin-top: 24px;
 
+  padding: 15px 20px;
+
   border: none;
   border-radius: 14px;
 
@@ -315,6 +322,8 @@ button {
 
 .confirm-button:disabled {
   background: #d5d5d5;
+
+  cursor: not-allowed;
 }
 
 
@@ -328,8 +337,11 @@ button {
   padding: 10px 14px;
 
   border: none;
+  border-radius: 10px;
 
   background: transparent;
+
+  color: #444444;
 
   font-size: 17px;
 
@@ -338,7 +350,7 @@ button {
 
 
 /* ========================================
-   PAYMENT SCREEN
+   PAYMENT
 ======================================== */
 
 .payment-modal {
@@ -450,31 +462,13 @@ button {
 
   box-shadow:
     0 6px 22px rgba(0, 0, 0, 0.05);
-
-  transition:
-    transform 0.15s ease,
-    border-color 0.15s ease,
-    background 0.15s ease;
 }
 
 .payment-card:active {
   transform: scale(0.98);
 
   border-color: #222222;
-
-  background: #f0f0f0;
 }
-
-.payment-card:disabled {
-  opacity: 0.5;
-
-  cursor: not-allowed;
-}
-
-
-/* ========================================
-   PAYMENT ICON
-======================================== */
 
 .payment-card-icon {
   display: flex;
@@ -496,11 +490,6 @@ button {
   height: 105px;
 }
 
-
-/* ========================================
-   PAYMENT TITLE
-======================================== */
-
 .payment-card-title {
   font-size: 28px;
   font-weight: 700;
@@ -508,7 +497,7 @@ button {
 
 
 /* ========================================
-   PAYMENT CANCEL
+   CANCEL PAYMENT
 ======================================== */
 
 .cancel-payment-button {
@@ -527,6 +516,176 @@ button {
   font-weight: 600;
 
   cursor: pointer;
+}
+
+
+/* ========================================
+   SUCCESS PAGE
+======================================== */
+
+.success-wrapper {
+  width: 100%;
+  max-width: 620px;
+
+  margin: 0 auto;
+
+  padding-top: 30px;
+
+  text-align: center;
+}
+
+
+/* เครื่องหมายสำเร็จ */
+
+.success-icon {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 88px;
+  height: 88px;
+
+  margin: 0 auto 22px;
+
+  border-radius: 50%;
+
+  background: #222222;
+
+  color: #ffffff;
+
+  font-size: 48px;
+  font-weight: 700;
+}
+
+
+/* หัวข้อ */
+
+.success-title {
+  margin: 0 0 8px;
+
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.success-subtitle {
+  margin: 0 0 30px;
+
+  color: #888888;
+
+  font-size: 17px;
+}
+
+
+/* กล่องรายละเอียด */
+
+.success-card {
+  width: 100%;
+
+  padding: 24px;
+
+  border: 1px solid #e5e5e5;
+  border-radius: 22px;
+
+  background: #ffffff;
+
+  box-shadow:
+    0 5px 18px rgba(0, 0, 0, 0.05);
+
+  text-align: left;
+}
+
+
+/* แถวข้อมูล */
+
+.success-info-row,
+.success-service-row {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 12px 0;
+
+  font-size: 18px;
+}
+
+.success-info-row span,
+.success-service-row span {
+  color: #666666;
+}
+
+.success-info-row strong,
+.success-service-row strong {
+  flex-shrink: 0;
+
+  color: #222222;
+
+  font-weight: 700;
+}
+
+
+/* เส้นแบ่ง */
+
+.success-divider {
+  height: 1px;
+
+  margin: 10px 0;
+
+  background: #eeeeee;
+}
+
+
+/* รายการบริการ */
+
+.success-service-list {
+  display: flex;
+
+  flex-direction: column;
+}
+
+
+/* ยอดรวม */
+
+.success-total-row {
+  font-size: 21px;
+}
+
+.success-total-row strong {
+  font-size: 25px;
+}
+
+
+/* ========================================
+   HOME BUTTON
+======================================== */
+
+.home-button {
+  width: 100%;
+
+  min-height: 62px;
+
+  margin-top: 24px;
+
+  padding: 15px 20px;
+
+  border: none;
+  border-radius: 15px;
+
+  background: #222222;
+
+  color: #ffffff;
+
+  font-size: 20px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.home-button:active {
+  transform: scale(0.99);
 }
 
 
@@ -605,11 +764,6 @@ button {
   }
 
 
-  .payment-header {
-    margin-bottom: 18px;
-  }
-
-
   .payment-header h2 {
     font-size: 22px;
   }
@@ -645,6 +799,65 @@ button {
 
   .payment-card-title {
     font-size: 24px;
+  }
+
+
+  /* Success */
+
+  .success-wrapper {
+    padding-top: 20px;
+  }
+
+
+  .success-icon {
+    width: 78px;
+    height: 78px;
+
+    margin-bottom: 18px;
+
+    font-size: 42px;
+  }
+
+
+  .success-title {
+    font-size: 27px;
+  }
+
+
+  .success-subtitle {
+    margin-bottom: 24px;
+
+    font-size: 16px;
+  }
+
+
+  .success-card {
+    padding: 20px;
+
+    border-radius: 20px;
+  }
+
+
+  .success-info-row,
+  .success-service-row {
+    font-size: 17px;
+  }
+
+
+  .success-total-row {
+    font-size: 19px;
+  }
+
+
+  .success-total-row strong {
+    font-size: 23px;
+  }
+
+
+  .home-button {
+    min-height: 60px;
+
+    font-size: 19px;
   }
 
 }
