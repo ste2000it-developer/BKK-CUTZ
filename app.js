@@ -1,8 +1,14 @@
-// ================================
+import {
+  saveTransaction
+} from "./firebase.js";
+
+
+// ========================================
 // ข้อมูลจำลอง
 //
-// หลังจากนี้เราจะย้ายไป Firebase
-// ================================
+// ต่อไปข้อมูลพวกนี้ก็สามารถย้าย
+// ไปอ่านจาก Firebase ได้
+// ========================================
 
 const barbers = [
   {
@@ -54,9 +60,9 @@ const services = [
 ];
 
 
-// ================================
+// ========================================
 // DOM
-// ================================
+// ========================================
 
 const barberPage =
   document.getElementById("barberPage");
@@ -70,30 +76,40 @@ const barberList =
 const serviceList =
   document.getElementById("serviceList");
 
+const summaryList =
+  document.getElementById("summaryList");
+
+const totalPrice =
+  document.getElementById("totalPrice");
+
 const selectedBarberName =
   document.getElementById("selectedBarberName");
 
 const backButton =
   document.getElementById("backButton");
 
+const confirmButton =
+  document.getElementById("confirmButton");
 
-// ================================
+
+// ========================================
 // ข้อมูลที่เลือก
-// ================================
+// ========================================
 
 let selectedBarber = null;
 
-// เก็บรายการบริการที่เลือก
-const selectedServices = new Set();
+const selectedServices =
+  new Set();
 
 
-// ================================
+// ========================================
 // แสดงรายชื่อช่าง
-// ================================
+// ========================================
 
 function renderBarbers() {
 
   barberList.innerHTML = "";
+
 
   barbers.forEach((barber) => {
 
@@ -126,16 +142,14 @@ function renderBarbers() {
 }
 
 
-// ================================
-// เมื่อเลือกช่าง
-// ================================
+// ========================================
+// เลือกช่าง
+// ========================================
 
 function selectBarber(barber) {
 
   selectedBarber = barber;
 
-  // เริ่มลูกค้าคนใหม่
-  // ล้างบริการที่เคยเลือกไว้
   selectedServices.clear();
 
 
@@ -155,12 +169,14 @@ function selectBarber(barber) {
 
   renderServices();
 
+  renderSummary();
+
 }
 
 
-// ================================
+// ========================================
 // แสดงบริการ
-// ================================
+// ========================================
 
 function renderServices() {
 
@@ -178,9 +194,10 @@ function renderServices() {
       "service-button";
 
 
-    // เช็กว่ารายการนี้ถูกเลือกอยู่หรือไม่
     const isSelected =
-      selectedServices.has(service.id);
+      selectedServices.has(
+        service.id
+      );
 
 
     if (isSelected) {
@@ -228,24 +245,24 @@ function renderServices() {
 }
 
 
-// ================================
+// ========================================
 // เลือก / ยกเลิกบริการ
-// ================================
+// ========================================
 
 function toggleService(service) {
 
-  if (selectedServices.has(service.id)) {
+  if (
+    selectedServices.has(
+      service.id
+    )
+  ) {
 
-    // ถ้าเลือกอยู่แล้ว
-    // กดอีกครั้ง = ยกเลิก
     selectedServices.delete(
       service.id
     );
 
   } else {
 
-    // ถ้ายังไม่ได้เลือก
-    // เพิ่มเข้าไป
     selectedServices.add(
       service.id
     );
@@ -255,28 +272,230 @@ function toggleService(service) {
 
   renderServices();
 
+  renderSummary();
 
-  // เอาไว้ดูค่าทดลองตอนนี้
-  console.log(
-    "ช่าง:",
-    selectedBarber
-  );
+}
 
 
-  console.log(
-    "บริการที่เลือก:",
-    services.filter(
-      (service) =>
-        selectedServices.has(service.id)
-    )
+// ========================================
+// ดึงรายการที่เลือก
+// ========================================
+
+function getSelectedServiceList() {
+
+  return services.filter(
+    (service) =>
+      selectedServices.has(
+        service.id
+      )
   );
 
 }
 
 
-// ================================
-// กลับไปหน้าเลือกช่าง
-// ================================
+// ========================================
+// คำนวณยอดรวม
+// ========================================
+
+function calculateTotal() {
+
+  const selected =
+    getSelectedServiceList();
+
+
+  return selected.reduce(
+    (sum, service) =>
+      sum + service.price,
+    0
+  );
+
+}
+
+
+// ========================================
+// แสดงสรุป
+// ========================================
+
+function renderSummary() {
+
+  const selected =
+    getSelectedServiceList();
+
+
+  summaryList.innerHTML = "";
+
+
+  if (selected.length === 0) {
+
+    summaryList.innerHTML = `
+      <p class="empty-summary">
+        ยังไม่ได้เลือกบริการ
+      </p>
+    `;
+
+
+    totalPrice.textContent =
+      "0 บาท";
+
+
+    confirmButton.disabled =
+      true;
+
+
+    return;
+  }
+
+
+  selected.forEach((service) => {
+
+    const row =
+      document.createElement("div");
+
+    row.className =
+      "summary-row";
+
+
+    row.innerHTML = `
+      <span>
+        ${service.name}
+      </span>
+
+      <span>
+        ${service.price.toLocaleString("th-TH")} บาท
+      </span>
+    `;
+
+
+    summaryList.appendChild(row);
+
+  });
+
+
+  const total =
+    calculateTotal();
+
+
+  totalPrice.textContent =
+    `${total.toLocaleString("th-TH")} บาท`;
+
+
+  confirmButton.disabled =
+    false;
+
+}
+
+
+// ========================================
+// ยืนยันรายการ
+// ========================================
+
+confirmButton.addEventListener(
+  "click",
+  async () => {
+
+    if (!selectedBarber) {
+      return;
+    }
+
+
+    const selected =
+      getSelectedServiceList();
+
+
+    if (selected.length === 0) {
+      return;
+    }
+
+
+    const total =
+      calculateTotal();
+
+
+    const transaction = {
+
+      barberId:
+        selectedBarber.id,
+
+      barberName:
+        selectedBarber.name,
+
+      services:
+        selected,
+
+      total:
+        total,
+
+      createdAt:
+        new Date().toISOString()
+
+    };
+
+
+    try {
+
+      // =============================
+      // ส่งให้ firebase.js จัดการ
+      // =============================
+
+      await saveTransaction(
+        transaction
+      );
+
+
+      alert(
+        `ยืนยันรายการเรียบร้อย\n\n${selectedBarber.name}\nยอดรวม ${total.toLocaleString("th-TH")} บาท`
+      );
+
+
+      resetTransaction();
+
+    } catch (error) {
+
+      console.error(
+        "บันทึกรายการไม่สำเร็จ:",
+        error
+      );
+
+
+      alert(
+        "บันทึกรายการไม่สำเร็จ"
+      );
+
+    }
+
+  }
+);
+
+
+// ========================================
+// ล้างรายการ
+// ========================================
+
+function resetTransaction() {
+
+  selectedBarber = null;
+
+  selectedServices.clear();
+
+
+  servicePage.classList.add(
+    "hidden"
+  );
+
+
+  barberPage.classList.remove(
+    "hidden"
+  );
+
+
+  renderSummary();
+
+}
+
+
+// ========================================
+// กลับ
+// ========================================
 
 backButton.addEventListener(
   "click",
@@ -296,12 +515,15 @@ backButton.addEventListener(
       "hidden"
     );
 
+
+    renderSummary();
+
   }
 );
 
 
-// ================================
+// ========================================
 // เริ่มระบบ
-// ================================
+// ========================================
 
 renderBarbers();
