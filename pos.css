@@ -14,6 +14,7 @@ body {
   margin: 0;
 
   min-height: 100vh;
+  min-height: 100dvh;
 
   font-family:
     Arial,
@@ -27,6 +28,9 @@ body {
 
 body.modal-open {
   overflow: hidden;
+
+  height: 100vh;
+  height: 100dvh;
 }
 
 button {
@@ -291,7 +295,7 @@ button {
 
 
 /* ========================================
-   BUTTONS
+   MAIN BUTTONS
 ======================================== */
 
 .confirm-button,
@@ -354,7 +358,7 @@ button {
 
 
 /* ========================================
-   PAYMENT
+   PAYMENT MODAL
 ======================================== */
 
 .payment-modal {
@@ -364,12 +368,22 @@ button {
 
   z-index: 1000;
 
+  width: 100%;
+
+  height: 100vh;
+  height: 100dvh;
+
   display: flex;
 
   align-items: center;
   justify-content: center;
 
-  padding: 22px;
+  padding:
+    max(10px, env(safe-area-inset-top))
+    12px
+    max(10px, env(safe-area-inset-bottom));
+
+  overflow: hidden;
 }
 
 .payment-backdrop {
@@ -381,22 +395,68 @@ button {
     rgba(0, 0, 0, 0.48);
 }
 
+
+/* ========================================
+   PAYMENT DIALOG
+======================================== */
+
 .payment-dialog {
   position: relative;
 
   z-index: 1;
 
-  width: 100%;
-  max-width: 520px;
+  width: min(
+    520px,
+    100%
+  );
+
+  height:
+    min(
+      720px,
+      calc(
+        100dvh
+        - max(20px, env(safe-area-inset-top))
+        - max(20px, env(safe-area-inset-bottom))
+      )
+    );
 
   max-height:
-    calc(100vh - 44px);
+    calc(
+      100dvh
+      - max(20px, env(safe-area-inset-top))
+      - max(20px, env(safe-area-inset-bottom))
+    );
 
-  overflow-y: auto;
+  display: grid;
 
-  padding: 28px;
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    auto;
 
-  border-radius: 28px;
+  gap:
+    clamp(
+      8px,
+      1.5dvh,
+      16px
+    );
+
+  padding:
+    clamp(
+      14px,
+      2.2dvh,
+      26px
+    );
+
+  border-radius:
+    clamp(
+      20px,
+      3dvh,
+      28px
+    );
+
+  overflow: hidden;
 
   background: #f4f5f7;
 
@@ -404,31 +464,75 @@ button {
     0 24px 70px rgba(0, 0, 0, 0.22);
 }
 
+
+/* ========================================
+   PAYMENT HEADER
+======================================== */
+
 .payment-header {
-  margin-bottom: 22px;
+  min-height: 0;
 
   text-align: center;
 }
 
 .payment-header h2 {
-  margin: 0 0 14px;
+  margin:
+    0
+    0
+    clamp(
+      5px,
+      0.8dvh,
+      10px
+    );
 
-  font-size: 26px;
+  font-size:
+    clamp(
+      19px,
+      2.7dvh,
+      26px
+    );
+
+  line-height: 1.15;
 }
 
 .payment-header p {
-  margin: 0 0 4px;
+  margin: 0 0 3px;
 
   color: #888888;
 
-  font-size: 15px;
+  font-size:
+    clamp(
+      13px,
+      1.7dvh,
+      15px
+    );
 }
 
 .payment-header strong {
-  font-size: 32px;
+  display: block;
+
+  font-size:
+    clamp(
+      26px,
+      4dvh,
+      34px
+    );
+
+  line-height: 1.1;
 }
 
+
+/* ========================================
+   PAYMENT CARDS
+======================================== */
+
 .payment-card {
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
   display: flex;
 
   flex-direction: column;
@@ -436,18 +540,30 @@ button {
   align-items: center;
   justify-content: center;
 
-  gap: 18px;
+  gap:
+    clamp(
+      7px,
+      1.4dvh,
+      16px
+    );
 
-  width: 100%;
+  margin: 0;
 
-  min-height: 220px;
-
-  margin-bottom: 20px;
-
-  padding: 30px 20px;
+  padding:
+    clamp(
+      10px,
+      1.8dvh,
+      20px
+    );
 
   border: 2px solid #e5e5e5;
-  border-radius: 26px;
+
+  border-radius:
+    clamp(
+      16px,
+      2.7dvh,
+      24px
+    );
 
   background: #ffffff;
 
@@ -456,14 +572,21 @@ button {
   cursor: pointer;
 
   box-shadow:
-    0 6px 22px rgba(0, 0, 0, 0.05);
+    0 5px 18px rgba(0, 0, 0, 0.05);
 }
 
 .payment-card:active {
-  transform: scale(0.98);
+  transform: scale(0.985);
 
   border-color: #222222;
+
+  background: #f1f1f1;
 }
+
+
+/* ========================================
+   PAYMENT ICON
+======================================== */
 
 .payment-card-icon {
   display: flex;
@@ -471,38 +594,111 @@ button {
   align-items: center;
   justify-content: center;
 
-  width: 130px;
-  height: 95px;
+  width:
+    clamp(
+      74px,
+      12dvh,
+      120px
+    );
+
+  height:
+    clamp(
+      52px,
+      8.5dvh,
+      84px
+    );
+
+  flex-shrink: 1;
 }
 
 .payment-card-icon svg {
+  display: block;
+
   width: 100%;
   height: 100%;
 }
 
 .payment-card-icon.qr-icon {
-  width: 105px;
-  height: 105px;
+  width:
+    clamp(
+      65px,
+      10dvh,
+      98px
+    );
+
+  height:
+    clamp(
+      65px,
+      10dvh,
+      98px
+    );
 }
 
+
+/* ========================================
+   PAYMENT TITLE
+======================================== */
+
 .payment-card-title {
-  font-size: 28px;
+  flex-shrink: 0;
+
+  font-size:
+    clamp(
+      19px,
+      2.8dvh,
+      27px
+    );
+
   font-weight: 700;
+
+  line-height: 1.1;
 }
+
+
+/* ========================================
+   PAYMENT BACK
+======================================== */
 
 .cancel-payment-button {
   width: 100%;
 
-  min-height: 54px;
+  min-height:
+    clamp(
+      44px,
+      6dvh,
+      54px
+    );
+
+  margin: 0;
+
+  padding:
+    clamp(
+      8px,
+      1.4dvh,
+      13px
+    )
+    16px;
 
   border: none;
-  border-radius: 14px;
+
+  border-radius:
+    clamp(
+      11px,
+      1.8dvh,
+      14px
+    );
 
   background: #e7e7e7;
 
   color: #555555;
 
-  font-size: 17px;
+  font-size:
+    clamp(
+      15px,
+      2dvh,
+      17px
+    );
+
   font-weight: 600;
 
   cursor: pointer;
@@ -800,33 +996,41 @@ button {
   }
 
 
-  /* Payment */
+  /* ====================================
+     PAYMENT MOBILE
+  ==================================== */
 
   .payment-modal {
-    padding: 14px;
+    padding:
+      max(8px, env(safe-area-inset-top))
+      10px
+      max(8px, env(safe-area-inset-bottom));
   }
 
 
   .payment-dialog {
-    padding: 20px;
+    width: 100%;
 
-    border-radius: 24px;
-  }
+    height:
+      calc(
+        100dvh
+        - max(16px, env(safe-area-inset-top))
+        - max(16px, env(safe-area-inset-bottom))
+      );
 
+    padding:
+      clamp(
+        12px,
+        2dvh,
+        18px
+      );
 
-  .payment-card {
-    min-height: 180px;
-
-    margin-bottom: 14px;
-
-    padding: 24px 15px;
-
-    border-radius: 22px;
-  }
-
-
-  .payment-card-title {
-    font-size: 24px;
+    border-radius:
+      clamp(
+        18px,
+        2.6dvh,
+        24px
+      );
   }
 
 
@@ -885,6 +1089,139 @@ button {
 
   .success-card {
     padding: 20px;
+  }
+
+}
+
+
+/* ========================================
+   จอที่เตี้ย
+   เช่นมือถือเปิดผ่าน Safari
+======================================== */
+
+@media (max-height: 700px) {
+
+  .payment-dialog {
+    gap: 7px;
+
+    padding: 11px 14px;
+
+    border-radius: 20px;
+  }
+
+
+  .payment-header h2 {
+    margin-bottom: 3px;
+
+    font-size: 18px;
+  }
+
+
+  .payment-header p {
+    font-size: 12px;
+  }
+
+
+  .payment-header strong {
+    font-size: 25px;
+  }
+
+
+  .payment-card {
+    gap: 5px;
+
+    padding: 7px 12px;
+
+    border-radius: 16px;
+  }
+
+
+  .payment-card-icon {
+    width: 70px;
+    height: 50px;
+  }
+
+
+  .payment-card-icon.qr-icon {
+    width: 62px;
+    height: 62px;
+  }
+
+
+  .payment-card-title {
+    font-size: 18px;
+  }
+
+
+  .cancel-payment-button {
+    min-height: 42px;
+
+    padding: 7px 14px;
+
+    font-size: 15px;
+  }
+
+}
+
+
+/* ========================================
+   จอเตี้ยมาก
+======================================== */
+
+@media (max-height: 560px) {
+
+  .payment-dialog {
+    gap: 5px;
+
+    padding: 8px 12px;
+  }
+
+
+  .payment-header h2 {
+    font-size: 16px;
+  }
+
+
+  .payment-header p {
+    display: none;
+  }
+
+
+  .payment-header strong {
+    font-size: 21px;
+  }
+
+
+  .payment-card {
+    gap: 3px;
+
+    padding: 5px 10px;
+  }
+
+
+  .payment-card-icon {
+    width: 58px;
+    height: 40px;
+  }
+
+
+  .payment-card-icon.qr-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+
+  .payment-card-title {
+    font-size: 16px;
+  }
+
+
+  .cancel-payment-button {
+    min-height: 36px;
+
+    padding: 5px 12px;
+
+    font-size: 14px;
   }
 
 }
