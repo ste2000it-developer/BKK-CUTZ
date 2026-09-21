@@ -43,51 +43,15 @@ const TRUE_MONEY_QR_IMAGE =
 
 
 // ========================================
-// BARBERS
-//
-// เปลี่ยนจาก hard-code
-// เป็นโหลดจาก Firestore
+// DATA
 // ========================================
 
 let barbers =
   [];
 
 
-
-// ========================================
-// SERVICES
-//
-// ตอนนี้ยังใช้ข้อมูลทดลองเดิมก่อน
-// ขั้นต่อไปค่อยย้ายเข้า Firestore
-// ========================================
-
-const services = [
-
-  {
-    id: "service-001",
-    name: "ตัดผม",
-    price: 150
-  },
-
-  {
-    id: "service-002",
-    name: "สระผม",
-    price: 80
-  },
-
-  {
-    id: "service-003",
-    name: "โกนหนวด",
-    price: 50
-  },
-
-  {
-    id: "service-004",
-    name: "ตัด + สระ",
-    price: 200
-  }
-
-];
+let services =
+  [];
 
 
 
@@ -353,7 +317,7 @@ const selectedServices =
 
 
 // ========================================
-// LOAD BARBERS FROM FIRESTORE
+// LOAD BARBERS
 // ========================================
 
 async function loadBarbers() {
@@ -396,8 +360,77 @@ async function loadBarbers() {
     );
 
 
-  // เรียงชื่อตามภาษาไทย
   barbers.sort(
+    (a, b) => {
+
+      return String(
+        a.name || ""
+      ).localeCompare(
+        String(
+          b.name || ""
+        ),
+        "th"
+      );
+
+    }
+  );
+
+}
+
+
+
+// ========================================
+// LOAD SERVICES
+// ========================================
+
+async function loadServices(
+  branchId
+) {
+
+  const serviceQuery =
+    query(
+      collection(
+        db,
+        "services"
+      ),
+
+      where(
+        "branchId",
+        "==",
+        branchId
+      )
+    );
+
+
+  const snapshot =
+    await getDocs(
+      serviceQuery
+    );
+
+
+  services =
+    snapshot.docs
+      .map(
+        (documentSnapshot) => {
+
+          return {
+
+            id:
+              documentSnapshot.id,
+
+            ...documentSnapshot.data()
+
+          };
+
+        }
+      )
+      .filter(
+        (service) =>
+          service.active === true
+      );
+
+
+  services.sort(
     (a, b) => {
 
       return String(
@@ -529,6 +562,10 @@ watchAuth(
         [];
 
 
+      services =
+        [];
+
+
       showLoginPage();
 
 
@@ -592,8 +629,12 @@ watchAuth(
         branch;
 
 
-      // โหลดรายชื่อช่างกลางจาก Firestore
       await loadBarbers();
+
+
+      await loadServices(
+        profile.branchId
+      );
 
 
       currentBranchName.textContent =
@@ -697,7 +738,7 @@ function showMainApp() {
 
 
 // ========================================
-// HIDE POS PAGES
+// HIDE PAGES
 // ========================================
 
 function hideAllPages() {
@@ -849,6 +890,22 @@ function renderServices() {
     "";
 
 
+  if (
+    services.length === 0
+  ) {
+
+    serviceList.innerHTML = `
+      <p class="empty-summary">
+        ยังไม่มีเมนูสำหรับสาขานี้
+      </p>
+    `;
+
+
+    return;
+
+  }
+
+
   services.forEach(
     (service) => {
 
@@ -895,7 +952,7 @@ function renderServices() {
         </span>
 
         <span class="service-price">
-          ${service.price.toLocaleString("th-TH")} บาท
+          ${Number(service.price).toLocaleString("th-TH")} บาท
         </span>
       `;
 
@@ -959,7 +1016,7 @@ function toggleService(
 
 
 // ========================================
-// GET SELECTED SERVICES
+// SELECTED SERVICES
 // ========================================
 
 function getSelectedServiceList() {
@@ -984,7 +1041,7 @@ function calculateTotal() {
   return getSelectedServiceList()
     .reduce(
       (sum, service) =>
-        sum + service.price,
+        sum + Number(service.price),
       0
     );
 
@@ -1049,7 +1106,7 @@ function renderSummary() {
         </span>
 
         <strong>
-          ${service.price.toLocaleString("th-TH")} บาท
+          ${Number(service.price).toLocaleString("th-TH")} บาท
         </strong>
       `;
 
@@ -1397,7 +1454,7 @@ function showSuccessPage(
         </span>
 
         <strong>
-          ${service.price.toLocaleString("th-TH")} บาท
+          ${Number(service.price).toLocaleString("th-TH")} บาท
         </strong>
       `;
 
