@@ -34,13 +34,11 @@
       color: #222222;
     }
 
-
     button,
     input,
     select {
       font-family: inherit;
     }
-
 
     .hidden {
       display: none !important;
@@ -64,14 +62,12 @@
       gap: 18px;
     }
 
-
     .loading-brand {
       font-size: 24px;
       font-weight: 800;
 
       letter-spacing: 3px;
     }
-
 
     .spinner {
       width: 42px;
@@ -83,7 +79,6 @@
 
       animation: spin 0.8s linear infinite;
     }
-
 
     @keyframes spin {
 
@@ -109,7 +104,6 @@
       padding: 20px;
     }
 
-
     .login-card {
       width: 100%;
       max-width: 440px;
@@ -119,12 +113,11 @@
       border: 1px solid #e5e5e5;
       border-radius: 24px;
 
-      background: white;
+      background: #ffffff;
 
       box-shadow:
         0 8px 28px rgba(0, 0, 0, 0.07);
     }
-
 
     .brand {
       margin-bottom: 24px;
@@ -137,13 +130,11 @@
       letter-spacing: 2px;
     }
 
-
     .login-card h1 {
       margin: 0 0 8px;
 
       text-align: center;
     }
-
 
     .subtitle {
       margin: 0 0 28px;
@@ -153,7 +144,6 @@
       color: #888888;
     }
 
-
     label {
       display: block;
 
@@ -161,7 +151,6 @@
 
       font-weight: 700;
     }
-
 
     input,
     select {
@@ -174,19 +163,17 @@
       border: 1px solid #d5d5d5;
       border-radius: 10px;
 
-      background: white;
+      background: #ffffff;
 
       font-size: 16px;
 
       outline: none;
     }
 
-
     input:focus,
     select:focus {
       border-color: #222222;
     }
-
 
     .main-button {
       width: 100%;
@@ -200,14 +187,13 @@
 
       background: #222222;
 
-      color: white;
+      color: #ffffff;
 
       font-size: 17px;
       font-weight: 700;
 
       cursor: pointer;
     }
-
 
     .error-box {
       margin-top: 15px;
@@ -233,7 +219,6 @@
       padding: 24px;
     }
 
-
     .top-bar {
       display: flex;
 
@@ -249,12 +234,10 @@
       border-bottom: 1px solid #dddddd;
     }
 
-
     .top-title {
       font-size: 23px;
       font-weight: 800;
     }
-
 
     .top-subtitle {
       margin-top: 4px;
@@ -263,7 +246,6 @@
 
       font-size: 14px;
     }
-
 
     .logout-button {
       padding: 10px 15px;
@@ -278,30 +260,136 @@
 
 
     /* ================================
-       BRANCH
+       MIGRATION
     ================================= */
 
-    .branch-card {
+    .migration-card {
+      margin-bottom: 24px;
+
+      padding: 20px;
+
+      border: 1px solid #dedede;
+      border-radius: 18px;
+
+      background: #ffffff;
+    }
+
+    .migration-card h2 {
+      margin: 0 0 8px;
+    }
+
+    .migration-card p {
+      margin: 0;
+
+      color: #777777;
+
+      line-height: 1.6;
+    }
+
+    .migration-button {
+      width: 100%;
+
+      min-height: 52px;
+
+      margin-top: 18px;
+
+      border: none;
+      border-radius: 11px;
+
+      background: #222222;
+
+      color: white;
+
+      font-size: 16px;
+      font-weight: 700;
+
+      cursor: pointer;
+    }
+
+    .migration-button:disabled {
+      background: #dddddd;
+
+      color: #777777;
+
+      cursor: default;
+    }
+
+    .migration-status {
+      margin-top: 14px;
+
+      padding: 12px;
+
+      border-radius: 10px;
+
+      background: #f1f1f1;
+
+      white-space: pre-line;
+    }
+
+
+    /* ================================
+       GROUP
+    ================================= */
+
+    .group-card {
       margin-bottom: 24px;
 
       padding: 20px;
 
       border-radius: 18px;
 
-      background: white;
+      background: #ffffff;
 
       box-shadow:
         0 4px 16px rgba(0, 0, 0, 0.05);
     }
 
-
-    .branch-card h2 {
+    .group-card h2 {
       margin: 0 0 15px;
+    }
+
+    .group-buttons {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+      gap: 10px;
+    }
+
+    .group-button {
+      min-height: 62px;
+
+      border: 1px solid #dddddd;
+      border-radius: 12px;
+
+      background: #ffffff;
+
+      font-size: 18px;
+      font-weight: 800;
+
+      cursor: pointer;
+    }
+
+    .group-button.active {
+      border-color: #222222;
+
+      background: #222222;
+
+      color: #ffffff;
+    }
+
+    .group-branches {
+      margin-top: 16px;
+
+      color: #777777;
+
+      line-height: 1.7;
     }
 
 
     /* ================================
-       TOOLBAR
+       SERVICES
     ================================= */
 
     .toolbar {
@@ -315,11 +403,9 @@
       margin-bottom: 16px;
     }
 
-
     .toolbar h2 {
       margin: 0;
     }
-
 
     .add-button {
       padding: 11px 17px;
@@ -329,17 +415,18 @@
 
       background: #222222;
 
-      color: white;
+      color: #ffffff;
 
       font-weight: 700;
 
       cursor: pointer;
     }
 
+    .add-button:disabled {
+      opacity: 0.4;
 
-    /* ================================
-       SERVICES
-    ================================= */
+      cursor: default;
+    }
 
     .service-list {
       display: flex;
@@ -349,19 +436,17 @@
       gap: 14px;
     }
 
-
     .service-card {
       padding: 20px;
 
       border: 1px solid #e1e1e1;
       border-radius: 16px;
 
-      background: white;
+      background: #ffffff;
 
       box-shadow:
         0 3px 12px rgba(0, 0, 0, 0.04);
     }
-
 
     .service-top {
       display: flex;
@@ -372,19 +457,16 @@
       gap: 15px;
     }
 
-
     .service-name {
       font-size: 19px;
       font-weight: 700;
     }
-
 
     .service-price {
       margin-top: 6px;
 
       color: #666666;
     }
-
 
     .service-status {
       padding: 6px 10px;
@@ -397,7 +479,6 @@
       font-weight: 700;
     }
 
-
     .service-actions {
       display: flex;
 
@@ -405,7 +486,6 @@
 
       margin-top: 16px;
     }
-
 
     .edit-button,
     .delete-button {
@@ -417,18 +497,15 @@
       cursor: pointer;
     }
 
-
     .edit-button {
       background: #e7e7e7;
     }
-
 
     .delete-button {
       background: #eeeeee;
 
       color: #555555;
     }
-
 
     .empty {
       padding: 40px;
@@ -440,7 +517,7 @@
 
 
     /* ================================
-       EDIT PANEL
+       EDITOR
     ================================= */
 
     .editor {
@@ -450,17 +527,15 @@
 
       border-radius: 20px;
 
-      background: white;
+      background: #ffffff;
 
       box-shadow:
         0 5px 20px rgba(0, 0, 0, 0.07);
     }
 
-
     .editor h2 {
       margin-top: 0;
     }
-
 
     .grid {
       display: grid;
@@ -470,12 +545,6 @@
 
       gap: 16px;
     }
-
-
-    .full {
-      grid-column: 1 / -1;
-    }
-
 
     .checkbox-row {
       display: flex;
@@ -487,12 +556,10 @@
       margin-top: 18px;
     }
 
-
     .checkbox-row input {
       width: auto;
       min-height: auto;
     }
-
 
     .editor-actions {
       display: flex;
@@ -501,7 +568,6 @@
 
       margin-top: 24px;
     }
-
 
     .save-button {
       flex: 1;
@@ -513,13 +579,12 @@
 
       background: #222222;
 
-      color: white;
+      color: #ffffff;
 
       font-weight: 700;
 
       cursor: pointer;
     }
-
 
     .cancel-button {
       min-height: 52px;
@@ -533,7 +598,6 @@
 
       cursor: pointer;
     }
-
 
     .status-box {
       margin-top: 15px;
@@ -552,23 +616,20 @@
         padding: 16px;
       }
 
-
       .grid {
         grid-template-columns: 1fr;
       }
 
-
-      .full {
-        grid-column: auto;
+      .group-buttons {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
       }
-
 
       .toolbar {
         align-items: stretch;
 
         flex-direction: column;
       }
-
 
       .add-button {
         width: 100%;
@@ -583,10 +644,6 @@
 
 <body>
 
-
-  <!-- ================================
-       LOADING
-  ================================= -->
 
   <section
     id="loadingPage"
@@ -607,10 +664,6 @@
 
 
 
-  <!-- ================================
-       LOGIN
-  ================================= -->
-
   <section
     id="loginPage"
     class="login-page hidden"
@@ -627,7 +680,7 @@
       </h1>
 
       <p class="subtitle">
-        จัดการเมนูและราคาของแต่ละสาขา
+        จัดการกลุ่มราคาและเมนูบริการ
       </p>
 
 
@@ -679,10 +732,6 @@
 
 
 
-  <!-- ================================
-       ADMIN APP
-  ================================= -->
-
   <main
     id="adminApp"
     class="admin-app hidden"
@@ -719,33 +768,99 @@
 
 
 
-    <!-- BRANCH -->
-
-    <section class="branch-card">
+    <section class="migration-card">
 
       <h2>
-        เลือกสาขา
+        ตั้งค่าระบบกลุ่ม A / B / C / D
       </h2>
 
-      <select id="branchSelect">
+      <p>
+        ใช้ครั้งเดียวเพื่อย้ายเมนูจากแบบแยกแต่ละสาขา
+        เป็นเมนูตามกลุ่มราคา
+      </p>
 
-        <option value="">
-          -- เลือกสาขา --
-        </option>
 
-      </select>
+      <button
+        id="migrationButton"
+        class="migration-button"
+        type="button"
+      >
+        ย้ายระบบเป็นกลุ่ม A / B / C / D
+      </button>
+
+
+      <div
+        id="migrationStatus"
+        class="migration-status hidden"
+      ></div>
 
     </section>
 
 
 
-    <!-- SERVICES -->
+    <section class="group-card">
+
+      <h2>
+        เลือกกลุ่มราคา
+      </h2>
+
+
+      <div class="group-buttons">
+
+        <button
+          class="group-button"
+          data-group="A"
+          type="button"
+        >
+          กลุ่ม A
+        </button>
+
+
+        <button
+          class="group-button"
+          data-group="B"
+          type="button"
+        >
+          กลุ่ม B
+        </button>
+
+
+        <button
+          class="group-button"
+          data-group="C"
+          type="button"
+        >
+          กลุ่ม C
+        </button>
+
+
+        <button
+          class="group-button"
+          data-group="D"
+          type="button"
+        >
+          กลุ่ม D
+        </button>
+
+      </div>
+
+
+      <div
+        id="groupBranches"
+        class="group-branches"
+      >
+        กรุณาเลือกกลุ่ม
+      </div>
+
+    </section>
+
+
 
     <section>
 
       <div class="toolbar">
 
-        <h2>
+        <h2 id="serviceTitle">
           เมนูบริการ
         </h2>
 
@@ -768,7 +883,7 @@
       >
 
         <div class="empty">
-          กรุณาเลือกสาขา
+          กรุณาเลือกกลุ่มราคา
         </div>
 
       </div>
@@ -776,8 +891,6 @@
     </section>
 
 
-
-    <!-- EDITOR -->
 
     <section
       id="editor"
@@ -964,7 +1077,7 @@
 
   <script
     type="module"
-    src="admin.js?v=1"
+    src="admin.js?v=2"
   ></script>
 
 
