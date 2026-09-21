@@ -11,7 +11,7 @@
 
   <link
     rel="stylesheet"
-    href="pos.css?v=15"
+    href="pos.css?v=16"
   >
 </head>
 
@@ -458,6 +458,30 @@
       ></div>
 
       <div
+        id="rangeServiceArea"
+        class="range-service-area hidden"
+      >
+        <label id="rangePriceLabel">
+          ใส่ราคา
+        </label>
+
+        <input
+          id="rangePriceInput"
+          type="number"
+          step="1"
+          inputmode="numeric"
+        >
+
+        <button
+          id="rangeConfirmButton"
+          class="service-option-primary"
+          type="button"
+        >
+          ยืนยันราคา
+        </button>
+      </div>
+
+      <div
         id="customServiceArea"
         class="custom-service-area hidden"
       >
@@ -505,7 +529,7 @@
 
   <script
     type="module"
-    src="app.js?v=15"
+    src="app.js?v=16"
   ></script>
 </body>
 </html>

@@ -96,6 +96,15 @@ const serviceOptionTitle =
   document.getElementById("serviceOptionTitle");
 const choiceOptionsArea =
   document.getElementById("choiceOptionsArea");
+const rangeServiceArea =
+  document.getElementById("rangeServiceArea");
+const rangePriceLabel =
+  document.getElementById("rangePriceLabel");
+const rangePriceInput =
+  document.getElementById("rangePriceInput");
+const rangeConfirmButton =
+  document.getElementById("rangeConfirmButton");
+
 const customServiceArea =
   document.getElementById("customServiceArea");
 const customDescriptionInput =
@@ -445,6 +454,19 @@ function getServiceButtonPriceText(service) {
         ? service.choices
         : [];
 
+    if (
+      service.serviceCode === "shave" &&
+      choices.length >= 2
+    ) {
+      const minPrice =
+        Math.min(...choices.map(Number));
+
+      const maxPrice =
+        Math.max(...choices.map(Number));
+
+      return `${formatMoney(minPrice)} - ${formatMoney(maxPrice)} บาท`;
+    }
+
     return choices.length
       ? `เลือก ${choices.map(formatMoney).join(" / ")}`
       : "เลือกราคา";
@@ -546,7 +568,14 @@ function handleServiceClick(service) {
   if (
     service.type === "choice"
   ) {
-    openChoiceModal(service);
+    if (
+      service.serviceCode === "shave"
+    ) {
+      openRangePriceModal(service);
+    } else {
+      openChoiceModal(service);
+    }
+
     return;
   }
 
@@ -628,6 +657,10 @@ function openChoiceModal(service) {
     "hidden"
   );
 
+  rangeServiceArea.classList.add(
+    "hidden"
+  );
+
   choiceOptionsArea.classList.remove(
     "hidden"
   );
@@ -682,6 +715,132 @@ function openChoiceModal(service) {
 
 
 // ========================================
+// RANGE PRICE SERVICE
+// ใช้กับโกนหนวด / กันขอบ
+// ========================================
+
+function openRangePriceModal(service) {
+  pendingService = service;
+
+  const choices =
+    Array.isArray(service.choices)
+      ? service.choices
+          .map(Number)
+          .filter(Number.isFinite)
+      : [];
+
+  const minPrice =
+    choices.length > 0
+      ? Math.min(...choices)
+      : 150;
+
+  const maxPrice =
+    choices.length > 0
+      ? Math.max(...choices)
+      : 200;
+
+  serviceOptionTitle.textContent =
+    service.name || "ใส่ราคา";
+
+  choiceOptionsArea.classList.add(
+    "hidden"
+  );
+
+  rangeServiceArea.classList.add(
+    "hidden"
+  );
+
+  customServiceArea.classList.add(
+    "hidden"
+  );
+
+  rangeServiceArea.classList.remove(
+    "hidden"
+  );
+
+  rangePriceLabel.textContent =
+    `ใส่ราคา ${formatMoney(minPrice)} - ${formatMoney(maxPrice)} บาท`;
+
+  rangePriceInput.min =
+    String(minPrice);
+
+  rangePriceInput.max =
+    String(maxPrice);
+
+  rangePriceInput.value = "";
+
+  rangePriceInput.dataset.min =
+    String(minPrice);
+
+  rangePriceInput.dataset.max =
+    String(maxPrice);
+
+  serviceOptionModal.classList.remove(
+    "hidden"
+  );
+
+  document.body.classList.add(
+    "modal-open"
+  );
+
+  setTimeout(
+    () => {
+      rangePriceInput.focus();
+    },
+    0
+  );
+}
+
+rangeConfirmButton.addEventListener(
+  "click",
+  () => {
+    if (!pendingService) {
+      return;
+    }
+
+    const price =
+      Number(
+        rangePriceInput.value
+      );
+
+    const minPrice =
+      Number(
+        rangePriceInput.dataset.min
+      );
+
+    const maxPrice =
+      Number(
+        rangePriceInput.dataset.max
+      );
+
+    if (
+      !Number.isInteger(price) ||
+      price < minPrice ||
+      price > maxPrice
+    ) {
+      window.alert(
+        `กรุณาใส่จำนวนเต็มตั้งแต่ ${formatMoney(minPrice)} ถึง ${formatMoney(maxPrice)} บาท`
+      );
+      return;
+    }
+
+    selectedServices.set(
+      pendingService.id,
+      makeSelectedService(
+        pendingService,
+        price
+      )
+    );
+
+    closeServiceOptionModal();
+
+    renderServices();
+    renderSummary();
+  }
+);
+
+
+// ========================================
 // CUSTOM SERVICE
 // ========================================
 
@@ -692,6 +851,10 @@ function openCustomModal(service) {
     service.name || "อื่นๆ";
 
   choiceOptionsArea.classList.add(
+    "hidden"
+  );
+
+  rangeServiceArea.classList.add(
     "hidden"
   );
 
@@ -876,6 +1039,10 @@ function closeServiceOptionModal() {
   );
 
   choiceOptionsArea.classList.add(
+    "hidden"
+  );
+
+  rangeServiceArea.classList.add(
     "hidden"
   );
 
