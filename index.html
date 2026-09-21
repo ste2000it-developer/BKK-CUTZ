@@ -11,7 +11,7 @@
 
   <link
     rel="stylesheet"
-    href="pos.css?v=16"
+    href="pos.css?v=17"
   >
 </head>
 
@@ -79,10 +79,19 @@
   <!-- APP -->
   <main id="mainApp" class="app hidden">
 
-    <div class="top-bar">
-      <div>
+    <header class="top-bar">
+      <div class="brand-lockup">
+        <div class="brand-mark">BC</div>
+
+        <div>
+          <div class="brand-name">BKK-CUTZ</div>
+          <div class="brand-caption">BARBER POS</div>
+        </div>
+      </div>
+
+      <div class="branch-identity">
         <div class="top-branch-label">
-          สาขา
+          สาขาปัจจุบัน
         </div>
 
         <strong
@@ -100,17 +109,21 @@
       >
         ออกจากระบบ
       </button>
-    </div>
+    </header>
 
 
     <!-- BARBER -->
     <section id="barberPage" class="page">
-      <div class="page-header">
-        <h1>เลือกชื่อช่าง</h1>
+      <div class="section-heading">
+        <div>
+          <div class="eyebrow">เริ่มรายการใหม่</div>
+          <h1>เลือกช่าง</h1>
+          <p>เลือกชื่อช่างที่จะรับรายการนี้</p>
+        </div>
 
-        <p>
-          เลือกชื่อของคุณเพื่อเริ่มบันทึกรายการ
-        </p>
+        <div class="step-badge">
+          01
+        </div>
       </div>
 
       <div
@@ -122,61 +135,80 @@
 
     <!-- SERVICES -->
     <section id="servicePage" class="page hidden">
-      <button
-        id="backButton"
-        class="back-button"
-        type="button"
-      >
-        ← กลับ
-      </button>
+      <div class="service-context-bar">
+        <button
+          id="backButton"
+          class="back-button"
+          type="button"
+        >
+          ←
+        </button>
 
-      <div class="page-header">
-        <p class="selected-label">
-          ช่างที่เลือก
-        </p>
+        <div class="service-context-copy">
+          <div class="eyebrow">รายการของช่าง</div>
 
-        <h1 id="selectedBarberName">
-          -
-        </h1>
+          <h1 id="selectedBarberName">
+            -
+          </h1>
+        </div>
 
-        <p>
-          เลือกบริการที่ทำให้ลูกค้า
-        </p>
+        <div class="step-badge">
+          02
+        </div>
       </div>
 
-      <div
-        id="serviceList"
-        class="service-list"
-      ></div>
+      <div class="service-workspace">
 
-      <div class="summary-card">
-        <h2>สรุปรายการ</h2>
+        <section class="service-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>เลือกบริการ</h2>
+              <p>แตะรายการที่ต้องการเพิ่ม</p>
+            </div>
+          </div>
 
-        <div
-          id="summaryList"
-          class="summary-list"
-        >
-          <p class="empty-summary">
-            ยังไม่ได้เลือกบริการ
-          </p>
-        </div>
+          <div
+            id="serviceList"
+            class="service-list"
+          ></div>
+        </section>
 
-        <div class="summary-total">
-          <span>รวมทั้งหมด</span>
 
-          <strong id="totalPrice">
-            0 บาท
-          </strong>
-        </div>
+        <aside class="summary-card">
+          <div class="summary-heading">
+            <div>
+              <div class="eyebrow">ออเดอร์ปัจจุบัน</div>
+              <h2>สรุปรายการ</h2>
+            </div>
+          </div>
 
-        <button
-          id="confirmButton"
-          class="confirm-button"
-          type="button"
-          disabled
-        >
-          ยืนยันรายการ
-        </button>
+          <div
+            id="summaryList"
+            class="summary-list"
+          >
+            <p class="empty-summary">
+              ยังไม่ได้เลือกบริการ
+            </p>
+          </div>
+
+          <div class="summary-total">
+            <span>รวมทั้งหมด</span>
+
+            <strong id="totalPrice">
+              0 บาท
+            </strong>
+          </div>
+
+          <button
+            id="confirmButton"
+            class="confirm-button"
+            type="button"
+            disabled
+          >
+            ยืนยันรายการ
+          </button>
+        </aside>
+
       </div>
     </section>
 
@@ -187,13 +219,14 @@
 
         <button
           id="qrBackButton"
-          class="back-button"
+          class="back-button standalone-back"
           type="button"
         >
-          ← กลับ
+          ←
         </button>
 
         <div class="qr-header">
+          <div class="eyebrow">ชำระเงิน</div>
           <h1>สแกนเพื่อชำระเงิน</h1>
           <p>TrueMoney Wallet</p>
         </div>
@@ -256,22 +289,22 @@
 
           <div class="slip-check-card">
             <div class="slip-check-title">
-              ก่อนกดชำระแล้ว
+              ตรวจสอบก่อนยืนยัน
             </div>
 
             <div class="slip-check-item">
               <span class="check-dot">✓</span>
-              <span>เช็กยอดเงินให้ตรง</span>
+              <span>ยอดเงินถูกต้อง</span>
             </div>
 
             <div class="slip-check-item">
               <span class="check-dot">✓</span>
-              <span>เช็กชื่อผู้รับ</span>
+              <span>ชื่อผู้รับถูกต้อง</span>
             </div>
 
             <div class="slip-check-item">
               <span class="check-dot">✓</span>
-              <span>เช็กเวลาในสลิป</span>
+              <span>เวลาในสลิปถูกต้อง</span>
             </div>
           </div>
 
@@ -291,6 +324,8 @@
     <section id="successPage" class="page hidden">
       <div class="success-wrapper">
         <div class="success-icon">✓</div>
+
+        <div class="eyebrow">เสร็จเรียบร้อย</div>
 
         <h1 class="success-title">
           บันทึกรายการแล้ว
@@ -349,6 +384,7 @@
 
     <div class="payment-dialog">
       <div class="payment-header">
+        <div class="eyebrow">ชำระเงิน</div>
         <h2>เลือกวิธีชำระเงิน</h2>
         <p>ยอดที่ต้องชำระ</p>
 
@@ -448,6 +484,8 @@
     ></div>
 
     <div class="service-option-dialog">
+      <div class="modal-handle"></div>
+
       <h2 id="serviceOptionTitle">
         เลือกตัวเลือก
       </h2>
@@ -465,12 +503,16 @@
           ใส่ราคา
         </label>
 
-        <input
-          id="rangePriceInput"
-          type="number"
-          step="1"
-          inputmode="numeric"
-        >
+        <div class="price-input-shell">
+          <span class="currency-mark">฿</span>
+
+          <input
+            id="rangePriceInput"
+            type="number"
+            step="1"
+            inputmode="numeric"
+          >
+        </div>
 
         <button
           id="rangeConfirmButton"
@@ -499,13 +541,17 @@
           ราคา
         </label>
 
-        <input
-          id="customPriceInput"
-          type="number"
-          min="0"
-          step="1"
-          placeholder="0"
-        >
+        <div class="price-input-shell compact">
+          <span class="currency-mark">฿</span>
+
+          <input
+            id="customPriceInput"
+            type="number"
+            min="0"
+            step="1"
+            placeholder="0"
+          >
+        </div>
 
         <button
           id="customConfirmButton"
