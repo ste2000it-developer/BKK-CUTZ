@@ -10,14 +10,182 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>
-    BKK-CUTZ POS
-  </title>
+  <title>BKK-CUTZ Admin Import</title>
 
-  <link
-    rel="stylesheet"
-    href="pos.css?v=14"
-  >
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+
+      min-height: 100vh;
+
+      display: flex;
+
+      align-items: center;
+      justify-content: center;
+
+      padding: 24px;
+
+      font-family:
+        Arial,
+        "Noto Sans Thai",
+        sans-serif;
+
+      background: #f4f5f7;
+
+      color: #222222;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 520px;
+
+      padding: 30px;
+
+      border: 1px solid #e5e5e5;
+      border-radius: 24px;
+
+      background: #ffffff;
+
+      box-shadow:
+        0 8px 28px rgba(0, 0, 0, 0.07);
+    }
+
+    .brand {
+      margin-bottom: 8px;
+
+      text-align: center;
+
+      font-size: 20px;
+      font-weight: 800;
+
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+
+      text-align: center;
+
+      font-size: 28px;
+    }
+
+    .subtitle {
+      margin: 0 0 28px;
+
+      text-align: center;
+
+      color: #888888;
+    }
+
+    label {
+      display: block;
+
+      margin: 16px 0 7px;
+
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+
+      min-height: 52px;
+
+      padding: 12px 14px;
+
+      border: 1px solid #d8d8d8;
+      border-radius: 12px;
+
+      font-size: 17px;
+
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #222222;
+    }
+
+    button {
+      width: 100%;
+
+      min-height: 56px;
+
+      margin-top: 20px;
+
+      border: none;
+      border-radius: 13px;
+
+      background: #222222;
+
+      color: #ffffff;
+
+      font-size: 17px;
+      font-weight: 700;
+
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+
+      cursor: not-allowed;
+    }
+
+    .secondary {
+      background: #e8e8e8;
+
+      color: #333333;
+    }
+
+    .status {
+      margin-top: 18px;
+
+      padding: 14px;
+
+      border-radius: 12px;
+
+      background: #f1f1f1;
+
+      line-height: 1.6;
+
+      white-space: pre-line;
+    }
+
+    .warning {
+      margin-top: 20px;
+
+      padding: 15px;
+
+      border-radius: 12px;
+
+      background: #f4f4f4;
+
+      color: #555555;
+
+      font-size: 14px;
+
+      line-height: 1.6;
+    }
+
+    .admin-info {
+      margin-bottom: 20px;
+
+      padding: 14px;
+
+      border-radius: 12px;
+
+      background: #f4f5f7;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+  </style>
 
 </head>
 
@@ -25,775 +193,149 @@
 <body>
 
 
-  <!-- ========================================
-       LOADING
-  ========================================= -->
+  <div class="card">
 
-  <section
-    id="loadingPage"
-    class="loading-page"
-  >
 
-    <div class="loading-content">
+    <div class="brand">
+      BKK-CUTZ
+    </div>
 
-      <div class="loading-brand">
-        BKK-CUTZ
+
+    <h1>
+      Service Import
+    </h1>
+
+
+    <p class="subtitle">
+      ตั้งค่ารายการบริการทั้ง 11 สาขา
+    </p>
+
+
+
+    <!-- ตรวจ session -->
+
+    <div id="loadingArea">
+
+      <div class="status">
+        กำลังตรวจสอบบัญชี...
       </div>
-
-      <div class="loading-spinner"></div>
-
-      <p>
-        กำลังโหลด...
-      </p>
 
     </div>
 
-  </section>
 
 
+    <!-- Login Admin -->
 
-  <!-- ========================================
-       LOGIN
-  ========================================= -->
-
-  <section
-    id="loginPage"
-    class="login-page hidden"
-  >
-
-    <div class="login-card">
-
-      <div class="login-brand">
-        BKK-CUTZ
-      </div>
-
-
-      <h1>
-        เข้าสู่ระบบสาขา
-      </h1>
-
-
-      <p class="login-subtitle">
-        เข้าสู่ระบบด้วยบัญชีประจำสาขา
-      </p>
-
+    <div
+      id="loginArea"
+      class="hidden"
+    >
 
       <form id="loginForm">
 
-        <label class="login-label">
-          อีเมล
+        <label>
+          อีเมล Admin
         </label>
-
 
         <input
           id="emailInput"
-          class="login-input"
           type="email"
           autocomplete="username"
           required
         >
 
 
-        <label class="login-label">
+        <label>
           รหัสผ่าน
         </label>
 
-
         <input
           id="passwordInput"
-          class="login-input"
           type="password"
           autocomplete="current-password"
           required
         >
 
 
-        <div
-          id="loginError"
-          class="login-error hidden"
-        ></div>
-
-
         <button
           id="loginButton"
-          class="login-button"
           type="submit"
         >
-          เข้าสู่ระบบ
+          เข้าสู่ระบบ Admin
         </button>
 
       </form>
 
+
+      <div
+        id="loginError"
+        class="status hidden"
+      ></div>
+
     </div>
 
-  </section>
 
 
+    <!-- Import -->
 
-  <!-- ========================================
-       APP
-  ========================================= -->
+    <div
+      id="adminArea"
+      class="hidden"
+    >
 
-  <main
-    id="mainApp"
-    class="app hidden"
-  >
+      <div class="admin-info">
 
-
-    <!-- ========================================
-         TOP BAR
-    ========================================= -->
-
-    <div class="top-bar">
-
-      <div>
-
-        <div class="top-branch-label">
-          สาขา
-        </div>
-
-        <strong
-          id="currentBranchName"
-          class="top-branch-name"
-        >
-          -
+        <strong>
+          Admin พร้อมใช้งาน
         </strong>
 
+        <div id="adminEmail">
+          -
+        </div>
+
       </div>
+
+
+      <div class="warning">
+
+        การ Import จะล้างข้อมูลใน collection
+        <strong>services</strong>
+        เดิมทั้งหมด แล้วสร้างรายการบริการใหม่ครบทั้ง 11 สาขา
+
+      </div>
+
+
+      <button
+        id="importButton"
+        type="button"
+      >
+        Import เมนูทั้ง 11 สาขา
+      </button>
 
 
       <button
         id="logoutButton"
-        class="logout-button"
+        class="secondary"
         type="button"
       >
-        ออกจากระบบ
+        ออกจากระบบ Admin
       </button>
-
-    </div>
-
-
-
-    <!-- ========================================
-         หน้าเลือกช่าง
-    ========================================= -->
-
-    <section
-      id="barberPage"
-      class="page"
-    >
-
-      <div class="page-header">
-
-        <h1>
-          เลือกชื่อช่าง
-        </h1>
-
-        <p>
-          เลือกชื่อของคุณเพื่อเริ่มบันทึกรายการ
-        </p>
-
-      </div>
 
 
       <div
-        id="barberList"
-        class="barber-grid"
+        id="importStatus"
+        class="status hidden"
       ></div>
-
-    </section>
-
-
-
-    <!-- ========================================
-         หน้าเลือกบริการ
-    ========================================= -->
-
-    <section
-      id="servicePage"
-      class="page hidden"
-    >
-
-      <button
-        id="backButton"
-        class="back-button"
-        type="button"
-      >
-        ← กลับ
-      </button>
-
-
-      <div class="page-header">
-
-        <p class="selected-label">
-          ช่างที่เลือก
-        </p>
-
-        <h1 id="selectedBarberName">
-          -
-        </h1>
-
-        <p>
-          เลือกบริการที่ทำให้ลูกค้า
-        </p>
-
-      </div>
-
-
-      <div
-        id="serviceList"
-        class="service-list"
-      ></div>
-
-
-      <div class="summary-card">
-
-        <h2>
-          สรุปรายการ
-        </h2>
-
-
-        <div
-          id="summaryList"
-          class="summary-list"
-        >
-
-          <p class="empty-summary">
-            ยังไม่ได้เลือกบริการ
-          </p>
-
-        </div>
-
-
-        <div class="summary-total">
-
-          <span>
-            รวมทั้งหมด
-          </span>
-
-          <strong id="totalPrice">
-            0 บาท
-          </strong>
-
-        </div>
-
-
-        <button
-          id="confirmButton"
-          class="confirm-button"
-          type="button"
-          disabled
-        >
-          ยืนยันรายการ
-        </button>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- ========================================
-         หน้า QR
-    ========================================= -->
-
-    <section
-      id="qrPage"
-      class="page hidden"
-    >
-
-      <div class="qr-wrapper">
-
-        <button
-          id="qrBackButton"
-          class="back-button"
-          type="button"
-        >
-          ← กลับ
-        </button>
-
-
-        <div class="qr-header">
-
-          <h1>
-            สแกนเพื่อชำระเงิน
-          </h1>
-
-          <p>
-            TrueMoney Wallet
-          </p>
-
-        </div>
-
-
-        <div class="qr-payment-card">
-
-          <p class="qr-amount-label">
-            ยอดที่ต้องชำระ
-          </p>
-
-
-          <div
-            id="qrTotal"
-            class="qr-total"
-          >
-            0 บาท
-          </div>
-
-
-          <div
-            id="trueMoneyQrArea"
-            class="truemoney-qr-area"
-          >
-
-            <img
-              id="trueMoneyQrImage"
-              class="truemoney-qr-image hidden"
-              alt="TrueMoney QR"
-            >
-
-
-            <div
-              id="trueMoneyQrPlaceholder"
-              class="truemoney-qr-placeholder"
-            >
-
-              <div class="qr-placeholder-icon">
-
-                <svg
-                  viewBox="0 0 100 100"
-                  aria-hidden="true"
-                >
-
-                  <rect
-                    x="8"
-                    y="8"
-                    width="30"
-                    height="30"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="6"
-                  />
-
-                  <rect
-                    x="62"
-                    y="8"
-                    width="30"
-                    height="30"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="6"
-                  />
-
-                  <rect
-                    x="8"
-                    y="62"
-                    width="30"
-                    height="30"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="6"
-                  />
-
-                  <rect
-                    x="55"
-                    y="55"
-                    width="10"
-                    height="10"
-                    fill="currentColor"
-                  />
-
-                  <rect
-                    x="75"
-                    y="55"
-                    width="17"
-                    height="10"
-                    fill="currentColor"
-                  />
-
-                  <rect
-                    x="55"
-                    y="75"
-                    width="10"
-                    height="17"
-                    fill="currentColor"
-                  />
-
-                  <rect
-                    x="75"
-                    y="75"
-                    width="17"
-                    height="17"
-                    fill="currentColor"
-                  />
-
-                </svg>
-
-              </div>
-
-
-              <strong>
-                QR TrueMoney
-              </strong>
-
-              <span>
-                ยังไม่ได้ตั้งค่า QR จริง
-              </span>
-
-            </div>
-
-          </div>
-
-
-          <div class="slip-check-card">
-
-            <div class="slip-check-title">
-              ก่อนกดชำระแล้ว
-            </div>
-
-
-            <div class="slip-check-item">
-
-              <span class="check-dot">
-                ✓
-              </span>
-
-              <span>
-                เช็กยอดเงินให้ตรง
-              </span>
-
-            </div>
-
-
-            <div class="slip-check-item">
-
-              <span class="check-dot">
-                ✓
-              </span>
-
-              <span>
-                เช็กชื่อผู้รับ
-              </span>
-
-            </div>
-
-
-            <div class="slip-check-item">
-
-              <span class="check-dot">
-                ✓
-              </span>
-
-              <span>
-                เช็กเวลาในสลิป
-              </span>
-
-            </div>
-
-          </div>
-
-
-          <button
-            id="qrPaidButton"
-            class="qr-paid-button"
-            type="button"
-          >
-            ตรวจสลิปแล้ว — ชำระแล้ว
-          </button>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- ========================================
-         SUCCESS
-    ========================================= -->
-
-    <section
-      id="successPage"
-      class="page hidden"
-    >
-
-      <div class="success-wrapper">
-
-        <div class="success-icon">
-          ✓
-        </div>
-
-
-        <h1 class="success-title">
-          บันทึกรายการแล้ว
-        </h1>
-
-
-        <p class="success-subtitle">
-          รายการได้รับการยืนยันเรียบร้อย
-        </p>
-
-
-        <div class="success-card">
-
-
-          <div class="success-info-row">
-
-            <span>
-              ช่าง
-            </span>
-
-            <strong id="successBarberName">
-              -
-            </strong>
-
-          </div>
-
-
-          <div class="success-divider"></div>
-
-
-          <div
-            id="successServiceList"
-            class="success-service-list"
-          ></div>
-
-
-          <div class="success-divider"></div>
-
-
-          <div
-            class="success-info-row success-total-row"
-          >
-
-            <span>
-              รวมทั้งหมด
-            </span>
-
-            <strong id="successTotal">
-              0 บาท
-            </strong>
-
-          </div>
-
-
-          <div class="success-info-row">
-
-            <span>
-              ชำระด้วย
-            </span>
-
-            <strong id="successPaymentMethod">
-              -
-            </strong>
-
-          </div>
-
-        </div>
-
-
-        <button
-          id="homeButton"
-          class="home-button"
-          type="button"
-        >
-          กลับหน้าหลัก
-        </button>
-
-      </div>
-
-    </section>
-
-
-  </main>
-
-
-
-  <!-- ========================================
-       PAYMENT MODAL
-  ========================================= -->
-
-  <div
-    id="paymentModal"
-    class="payment-modal hidden"
-  >
-
-    <div class="payment-backdrop"></div>
-
-
-    <div class="payment-dialog">
-
-
-      <div class="payment-header">
-
-        <h2>
-          เลือกวิธีชำระเงิน
-        </h2>
-
-        <p>
-          ยอดที่ต้องชำระ
-        </p>
-
-        <strong id="paymentTotal">
-          0 บาท
-        </strong>
-
-      </div>
-
-
-      <button
-        id="cashPaymentButton"
-        class="payment-card"
-        type="button"
-      >
-
-        <span class="payment-card-icon">
-
-          <svg
-            viewBox="0 0 100 70"
-            aria-hidden="true"
-          >
-
-            <rect
-              x="5"
-              y="8"
-              width="90"
-              height="54"
-              rx="8"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="5"
-            />
-
-            <circle
-              cx="50"
-              cy="35"
-              r="14"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="5"
-            />
-
-          </svg>
-
-        </span>
-
-
-        <span class="payment-card-title">
-          เงินสด
-        </span>
-
-      </button>
-
-
-
-      <button
-        id="scanPaymentButton"
-        class="payment-card"
-        type="button"
-      >
-
-        <span
-          class="payment-card-icon qr-icon"
-        >
-
-          <svg
-            viewBox="0 0 100 100"
-            aria-hidden="true"
-          >
-
-            <rect
-              x="8"
-              y="8"
-              width="30"
-              height="30"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="6"
-            />
-
-            <rect
-              x="62"
-              y="8"
-              width="30"
-              height="30"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="6"
-            />
-
-            <rect
-              x="8"
-              y="62"
-              width="30"
-              height="30"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="6"
-            />
-
-            <rect
-              x="55"
-              y="55"
-              width="10"
-              height="10"
-              fill="currentColor"
-            />
-
-            <rect
-              x="75"
-              y="55"
-              width="17"
-              height="10"
-              fill="currentColor"
-            />
-
-            <rect
-              x="55"
-              y="75"
-              width="10"
-              height="17"
-              fill="currentColor"
-            />
-
-            <rect
-              x="75"
-              y="75"
-              width="17"
-              height="17"
-              fill="currentColor"
-            />
-
-          </svg>
-
-        </span>
-
-
-        <span class="payment-card-title">
-          สแกนจ่าย
-        </span>
-
-      </button>
-
-
-      <button
-        id="cancelPaymentButton"
-        class="cancel-payment-button"
-        type="button"
-      >
-        ← กลับ
-      </button>
 
     </div>
+
 
   </div>
 
 
-
   <script
     type="module"
-    src="app.js?v=14"
+    src="admin-import.js?v=1"
   ></script>
 
 
