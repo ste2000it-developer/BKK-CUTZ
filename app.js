@@ -1,27 +1,24 @@
-// ========================================
-// BKK-CUTZ POS
-//
-// ตอนนี้ยังไม่เชื่อม Firebase
-// และยังไม่เชื่อม TrueMoney API
-// ========================================
+import {
+  login,
+  logout,
+  watchAuth,
+  getUserProfile,
+  getBranch
+} from "./firebase.js";
 
 
 
 // ========================================
-// QR TrueMoney
-//
-// ตอนนี้เว้นว่างไว้ก่อน
-//
-// ภายหลังถ้ามี QR จริง
-// เราจะใส่ path หรือ URL ตรงนี้
+// TrueMoney
 // ========================================
 
-const TRUE_MONEY_QR_IMAGE = "";
+const TRUE_MONEY_QR_IMAGE =
+  "";
 
 
 
 // ========================================
-// ข้อมูลช่างทดลอง
+// ข้อมูลทดลอง
 // ========================================
 
 const barbers = [
@@ -48,11 +45,6 @@ const barbers = [
 
 ];
 
-
-
-// ========================================
-// บริการทดลอง
-// ========================================
 
 const services = [
 
@@ -81,6 +73,65 @@ const services = [
   }
 
 ];
+
+
+
+// ========================================
+// LOGIN DOM
+// ========================================
+
+const loginPage =
+  document.getElementById(
+    "loginPage"
+  );
+
+
+const mainApp =
+  document.getElementById(
+    "mainApp"
+  );
+
+
+const loginForm =
+  document.getElementById(
+    "loginForm"
+  );
+
+
+const emailInput =
+  document.getElementById(
+    "emailInput"
+  );
+
+
+const passwordInput =
+  document.getElementById(
+    "passwordInput"
+  );
+
+
+const loginButton =
+  document.getElementById(
+    "loginButton"
+  );
+
+
+const loginError =
+  document.getElementById(
+    "loginError"
+  );
+
+
+const logoutButton =
+  document.getElementById(
+    "logoutButton"
+  );
+
+
+const currentBranchName =
+  document.getElementById(
+    "currentBranchName"
+  );
 
 
 
@@ -114,7 +165,7 @@ const successPage =
 
 
 // ========================================
-// BARBER / SERVICE DOM
+// POS DOM
 // ========================================
 
 const barberList =
@@ -161,7 +212,7 @@ const confirmButton =
 
 
 // ========================================
-// PAYMENT DOM
+// PAYMENT
 // ========================================
 
 const paymentModal =
@@ -196,7 +247,7 @@ const cancelPaymentButton =
 
 
 // ========================================
-// TRUE MONEY DOM
+// QR
 // ========================================
 
 const qrTotal =
@@ -231,7 +282,7 @@ const trueMoneyQrPlaceholder =
 
 
 // ========================================
-// SUCCESS DOM
+// SUCCESS
 // ========================================
 
 const successBarberName =
@@ -269,6 +320,14 @@ const homeButton =
 // STATE
 // ========================================
 
+let currentUserProfile =
+  null;
+
+
+let currentBranch =
+  null;
+
+
 let selectedBarber =
   null;
 
@@ -279,7 +338,279 @@ const selectedServices =
 
 
 // ========================================
-// ซ่อนทุกหน้า
+// LOGIN
+// ========================================
+
+loginForm.addEventListener(
+  "submit",
+  async (event) => {
+
+    event.preventDefault();
+
+
+    loginError.classList.add(
+      "hidden"
+    );
+
+
+    loginError.textContent =
+      "";
+
+
+    loginButton.disabled =
+      true;
+
+
+    loginButton.textContent =
+      "กำลังเข้าสู่ระบบ...";
+
+
+    try {
+
+      await login(
+        emailInput.value.trim(),
+        passwordInput.value
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Login error:",
+        error
+      );
+
+
+      loginError.textContent =
+        "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+
+
+      loginError.classList.remove(
+        "hidden"
+      );
+
+
+      loginButton.disabled =
+        false;
+
+
+      loginButton.textContent =
+        "เข้าสู่ระบบ";
+
+    }
+
+  }
+);
+
+
+
+// ========================================
+// LOGOUT
+// ========================================
+
+logoutButton.addEventListener(
+  "click",
+  async () => {
+
+    try {
+
+      await logout();
+
+    } catch (error) {
+
+      console.error(
+        "Logout error:",
+        error
+      );
+
+    }
+
+  }
+);
+
+
+
+// ========================================
+// AUTH STATE
+// ========================================
+
+watchAuth(
+  async (user) => {
+
+    if (!user) {
+
+      currentUserProfile =
+        null;
+
+
+      currentBranch =
+        null;
+
+
+      showLoginPage();
+
+
+      return;
+
+    }
+
+
+    try {
+
+      const profile =
+        await getUserProfile(
+          user.uid
+        );
+
+
+      if (
+        profile.active !== true
+      ) {
+
+        throw new Error(
+          "บัญชีถูกปิดใช้งาน"
+        );
+
+      }
+
+
+      if (
+        profile.role !== "branch"
+      ) {
+
+        throw new Error(
+          "บัญชีนี้ไม่ใช่บัญชีสาขา"
+        );
+
+      }
+
+
+      const branch =
+        await getBranch(
+          profile.branchId
+        );
+
+
+      if (
+        branch.active !== true
+      ) {
+
+        throw new Error(
+          "สาขานี้ถูกปิดใช้งาน"
+        );
+
+      }
+
+
+      currentUserProfile =
+        profile;
+
+
+      currentBranch =
+        branch;
+
+
+      currentBranchName.textContent =
+        branch.name || branch.id;
+
+
+      loginButton.disabled =
+        false;
+
+
+      loginButton.textContent =
+        "เข้าสู่ระบบ";
+
+
+      loginError.classList.add(
+        "hidden"
+      );
+
+
+      showMainApp();
+
+    } catch (error) {
+
+      console.error(
+        "Account setup error:",
+        error
+      );
+
+
+      await logout();
+
+
+      showLoginPage();
+
+
+      loginError.textContent =
+        error.message;
+
+
+      loginError.classList.remove(
+        "hidden"
+      );
+
+
+      loginButton.disabled =
+        false;
+
+
+      loginButton.textContent =
+        "เข้าสู่ระบบ";
+
+    }
+
+  }
+);
+
+
+
+// ========================================
+// SHOW LOGIN
+// ========================================
+
+function showLoginPage() {
+
+  mainApp.classList.add(
+    "hidden"
+  );
+
+
+  loginPage.classList.remove(
+    "hidden"
+  );
+
+
+  closePaymentModal();
+
+}
+
+
+
+// ========================================
+// SHOW APP
+// ========================================
+
+function showMainApp() {
+
+  loginPage.classList.add(
+    "hidden"
+  );
+
+
+  mainApp.classList.remove(
+    "hidden"
+  );
+
+
+  resetTransaction();
+
+}
+
+
+
+// ========================================
+// ซ่อนหน้าภายใน POS
 // ========================================
 
 function hideAllPages() {
@@ -308,7 +639,7 @@ function hideAllPages() {
 
 
 // ========================================
-// แสดงรายชื่อช่าง
+// BARBERS
 // ========================================
 
 function renderBarbers() {
@@ -362,7 +693,7 @@ function renderBarbers() {
 
 
 // ========================================
-// เลือกช่าง
+// SELECT BARBER
 // ========================================
 
 function selectBarber(
@@ -403,7 +734,7 @@ function selectBarber(
 
 
 // ========================================
-// แสดงบริการ
+// SERVICES
 // ========================================
 
 function renderServices() {
@@ -487,7 +818,7 @@ function renderServices() {
 
 
 // ========================================
-// เลือก / ยกเลิกบริการ
+// TOGGLE SERVICE
 // ========================================
 
 function toggleService(
@@ -522,7 +853,7 @@ function toggleService(
 
 
 // ========================================
-// รายการที่เลือก
+// SELECTED SERVICES
 // ========================================
 
 function getSelectedServiceList() {
@@ -539,7 +870,7 @@ function getSelectedServiceList() {
 
 
 // ========================================
-// คำนวณยอดรวม
+// TOTAL
 // ========================================
 
 function calculateTotal() {
@@ -556,7 +887,7 @@ function calculateTotal() {
 
 
 // ========================================
-// สรุปรายการ
+// SUMMARY
 // ========================================
 
 function renderSummary() {
@@ -625,12 +956,8 @@ function renderSummary() {
   );
 
 
-  const total =
-    calculateTotal();
-
-
   totalPrice.textContent =
-    `${total.toLocaleString("th-TH")} บาท`;
+    `${calculateTotal().toLocaleString("th-TH")} บาท`;
 
 
   confirmButton.disabled =
@@ -641,22 +968,20 @@ function renderSummary() {
 
 
 // ========================================
-// ยืนยันรายการ
+// CONFIRM
 // ========================================
 
 confirmButton.addEventListener(
   "click",
   () => {
 
-    if (!selectedBarber) {
-      return;
-    }
-
-
     if (
+      !selectedBarber ||
       selectedServices.size === 0
     ) {
+
       return;
+
     }
 
 
@@ -668,17 +993,13 @@ confirmButton.addEventListener(
 
 
 // ========================================
-// เปิดหน้าเลือกวิธีชำระเงิน
+// PAYMENT
 // ========================================
 
 function openPaymentModal() {
 
-  const total =
-    calculateTotal();
-
-
   paymentTotal.textContent =
-    `${total.toLocaleString("th-TH")} บาท`;
+    `${calculateTotal().toLocaleString("th-TH")} บาท`;
 
 
   paymentModal.classList.remove(
@@ -694,10 +1015,6 @@ function openPaymentModal() {
 
 
 
-// ========================================
-// ปิดหน้าเลือกวิธีชำระเงิน
-// ========================================
-
 function closePaymentModal() {
 
   paymentModal.classList.add(
@@ -712,10 +1029,6 @@ function closePaymentModal() {
 }
 
 
-
-// ========================================
-// เงินสด
-// ========================================
 
 cashPaymentButton.addEventListener(
   "click",
@@ -733,10 +1046,6 @@ cashPaymentButton.addEventListener(
 
 
 
-// ========================================
-// สแกนจ่าย
-// ========================================
-
 scanPaymentButton.addEventListener(
   "click",
   () => {
@@ -751,30 +1060,21 @@ scanPaymentButton.addEventListener(
 
 
 
-// ========================================
-// กลับจากหน้าเลือกการชำระ
-// ========================================
-
 cancelPaymentButton.addEventListener(
   "click",
-  () => {
-
-    closePaymentModal();
-
-  }
+  closePaymentModal
 );
 
 
 
 // ========================================
-// ตั้งค่า QR TrueMoney
+// TRUE MONEY
 // ========================================
 
 function renderTrueMoneyQr() {
 
   if (
-    TRUE_MONEY_QR_IMAGE &&
-    TRUE_MONEY_QR_IMAGE.trim() !== ""
+    TRUE_MONEY_QR_IMAGE
   ) {
 
     trueMoneyQrImage.src =
@@ -796,11 +1096,6 @@ function renderTrueMoneyQr() {
   }
 
 
-  trueMoneyQrImage.removeAttribute(
-    "src"
-  );
-
-
   trueMoneyQrImage.classList.add(
     "hidden"
   );
@@ -814,18 +1109,10 @@ function renderTrueMoneyQr() {
 
 
 
-// ========================================
-// หน้า QR TrueMoney
-// ========================================
-
 function showQrPage() {
 
-  const total =
-    calculateTotal();
-
-
   qrTotal.textContent =
-    `${total.toLocaleString("th-TH")} บาท`;
+    `${calculateTotal().toLocaleString("th-TH")} บาท`;
 
 
   renderTrueMoneyQr();
@@ -848,10 +1135,6 @@ function showQrPage() {
 
 
 
-// ========================================
-// ตรวจสลิปแล้ว
-// ========================================
-
 qrPaidButton.addEventListener(
   "click",
   () => {
@@ -864,10 +1147,6 @@ qrPaidButton.addEventListener(
 );
 
 
-
-// ========================================
-// กลับจากหน้า QR
-// ========================================
 
 qrBackButton.addEventListener(
   "click",
@@ -891,36 +1170,35 @@ qrBackButton.addEventListener(
 
 
 // ========================================
-// จบรายการ
-//
-// ตอนนี้ยังไม่บันทึก Firebase
+// COMPLETE TRANSACTION
 // ========================================
 
 function completeTransaction(
   paymentMethod
 ) {
 
-  if (!selectedBarber) {
-    return;
-  }
-
-
   const selected =
     getSelectedServiceList();
 
 
   if (
-    selected.length === 0
+    !selectedBarber ||
+    selected.length === 0 ||
+    !currentBranch
   ) {
+
     return;
+
   }
 
 
-  const total =
-    calculateTotal();
-
-
   const transaction = {
+
+    branchId:
+      currentBranch.id,
+
+    branchName:
+      currentBranch.name,
 
     barberId:
       selectedBarber.id,
@@ -932,7 +1210,7 @@ function completeTransaction(
       selected,
 
     total:
-      total,
+      calculateTotal(),
 
     paymentMethod:
       paymentMethod,
@@ -958,7 +1236,7 @@ function completeTransaction(
 
 
 // ========================================
-// หน้าสำเร็จ
+// SUCCESS
 // ========================================
 
 function showSuccessPage(
@@ -1036,37 +1314,7 @@ function showSuccessPage(
 
 
 // ========================================
-// กลับหน้าหลัก
-// ========================================
-
-homeButton.addEventListener(
-  "click",
-  () => {
-
-    resetTransaction();
-
-  }
-);
-
-
-
-// ========================================
-// กลับจากหน้าเลือกบริการ
-// ========================================
-
-backButton.addEventListener(
-  "click",
-  () => {
-
-    resetTransaction();
-
-  }
-);
-
-
-
-// ========================================
-// Reset
+// RESET
 // ========================================
 
 function resetTransaction() {
@@ -1098,6 +1346,23 @@ function resetTransaction() {
   });
 
 }
+
+
+
+// ========================================
+// BUTTONS
+// ========================================
+
+homeButton.addEventListener(
+  "click",
+  resetTransaction
+);
+
+
+backButton.addEventListener(
+  "click",
+  resetTransaction
+);
 
 
 
