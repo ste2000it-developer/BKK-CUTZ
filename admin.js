@@ -18,9 +18,10 @@ import {
   where,
   getDocs,
   doc,
-  updateDoc,
   addDoc,
+  setDoc,
   deleteDoc,
+  writeBatch,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
@@ -34,6 +35,56 @@ const db =
   getFirestore(
     getApp()
   );
+
+
+
+// ========================================
+// BRANCH → GROUP
+// ========================================
+
+const BRANCH_GROUPS = {
+
+  b001: "A",
+  b002: "A",
+  b003: "A",
+
+  b004: "B",
+  b005: "B",
+
+  b006: "C",
+
+  b007: "B",
+  b008: "B",
+
+  b009: "A",
+
+  b010: "D",
+
+  b011: "B"
+
+};
+
+
+
+// ========================================
+// FALLBACK BRANCH NAMES
+// ========================================
+
+const BRANCH_NAMES = {
+
+  b001: "สะพานใหม่",
+  b002: "ม.รังสิต",
+  b003: "ม.กรุงเทพ",
+  b004: "แบริ่ง",
+  b005: "สุขุมวิท101",
+  b006: "แบริ่ง10",
+  b007: "สุขุมวิท66",
+  b008: "สุขุมวิท107",
+  b009: "นนทบุรี11/1",
+  b010: "1981",
+  b011: "tops101"
+
+};
 
 
 
@@ -101,9 +152,33 @@ const logoutButton =
   );
 
 
-const branchSelect =
+const migrationButton =
   document.getElementById(
-    "branchSelect"
+    "migrationButton"
+  );
+
+
+const migrationStatus =
+  document.getElementById(
+    "migrationStatus"
+  );
+
+
+const groupButtons =
+  document.querySelectorAll(
+    ".group-button"
+  );
+
+
+const groupBranches =
+  document.getElementById(
+    "groupBranches"
+  );
+
+
+const serviceTitle =
+  document.getElementById(
+    "serviceTitle"
   );
 
 
@@ -222,7 +297,7 @@ let services =
   [];
 
 
-let selectedBranchId =
+let selectedGroup =
   "";
 
 
@@ -342,6 +417,9 @@ watchAuth(
 
 
       await loadBranches();
+
+
+      await checkMigrationState();
 
 
     } catch (error) {
@@ -483,112 +561,841 @@ async function loadBranches() {
       }
     );
 
+}
 
-  branches.sort(
-    (a, b) => {
 
-      return String(
-        a.id
-      ).localeCompare(
-        String(
-          b.id
+
+// ========================================
+// CHECK MIGRATION
+// ========================================
+
+async function checkMigrationState() {
+
+  const branchesReady =
+    Object.entries(
+      BRANCH_GROUPS
+    ).every(
+      ([branchId, groupId]) => {
+
+        const branch =
+          branches.find(
+            (item) =>
+              item.id === branchId
+          );
+
+
+        return branch
+          && branch.serviceGroup === groupId;
+
+      }
+    );
+
+
+  const serviceSnapshot =
+    await getDocs(
+      collection(
+        db,
+        "services"
+      )
+    );
+
+
+  const hasGroupServices =
+    serviceSnapshot.docs.some(
+      (snapshot) =>
+        Boolean(
+          snapshot.data().groupId
         )
-      );
-
-    }
-  );
+    );
 
 
-  renderBranches();
+  if (
+    branchesReady &&
+    hasGroupServices
+  ) {
 
-}
-
-
-
-// ========================================
-// RENDER BRANCHES
-// ========================================
-
-function renderBranches() {
-
-  branchSelect.innerHTML = `
-    <option value="">
-      -- เลือกสาขา --
-    </option>
-  `;
+    migrationButton.disabled =
+      true;
 
 
-  branches.forEach(
-    (branch) => {
-
-      const option =
-        document.createElement(
-          "option"
-        );
+    migrationButton.textContent =
+      "ตั้งค่ากลุ่ม A / B / C / D แล้ว";
 
 
-      option.value =
-        branch.id;
+    return;
+
+  }
 
 
-      option.textContent =
-        `${branch.id} - ${branch.name || branch.id}`;
+  migrationButton.disabled =
+    false;
 
 
-      branchSelect.appendChild(
-        option
-      );
-
-    }
-  );
+  migrationButton.textContent =
+    "ย้ายระบบเป็นกลุ่ม A / B / C / D";
 
 }
 
 
 
 // ========================================
-// BRANCH CHANGE
+// SERVICE BUILDERS
 // ========================================
 
-branchSelect.addEventListener(
-  "change",
+function fixedService(
+  code,
+  name,
+  price,
+  sortOrder
+) {
+
+  return {
+
+    serviceCode:
+      code,
+
+    name,
+
+    type:
+      "fixed",
+
+    price,
+
+    active:
+      true,
+
+    sortOrder
+
+  };
+
+}
+
+
+
+function choiceService(
+  code,
+  name,
+  choices,
+  sortOrder
+) {
+
+  return {
+
+    serviceCode:
+      code,
+
+    name,
+
+    type:
+      "choice",
+
+    price:
+      0,
+
+    choices,
+
+    active:
+      true,
+
+    sortOrder
+
+  };
+
+}
+
+
+
+function customService(
+  sortOrder
+) {
+
+  return {
+
+    serviceCode:
+      "custom",
+
+    name:
+      "อื่นๆ",
+
+    type:
+      "custom",
+
+    price:
+      0,
+
+    active:
+      true,
+
+    sortOrder
+
+  };
+
+}
+
+
+
+function freeCutService(
+  sortOrder
+) {
+
+  return {
+
+    serviceCode:
+      "free_cut",
+
+    name:
+      "discount10ฟรี1",
+
+    type:
+      "free_cut",
+
+    price:
+      0,
+
+    targetServiceCode:
+      "haircut",
+
+    active:
+      true,
+
+    sortOrder
+
+  };
+
+}
+
+
+
+function halfCutService(
+  sortOrder
+) {
+
+  return {
+
+    serviceCode:
+      "half_cut",
+
+    name:
+      "discount 50%",
+
+    type:
+      "half_cut",
+
+    price:
+      0,
+
+    discountPercent:
+      50,
+
+    targetServiceCode:
+      "haircut",
+
+    active:
+      true,
+
+    sortOrder
+
+  };
+
+}
+
+
+
+// ========================================
+// GROUP A
+// ========================================
+
+function servicesGroupA() {
+
+  return [
+
+    fixedService(
+      "haircut",
+      "ตัดผม",
+      250,
+      1
+    ),
+
+    fixedService(
+      "kids",
+      "ตัดผมเด็ก",
+      200,
+      2
+    ),
+
+    fixedService(
+      "trim",
+      "เก็บทรง",
+      200,
+      3
+    ),
+
+    choiceService(
+      "shave",
+      "โกนหนวด/กันขอบ",
+      [150, 200],
+      4
+    ),
+
+    fixedService(
+      "wash",
+      "สระผม",
+      50,
+      5
+    ),
+
+    fixedService(
+      "product",
+      "ผลิตภัณฑ์",
+      285,
+      6
+    ),
+
+    customService(
+      7
+    ),
+
+    freeCutService(
+      8
+    ),
+
+    halfCutService(
+      9
+    )
+
+  ];
+
+}
+
+
+
+// ========================================
+// GROUP B
+// ========================================
+
+function servicesGroupB() {
+
+  return [
+
+    fixedService(
+      "haircut",
+      "ตัดผม",
+      300,
+      1
+    ),
+
+    fixedService(
+      "kids",
+      "ตัดผมเด็ก",
+      250,
+      2
+    ),
+
+    fixedService(
+      "trim",
+      "เก็บทรง",
+      250,
+      3
+    ),
+
+    choiceService(
+      "shave",
+      "โกนหนวด/กันขอบ",
+      [150, 200],
+      4
+    ),
+
+    fixedService(
+      "wash",
+      "สระผม",
+      50,
+      5
+    ),
+
+    fixedService(
+      "product",
+      "ผลิตภัณฑ์",
+      285,
+      6
+    ),
+
+    customService(
+      7
+    ),
+
+    freeCutService(
+      8
+    ),
+
+    halfCutService(
+      9
+    )
+
+  ];
+
+}
+
+
+
+// ========================================
+// GROUP C
+// ========================================
+
+function servicesGroupC() {
+
+  return [
+
+    fixedService(
+      "haircut",
+      "ตัดผม",
+      300,
+      1
+    ),
+
+    fixedService(
+      "kids",
+      "ตัดผมเด็ก",
+      250,
+      2
+    ),
+
+    fixedService(
+      "trim",
+      "เก็บทรง",
+      250,
+      3
+    ),
+
+    choiceService(
+      "shave",
+      "โกนหนวด/กันขอบ",
+      [150, 200],
+      4
+    ),
+
+    fixedService(
+      "product",
+      "ผลิตภัณฑ์",
+      285,
+      5
+    ),
+
+    customService(
+      6
+    ),
+
+    freeCutService(
+      7
+    ),
+
+    halfCutService(
+      8
+    )
+
+  ];
+
+}
+
+
+
+// ========================================
+// GROUP D
+// ========================================
+
+function servicesGroupD() {
+
+  return [
+
+    fixedService(
+      "haircut",
+      "ตัดผม",
+      400,
+      1
+    ),
+
+    fixedService(
+      "kids",
+      "ตัดผมเด็ก",
+      300,
+      2
+    ),
+
+    fixedService(
+      "trim",
+      "เก็บทรง",
+      350,
+      3
+    ),
+
+    fixedService(
+      "shave",
+      "โกนหนวด/กันขอบ",
+      300,
+      4
+    ),
+
+    fixedService(
+      "product",
+      "ผลิตภัณฑ์",
+      285,
+      5
+    ),
+
+    customService(
+      6
+    ),
+
+    freeCutService(
+      7
+    ),
+
+    halfCutService(
+      8
+    )
+
+  ];
+
+}
+
+
+
+// ========================================
+// GROUP SERVICES
+// ========================================
+
+function getInitialServices(
+  groupId
+) {
+
+  if (
+    groupId === "A"
+  ) {
+
+    return servicesGroupA();
+
+  }
+
+
+  if (
+    groupId === "B"
+  ) {
+
+    return servicesGroupB();
+
+  }
+
+
+  if (
+    groupId === "C"
+  ) {
+
+    return servicesGroupC();
+
+  }
+
+
+  return servicesGroupD();
+
+}
+
+
+
+// ========================================
+// MIGRATION
+// ========================================
+
+migrationButton.addEventListener(
+  "click",
   async () => {
 
-    selectedBranchId =
-      branchSelect.value;
+    const confirmed =
+      window.confirm(
+        "ระบบจะลบ services แบบแยกสาขาเดิม แล้วสร้างใหม่เป็นกลุ่ม A / B / C / D ต้องการดำเนินการต่อหรือไม่?"
+      );
 
 
-    closeEditor();
-
-
-    if (
-      !selectedBranchId
-    ) {
-
-      addServiceButton.disabled =
-        true;
-
-
-      serviceList.innerHTML = `
-        <div class="empty">
-          กรุณาเลือกสาขา
-        </div>
-      `;
-
+    if (!confirmed) {
 
       return;
 
     }
 
 
-    addServiceButton.disabled =
-      false;
+    migrationButton.disabled =
+      true;
 
 
-    await loadServices();
+    migrationStatus.classList.remove(
+      "hidden"
+    );
+
+
+    migrationStatus.textContent =
+      "กำลังล้าง services แบบเดิม...";
+
+
+    try {
+
+      const existingServices =
+        await getDocs(
+          collection(
+            db,
+            "services"
+          )
+        );
+
+
+      const documents =
+        existingServices.docs;
+
+
+      const chunkSize =
+        400;
+
+
+      for (
+        let index = 0;
+        index < documents.length;
+        index += chunkSize
+      ) {
+
+        const batch =
+          writeBatch(
+            db
+          );
+
+
+        documents
+          .slice(
+            index,
+            index + chunkSize
+          )
+          .forEach(
+            (snapshot) => {
+
+              batch.delete(
+                snapshot.ref
+              );
+
+            }
+          );
+
+
+        await batch.commit();
+
+      }
+
+
+      migrationStatus.textContent =
+        "กำลังกำหนดกลุ่มให้ 11 สาขา...";
+
+
+      const setupBatch =
+        writeBatch(
+          db
+        );
+
+
+      Object.entries(
+        BRANCH_GROUPS
+      ).forEach(
+        ([branchId, groupId]) => {
+
+          setupBatch.set(
+
+            doc(
+              db,
+              "branches",
+              branchId
+            ),
+
+            {
+              serviceGroup:
+                groupId
+            },
+
+            {
+              merge: true
+            }
+
+          );
+
+        }
+      );
+
+
+      ["A", "B", "C", "D"]
+        .forEach(
+          (groupId) => {
+
+            getInitialServices(
+              groupId
+            ).forEach(
+              (service) => {
+
+                const reference =
+                  doc(
+                    db,
+                    "services",
+                    `${groupId}_${service.serviceCode}`
+                  );
+
+
+                setupBatch.set(
+                  reference,
+                  {
+                    groupId,
+                    ...service
+                  }
+                );
+
+              }
+            );
+
+          }
+        );
+
+
+      await setupBatch.commit();
+
+
+      migrationStatus.textContent =
+        "สำเร็จ ✅\nสร้างกลุ่ม A / B / C / D เรียบร้อย";
+
+
+      await loadBranches();
+
+
+      await checkMigrationState();
+
+
+      selectGroup(
+        "A"
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        error
+      );
+
+
+      migrationStatus.textContent =
+        `ย้ายระบบไม่สำเร็จ\n${error.message}`;
+
+
+      migrationButton.disabled =
+        false;
+
+    }
 
   }
 );
+
+
+
+// ========================================
+// GROUP BUTTONS
+// ========================================
+
+groupButtons.forEach(
+  (button) => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        selectGroup(
+          button.dataset.group
+        );
+
+      }
+    );
+
+  }
+);
+
+
+
+function selectGroup(
+  groupId
+) {
+
+  selectedGroup =
+    groupId;
+
+
+  groupButtons.forEach(
+    (button) => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.group === groupId
+      );
+
+    }
+  );
+
+
+  serviceTitle.textContent =
+    `เมนูบริการ — กลุ่ม ${groupId}`;
+
+
+  addServiceButton.disabled =
+    false;
+
+
+  renderGroupBranches();
+
+
+  closeEditor();
+
+
+  loadServices();
+
+}
+
+
+
+// ========================================
+// GROUP BRANCHES
+// ========================================
+
+function renderGroupBranches() {
+
+  const branchIds =
+    Object.keys(
+      BRANCH_GROUPS
+    ).filter(
+      (branchId) =>
+        BRANCH_GROUPS[branchId] === selectedGroup
+    );
+
+
+  const names =
+    branchIds.map(
+      (branchId) => {
+
+        const branch =
+          branches.find(
+            (item) =>
+              item.id === branchId
+          );
+
+
+        return branch?.name
+          || BRANCH_NAMES[branchId]
+          || branchId;
+
+      }
+    );
+
+
+  groupBranches.textContent =
+    `สาขาในกลุ่ม ${selectedGroup}: ${names.join(" / ")}`;
+
+}
 
 
 
@@ -598,6 +1405,13 @@ branchSelect.addEventListener(
 
 async function loadServices() {
 
+  if (!selectedGroup) {
+
+    return;
+
+  }
+
+
   serviceList.innerHTML = `
     <div class="empty">
       กำลังโหลดเมนู...
@@ -605,66 +1419,84 @@ async function loadServices() {
   `;
 
 
-  const q =
-    query(
-      collection(
-        db,
-        "services"
-      ),
+  try {
 
-      where(
-        "branchId",
-        "==",
-        selectedBranchId
-      )
-    );
+    const serviceQuery =
+      query(
+        collection(
+          db,
+          "services"
+        ),
 
-
-  const snapshot =
-    await getDocs(
-      q
-    );
+        where(
+          "groupId",
+          "==",
+          selectedGroup
+        )
+      );
 
 
-  services =
-    snapshot.docs.map(
-      (snapshot) => {
+    const snapshot =
+      await getDocs(
+        serviceQuery
+      );
 
-        return {
 
-          id:
-            snapshot.id,
+    services =
+      snapshot.docs.map(
+        (snapshot) => {
 
-          ...snapshot.data()
+          return {
 
-        };
+            id:
+              snapshot.id,
+
+            ...snapshot.data()
+
+          };
+
+        }
+      );
+
+
+    services.sort(
+      (a, b) => {
+
+        return Number(
+          a.sortOrder || 999
+        ) -
+        Number(
+          b.sortOrder || 999
+        );
 
       }
     );
 
 
-  services.sort(
-    (a, b) => {
-
-      return Number(
-        a.sortOrder || 999
-      ) -
-      Number(
-        b.sortOrder || 999
-      );
-
-    }
-  );
+    renderServices();
 
 
-  renderServices();
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    serviceList.innerHTML = `
+      <div class="empty">
+        โหลดเมนูไม่สำเร็จ
+      </div>
+    `;
+
+  }
 
 }
 
 
 
 // ========================================
-// PRICE TEXT
+// SERVICE PRICE TEXT
 // ========================================
 
 function getServicePriceText(
@@ -697,7 +1529,7 @@ function getServicePriceText(
     service.type === "custom"
   ) {
 
-    return "กรอกราคาเอง";
+    return "กรอกรายละเอียดและราคาเอง";
 
   }
 
@@ -706,7 +1538,7 @@ function getServicePriceText(
     service.type === "free_cut"
   ) {
 
-    return "ฟรี";
+    return "ตัดผมฟรี 1 ครั้ง";
 
   }
 
@@ -715,7 +1547,7 @@ function getServicePriceText(
     service.type === "half_cut"
   ) {
 
-    return `ลด ${Number(service.discountPercent || 0)}%`;
+    return `ลดค่าตัดผม ${Number(service.discountPercent || 0)}%`;
 
   }
 
@@ -742,7 +1574,7 @@ function renderServices() {
 
     serviceList.innerHTML = `
       <div class="empty">
-        ยังไม่มีเมนูในสาขานี้
+        ยังไม่มีเมนูในกลุ่มนี้
       </div>
     `;
 
@@ -776,7 +1608,7 @@ function renderServices() {
             </div>
 
             <div class="service-price">
-              ${getServicePriceText(service)}
+              ${escapeHtml(getServicePriceText(service))}
             </div>
 
           </div>
@@ -855,19 +1687,26 @@ function renderServices() {
 
 
 // ========================================
-// ADD
+// ADD SERVICE
 // ========================================
 
 addServiceButton.addEventListener(
   "click",
   () => {
 
+    if (!selectedGroup) {
+
+      return;
+
+    }
+
+
     editingServiceId =
       null;
 
 
     editorTitle.textContent =
-      "เพิ่มเมนู";
+      `เพิ่มเมนู — กลุ่ม ${selectedGroup}`;
 
 
     serviceNameInput.value =
@@ -901,6 +1740,11 @@ addServiceButton.addEventListener(
     updateEditorFields();
 
 
+    saveStatus.classList.add(
+      "hidden"
+    );
+
+
     editor.classList.remove(
       "hidden"
     );
@@ -916,7 +1760,7 @@ addServiceButton.addEventListener(
 
 
 // ========================================
-// EDIT
+// EDIT SERVICE
 // ========================================
 
 function openEditService(
@@ -928,7 +1772,7 @@ function openEditService(
 
 
   editorTitle.textContent =
-    "แก้ไขเมนู";
+    `แก้ไขเมนู — กลุ่ม ${selectedGroup}`;
 
 
   serviceNameInput.value =
@@ -972,6 +1816,11 @@ function openEditService(
   updateEditorFields();
 
 
+  saveStatus.classList.add(
+    "hidden"
+  );
+
+
   editor.classList.remove(
     "hidden"
   );
@@ -986,7 +1835,7 @@ function openEditService(
 
 
 // ========================================
-// TYPE CHANGE
+// TYPE
 // ========================================
 
 serviceTypeInput.addEventListener(
@@ -1061,9 +1910,7 @@ saveButton.addEventListener(
   "click",
   async () => {
 
-    if (
-      !selectedBranchId
-    ) {
+    if (!selectedGroup) {
 
       return;
 
@@ -1090,10 +1937,17 @@ saveButton.addEventListener(
       serviceTypeInput.value;
 
 
+    const existingService =
+      services.find(
+        (service) =>
+          service.id === editingServiceId
+      );
+
+
     const data = {
 
-      branchId:
-        selectedBranchId,
+      groupId:
+        selectedGroup,
 
       name,
 
@@ -1111,6 +1965,16 @@ saveButton.addEventListener(
         serverTimestamp()
 
     };
+
+
+    if (
+      existingService?.serviceCode
+    ) {
+
+      data.serviceCode =
+        existingService.serviceCode;
+
+    }
 
 
     if (
@@ -1186,7 +2050,7 @@ saveButton.addEventListener(
         0;
 
 
-      data.targetServiceType =
+      data.targetServiceCode =
         "haircut";
 
     }
@@ -1206,7 +2070,7 @@ saveButton.addEventListener(
         );
 
 
-      data.targetServiceType =
+      data.targetServiceCode =
         "haircut";
 
     }
@@ -1227,7 +2091,7 @@ saveButton.addEventListener(
         editingServiceId
       ) {
 
-        await updateDoc(
+        await setDoc(
           doc(
             db,
             "services",
@@ -1305,7 +2169,7 @@ async function deleteService(
 
   const confirmed =
     window.confirm(
-      `ต้องการลบ "${service.name}" ใช่ไหม?`
+      `ต้องการลบ "${service.name}" จากกลุ่ม ${selectedGroup} ใช่ไหม?`
     );
 
 
@@ -1398,7 +2262,7 @@ function showSaveStatus(
 
 
 // ========================================
-// HTML ESCAPE
+// ESCAPE HTML
 // ========================================
 
 function escapeHtml(
