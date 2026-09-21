@@ -32,23 +32,12 @@ import {
 
 const firebaseConfig = {
 
-  apiKey:
-    "AIzaSyCDdF3fUIx5WwRf8mx6T7EQ_IMJ862fEvc",
-
-  authDomain:
-    "bkk-cutz.firebaseapp.com",
-
-  projectId:
-    "bkk-cutz",
-
-  storageBucket:
-    "bkk-cutz.firebasestorage.app",
-
-  messagingSenderId:
-    "539745181048",
-
-  appId:
-    "1:539745181048:web:24fa05be416a582cdefc8d"
+  apiKey: "AIzaSyCDdF3fUlx5WwRf8mx6T7EQ_IMJ862fEvc",
+  authDomain: "bkk-cutz.firebaseapp.com",
+  projectId: "bkk-cutz",
+  storageBucket: "bkk-cutz.firebasestorage.app",
+  messagingSenderId: "539745181048",
+  appId: "1:539745181048:web:24fa05be416a582cdefc8d"
 
 };
 
