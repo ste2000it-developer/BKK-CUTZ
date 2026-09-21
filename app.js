@@ -56,6 +56,17 @@ let services =
 
 
 // ========================================
+// LOADING DOM
+// ========================================
+
+const loadingPage =
+  document.getElementById(
+    "loadingPage"
+  );
+
+
+
+// ========================================
 // LOGIN DOM
 // ========================================
 
@@ -694,10 +705,42 @@ watchAuth(
 
 
 // ========================================
+// SHOW LOADING
+// ========================================
+
+function showLoadingPage() {
+
+  loginPage.classList.add(
+    "hidden"
+  );
+
+
+  mainApp.classList.add(
+    "hidden"
+  );
+
+
+  loadingPage.classList.remove(
+    "hidden"
+  );
+
+
+  closePaymentModal();
+
+}
+
+
+
+// ========================================
 // SHOW LOGIN
 // ========================================
 
 function showLoginPage() {
+
+  loadingPage.classList.add(
+    "hidden"
+  );
+
 
   mainApp.classList.add(
     "hidden"
@@ -720,6 +763,11 @@ function showLoginPage() {
 // ========================================
 
 function showMainApp() {
+
+  loadingPage.classList.add(
+    "hidden"
+  );
+
 
   loginPage.classList.add(
     "hidden"
@@ -1528,3 +1576,15 @@ backButton.addEventListener(
   "click",
   resetTransaction
 );
+
+
+
+// ========================================
+// START
+//
+// HTML เริ่มต้นที่ Loading อยู่แล้ว
+// ตรงนี้ย้ำให้ Loading แสดงจนกว่า Firebase
+// จะส่งสถานะ Auth กลับมา
+// ========================================
+
+showLoadingPage();
