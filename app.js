@@ -7,9 +7,34 @@ import {
 } from "./firebase.js";
 
 
+import {
+  getApp
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+
+
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+
 
 // ========================================
-// TrueMoney
+// FIRESTORE
+// ========================================
+
+const db =
+  getFirestore(
+    getApp()
+  );
+
+
+
+// ========================================
+// TRUE MONEY
 // ========================================
 
 const TRUE_MONEY_QR_IMAGE =
@@ -18,33 +43,23 @@ const TRUE_MONEY_QR_IMAGE =
 
 
 // ========================================
-// ข้อมูลทดลอง
+// BARBERS
+//
+// เปลี่ยนจาก hard-code
+// เป็นโหลดจาก Firestore
 // ========================================
 
-const barbers = [
+let barbers =
+  [];
 
-  {
-    id: "barber-001",
-    name: "ช่างเอ"
-  },
 
-  {
-    id: "barber-002",
-    name: "ช่างบี"
-  },
 
-  {
-    id: "barber-003",
-    name: "ช่างซี"
-  },
-
-  {
-    id: "barber-004",
-    name: "ช่างดี"
-  }
-
-];
-
+// ========================================
+// SERVICES
+//
+// ตอนนี้ยังใช้ข้อมูลทดลองเดิมก่อน
+// ขั้นต่อไปค่อยย้ายเข้า Firestore
+// ========================================
 
 const services = [
 
@@ -338,6 +353,70 @@ const selectedServices =
 
 
 // ========================================
+// LOAD BARBERS FROM FIRESTORE
+// ========================================
+
+async function loadBarbers() {
+
+  const barberQuery =
+    query(
+      collection(
+        db,
+        "barbers"
+      ),
+
+      where(
+        "active",
+        "==",
+        true
+      )
+    );
+
+
+  const snapshot =
+    await getDocs(
+      barberQuery
+    );
+
+
+  barbers =
+    snapshot.docs.map(
+      (documentSnapshot) => {
+
+        return {
+
+          id:
+            documentSnapshot.id,
+
+          ...documentSnapshot.data()
+
+        };
+
+      }
+    );
+
+
+  // เรียงชื่อตามภาษาไทย
+  barbers.sort(
+    (a, b) => {
+
+      return String(
+        a.name || ""
+      ).localeCompare(
+        String(
+          b.name || ""
+        ),
+        "th"
+      );
+
+    }
+  );
+
+}
+
+
+
+// ========================================
 // LOGIN
 // ========================================
 
@@ -446,6 +525,10 @@ watchAuth(
         null;
 
 
+      barbers =
+        [];
+
+
       showLoginPage();
 
 
@@ -507,6 +590,10 @@ watchAuth(
 
       currentBranch =
         branch;
+
+
+      // โหลดรายชื่อช่างกลางจาก Firestore
+      await loadBarbers();
 
 
       currentBranchName.textContent =
@@ -610,7 +697,7 @@ function showMainApp() {
 
 
 // ========================================
-// ซ่อนหน้าภายใน POS
+// HIDE POS PAGES
 // ========================================
 
 function hideAllPages() {
@@ -646,6 +733,25 @@ function renderBarbers() {
 
   barberList.innerHTML =
     "";
+
+
+  if (
+    barbers.length === 0
+  ) {
+
+    barberList.innerHTML = `
+      <p
+        class="empty-summary"
+        style="grid-column: 1 / -1;"
+      >
+        ยังไม่มีรายชื่อช่าง
+      </p>
+    `;
+
+
+    return;
+
+  }
 
 
   barbers.forEach(
@@ -853,7 +959,7 @@ function toggleService(
 
 
 // ========================================
-// SELECTED SERVICES
+// GET SELECTED SERVICES
 // ========================================
 
 function getSelectedServiceList() {
@@ -1337,6 +1443,8 @@ function resetTransaction() {
   );
 
 
+  renderBarbers();
+
   renderSummary();
 
 
@@ -1363,11 +1471,3 @@ backButton.addEventListener(
   "click",
   resetTransaction
 );
-
-
-
-// ========================================
-// START
-// ========================================
-
-renderBarbers();
