@@ -56,7 +56,7 @@ let services =
 
 
 // ========================================
-// LOADING DOM
+// LOADING
 // ========================================
 
 const loadingPage =
@@ -67,7 +67,7 @@ const loadingPage =
 
 
 // ========================================
-// LOGIN DOM
+// LOGIN
 // ========================================
 
 const loginPage =
@@ -126,7 +126,7 @@ const currentBranchName =
 
 
 // ========================================
-// PAGE DOM
+// PAGES
 // ========================================
 
 const barberPage =
@@ -155,7 +155,7 @@ const successPage =
 
 
 // ========================================
-// POS DOM
+// POS
 // ========================================
 
 const barberList =
@@ -356,14 +356,14 @@ async function loadBarbers() {
 
   barbers =
     snapshot.docs.map(
-      (documentSnapshot) => {
+      (snapshot) => {
 
         return {
 
           id:
-            documentSnapshot.id,
+            snapshot.id,
 
-          ...documentSnapshot.data()
+          ...snapshot.data()
 
         };
 
@@ -391,11 +391,11 @@ async function loadBarbers() {
 
 
 // ========================================
-// LOAD SERVICES
+// LOAD SERVICES BY GROUP
 // ========================================
 
 async function loadServices(
-  branchId
+  groupId
 ) {
 
   const serviceQuery =
@@ -406,9 +406,9 @@ async function loadServices(
       ),
 
       where(
-        "branchId",
+        "groupId",
         "==",
-        branchId
+        groupId
       )
     );
 
@@ -422,14 +422,14 @@ async function loadServices(
   services =
     snapshot.docs
       .map(
-        (documentSnapshot) => {
+        (snapshot) => {
 
           return {
 
             id:
-              documentSnapshot.id,
+              snapshot.id,
 
-            ...documentSnapshot.data()
+            ...snapshot.data()
 
           };
 
@@ -444,13 +444,11 @@ async function loadServices(
   services.sort(
     (a, b) => {
 
-      return String(
-        a.name || ""
-      ).localeCompare(
-        String(
-          b.name || ""
-        ),
-        "th"
+      return Number(
+        a.sortOrder || 999
+      ) -
+      Number(
+        b.sortOrder || 999
       );
 
     }
@@ -541,7 +539,6 @@ logoutButton.addEventListener(
     } catch (error) {
 
       console.error(
-        "Logout error:",
         error
       );
 
@@ -553,7 +550,7 @@ logoutButton.addEventListener(
 
 
 // ========================================
-// AUTH STATE
+// AUTH
 // ========================================
 
 watchAuth(
@@ -632,6 +629,17 @@ watchAuth(
       }
 
 
+      if (
+        !branch.serviceGroup
+      ) {
+
+        throw new Error(
+          "สาขานี้ยังไม่ได้กำหนดกลุ่มราคา"
+        );
+
+      }
+
+
       currentUserProfile =
         profile;
 
@@ -644,7 +652,7 @@ watchAuth(
 
 
       await loadServices(
-        profile.branchId
+        branch.serviceGroup
       );
 
 
@@ -666,6 +674,7 @@ watchAuth(
 
 
       showMainApp();
+
 
     } catch (error) {
 
@@ -944,7 +953,7 @@ function renderServices() {
 
     serviceList.innerHTML = `
       <p class="empty-summary">
-        ยังไม่มีเมนูสำหรับสาขานี้
+        ยังไม่มีเมนูสำหรับกลุ่มราคานี้
       </p>
     `;
 
@@ -1000,7 +1009,7 @@ function renderServices() {
         </span>
 
         <span class="service-price">
-          ${Number(service.price).toLocaleString("th-TH")} บาท
+          ${Number(service.price || 0).toLocaleString("th-TH")} บาท
         </span>
       `;
 
@@ -1089,7 +1098,7 @@ function calculateTotal() {
   return getSelectedServiceList()
     .reduce(
       (sum, service) =>
-        sum + Number(service.price),
+        sum + Number(service.price || 0),
       0
     );
 
@@ -1154,7 +1163,7 @@ function renderSummary() {
         </span>
 
         <strong>
-          ${Number(service.price).toLocaleString("th-TH")} บาท
+          ${Number(service.price || 0).toLocaleString("th-TH")} บาท
         </strong>
       `;
 
@@ -1411,6 +1420,9 @@ function completeTransaction(
     branchName:
       currentBranch.name,
 
+    serviceGroup:
+      currentBranch.serviceGroup,
+
     barberId:
       selectedBarber.id,
 
@@ -1423,8 +1435,7 @@ function completeTransaction(
     total:
       calculateTotal(),
 
-    paymentMethod:
-      paymentMethod,
+    paymentMethod,
 
     createdAt:
       new Date().toISOString()
@@ -1502,7 +1513,7 @@ function showSuccessPage(
         </span>
 
         <strong>
-          ${Number(service.price).toLocaleString("th-TH")} บาท
+          ${Number(service.price || 0).toLocaleString("th-TH")} บาท
         </strong>
       `;
 
@@ -1581,10 +1592,6 @@ backButton.addEventListener(
 
 // ========================================
 // START
-//
-// HTML เริ่มต้นที่ Loading อยู่แล้ว
-// ตรงนี้ย้ำให้ Loading แสดงจนกว่า Firebase
-// จะส่งสถานะ Auth กลับมา
 // ========================================
 
 showLoadingPage();
