@@ -255,14 +255,16 @@ loginForm.addEventListener("submit", async (event) => {
 // LOGOUT
 // ========================================
 
-logoutButton.addEventListener("click", async () => {
-  try {
-    await logout();
+if (logoutButton) {
+  logoutButton.addEventListener("click", async () => {
+    try {
+      await logout();
 
-  } catch (error) {
-    console.error(error);
-  }
-});
+    } catch (error) {
+      console.error(error);
+    }
+  });
+}
 
 
 // ========================================

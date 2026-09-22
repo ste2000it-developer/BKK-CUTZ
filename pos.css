@@ -1363,3 +1363,13 @@ svg {
   width: 118px;
   text-align: right;
 }
+
+
+/* POS header without logout button */
+.app-header {
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.branch-block {
+  grid-column: 2;
+}
