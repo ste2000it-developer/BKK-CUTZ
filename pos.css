@@ -520,9 +520,9 @@ svg {
   width: 100%;
   min-height: 70px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: 42px minmax(0, 1fr) 28px 118px;
   align-items: center;
-  gap: 18px;
+  column-gap: 12px;
   padding: 10px 14px;
   border: none;
   border-bottom: 1px solid #eeeeee;
@@ -541,12 +541,7 @@ svg {
 }
 
 .service-left {
-  width: 100%;
-  min-width: 0;
-  display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) 28px;
-  align-items: center;
-  gap: 12px;
+  display: contents;
 }
 
 .service-icon {
@@ -1260,13 +1255,18 @@ svg {
     width: 20px;
   }
 
-  .service-left {
-    grid-template-columns: 34px minmax(0, 1fr) 24px;
+  .service-button {
+    grid-template-columns: 34px minmax(0, 1fr) 26px 104px;
+    column-gap: 9px;
   }
 
   .service-icon {
     width: 32px;
     height: 32px;
+  }
+
+  .service-price {
+    width: 104px;
   }
 
   .service-name {
@@ -1342,4 +1342,24 @@ svg {
 
 .notice-close-button:active {
   transform: scale(0.99);
+}
+
+
+.service-icon {
+  grid-column: 1;
+}
+
+.service-copy {
+  grid-column: 2;
+}
+
+.service-check {
+  grid-column: 3;
+  justify-self: center;
+}
+
+.service-price {
+  grid-column: 4;
+  width: 118px;
+  text-align: right;
 }
