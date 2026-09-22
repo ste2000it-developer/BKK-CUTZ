@@ -519,10 +519,10 @@ svg {
 .service-button {
   width: 100%;
   min-height: 70px;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 14px;
+  gap: 18px;
   padding: 10px 14px;
   border: none;
   border-bottom: 1px solid #eeeeee;
@@ -541,6 +541,7 @@ svg {
 }
 
 .service-left {
+  width: 100%;
   min-width: 0;
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr) 28px;
@@ -583,6 +584,7 @@ svg {
 .service-check {
   width: 24px;
   height: 24px;
+  justify-self: center;
   display: flex;
   align-items: center;
   justify-content: center;
