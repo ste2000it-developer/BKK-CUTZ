@@ -475,23 +475,30 @@ function getServiceIconMarkup(service) {
   const type = service.type || "";
 
   const icons = {
-    haircut: "fa-solid fa-scissors",
-    kids: "fa-solid fa-child-reaching",
-    trim: "fa-solid fa-scissors",
-    shave: "fa-solid fa-brush",
-    wash: "fa-solid fa-shower",
-    product: "fa-solid fa-box-open",
-    custom: "fa-solid fa-ellipsis",
-    free_cut: "fa-solid fa-gift",
-    half_cut: "fa-solid fa-percent"
+    haircut: "content_cut",
+    kids: "child_care",
+    trim: "health_and_beauty",
+    shave: "razor",
+    wash: "shower",
+    product: "inventory_2",
+    custom: "more_horiz",
+    free_cut: "redeem",
+    half_cut: "percent"
   };
 
-  const iconClass =
+  const iconName =
     icons[code] ||
     icons[type] ||
-    "fa-solid fa-ellipsis";
+    "more_horiz";
 
-  return `<i class="${iconClass}" aria-hidden="true"></i>`;
+  return `
+    <span
+      class="material-symbols-outlined"
+      aria-hidden="true"
+    >
+      ${iconName}
+    </span>
+  `;
 }
 
 
