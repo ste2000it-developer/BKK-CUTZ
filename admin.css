@@ -168,7 +168,7 @@ select {
 }
 
 .login-card .primary-button {
-  margin-top: 22px;
+  margin-top: 26px;
 }
 
 
@@ -694,4 +694,40 @@ select {
   .admin-topbar h1 {
     font-size: 31px;
   }
+}
+
+
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 52px;
+}
+
+.password-toggle-button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #777777;
+  font-size: 18px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.password-toggle-button:active {
+  background: #f1f1f1;
+}
+
+.delete-button i,
+.edit-button i {
+  pointer-events: none;
 }

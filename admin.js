@@ -448,7 +448,7 @@ function renderServices() {
           aria-label="แก้ไข"
           title="แก้ไข"
         >
-          ✎
+          <i class="fa-solid fa-pen" aria-hidden="true"></i>
         </button>
 
         <button
@@ -457,7 +457,7 @@ function renderServices() {
           aria-label="ลบ"
           title="ลบ"
         >
-          ⌫
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
         </button>
       </div>
     `;
@@ -809,6 +809,55 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+
+
+// ========================================
+// PASSWORD VISIBILITY
+// ========================================
+
+const adminPasswordToggleButton =
+  document.getElementById("adminPasswordToggleButton");
+
+const adminPasswordToggleIcon =
+  document.getElementById("adminPasswordToggleIcon");
+
+if (
+  adminPasswordToggleButton &&
+  adminPasswordToggleIcon
+) {
+  adminPasswordToggleButton.addEventListener(
+    "click",
+    () => {
+      const isHidden =
+        passwordInput.type === "password";
+
+      passwordInput.type =
+        isHidden
+          ? "text"
+          : "password";
+
+      adminPasswordToggleIcon.classList.toggle(
+        "fa-eye",
+        !isHidden
+      );
+
+      adminPasswordToggleIcon.classList.toggle(
+        "fa-eye-slash",
+        isHidden
+      );
+
+      adminPasswordToggleButton.setAttribute(
+        "aria-label",
+        isHidden
+          ? "ซ่อนรหัสผ่าน"
+          : "แสดงรหัสผ่าน"
+      );
+
+      passwordInput.focus();
+    }
+  );
 }
 
 

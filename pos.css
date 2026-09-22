@@ -213,6 +213,32 @@ svg {
   height: 100%;
 }
 
+.field-icon-button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: #777777;
+  font-size: 19px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.field-icon-button:active {
+  background: #f1f1f1;
+}
+
+.login-card .primary-button {
+  margin-top: 26px;
+}
+
 .login-error {
   margin-top: 16px;
   padding: 14px 16px;
@@ -531,10 +557,9 @@ svg {
   color: #111111;
 }
 
-.service-icon svg {
-  width: 27px;
-  height: 27px;
-  stroke-width: 1.9;
+.service-icon i {
+  font-size: 22px;
+  line-height: 1;
 }
 
 .service-copy {

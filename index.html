@@ -18,7 +18,12 @@
 
   <link
     rel="stylesheet"
-    href="pos.css?v=20"
+    href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="pos.css?v=21"
   >
 </head>
 
@@ -86,12 +91,18 @@
             required
           >
 
-          <span class="field-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <path d="M3 12s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6Z"></path>
-              <circle cx="12" cy="12" r="2.4"></circle>
-            </svg>
-          </span>
+          <button
+            id="passwordToggleButton"
+            class="field-icon-button"
+            type="button"
+            aria-label="แสดงรหัสผ่าน"
+          >
+            <i
+              id="passwordToggleIcon"
+              class="fa-regular fa-eye"
+              aria-hidden="true"
+            ></i>
+          </button>
         </div>
 
         <div
@@ -617,7 +628,7 @@
 
   <script
     type="module"
-    src="app.js?v=20"
+    src="app.js?v=21"
   ></script>
 </body>
 </html>
