@@ -438,6 +438,114 @@ function selectBarber(barber) {
 // SERVICE DISPLAY
 // ========================================
 
+// ========================================
+// DISPLAY HELPERS
+// ========================================
+
+function getServiceDisplayName(service) {
+  if (service.type === "free_cut") {
+    return "ตัดผมฟรี 1 ครั้ง";
+  }
+
+  if (service.type === "half_cut") {
+    return `ส่วนลดค่าตัดผม ${Number(service.discountPercent || 0)}%`;
+  }
+
+  return service.name || "-";
+}
+
+function getServiceIconMarkup(service) {
+  const code = service.serviceCode || "";
+  const type = service.type || "";
+
+  const icons = {
+    haircut: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="6" cy="6" r="3"></circle>
+        <circle cx="6" cy="18" r="3"></circle>
+        <path d="M8.7 7.4 20 2"></path>
+        <path d="M8.7 16.6 20 22"></path>
+        <path d="M8.5 8.5 15 12 8.5 15.5"></path>
+      </svg>
+    `,
+    kids: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="8" r="4"></circle>
+        <path d="M5 21c.7-4.2 3.1-6.3 7-6.3S18.3 16.8 19 21"></path>
+      </svg>
+    `,
+    trim: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 8c2-4 5-6 8-6s6 2 8 6"></path>
+        <path d="M5 10v9"></path>
+        <path d="M19 10v9"></path>
+        <path d="M5 14c2 1.5 4.3 2.2 7 2.2s5-.7 7-2.2"></path>
+      </svg>
+    `,
+    shave: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m4 18 9-9"></path>
+        <path d="m8 22 9-9"></path>
+        <path d="m12 8 4-4 4 4-4 4z"></path>
+        <path d="M3 17 7 21"></path>
+      </svg>
+    `,
+    wash: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 10h14"></path>
+        <path d="M7 10c0-4 2-6 5-6s5 2 5 6"></path>
+        <path d="M8 14v2"></path>
+        <path d="M12 14v3"></path>
+        <path d="M16 14v2"></path>
+        <path d="M7 20h10"></path>
+      </svg>
+    `,
+    product: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="5" y="8" width="14" height="12" rx="2"></rect>
+        <path d="M8 8V5h8v3"></path>
+        <path d="M8 13h8"></path>
+      </svg>
+    `,
+    custom: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="6" cy="12" r="1.3"></circle>
+        <circle cx="12" cy="12" r="1.3"></circle>
+        <circle cx="18" cy="12" r="1.3"></circle>
+      </svg>
+    `,
+    free_cut: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="4" y="7" width="16" height="13" rx="2"></rect>
+        <path d="M12 7v13"></path>
+        <path d="M4 11h16"></path>
+        <path d="M12 7c-2-4-6-4-6-1 0 2 3 2 6 1Z"></path>
+        <path d="M12 7c2-4 6-4 6-1 0 2-3 2-6 1Z"></path>
+      </svg>
+    `,
+    half_cut: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="7" cy="7" r="2.5"></circle>
+        <circle cx="17" cy="17" r="2.5"></circle>
+        <path d="M18.5 5.5 5.5 18.5"></path>
+      </svg>
+    `
+  };
+
+  const key =
+    icons[code]
+      ? code
+      : (
+          icons[type]
+            ? type
+            : "custom"
+        );
+
+  return icons[key];
+}
+
+
+
 function getServiceButtonPriceText(service) {
   const selected =
     selectedServices.get(service.id);
@@ -527,12 +635,18 @@ function renderServices() {
 
     button.innerHTML = `
       <span class="service-left">
-        <span class="service-check">
-          ${isSelected ? "✓" : ""}
+        <span class="service-icon">
+          ${getServiceIconMarkup(service)}
         </span>
 
-        <span class="service-name">
-          ${escapeHtml(service.name || "-")}
+        <span class="service-copy">
+          <span class="service-name">
+            ${escapeHtml(getServiceDisplayName(service))}
+          </span>
+        </span>
+
+        <span class="service-check">
+          ${isSelected ? "✓" : ""}
         </span>
       </span>
 
@@ -630,7 +744,7 @@ function makeSelectedService(
     id: service.id,
     serviceCode:
       service.serviceCode || null,
-    name: service.name || "",
+    name: getServiceDisplayName(service),
     type: service.type || "fixed",
     price:
       Number(price || 0),
@@ -649,7 +763,7 @@ function openChoiceModal(service) {
   pendingService = service;
 
   serviceOptionTitle.textContent =
-    service.name || "เลือกตัวเลือก";
+    getServiceDisplayName(service) || "เลือกตัวเลือก";
 
   choiceOptionsArea.innerHTML = "";
 
@@ -740,7 +854,7 @@ function openRangePriceModal(service) {
       : 200;
 
   serviceOptionTitle.textContent =
-    service.name || "ใส่ราคา";
+    getServiceDisplayName(service) || "ใส่ราคา";
 
   choiceOptionsArea.classList.add(
     "hidden"
@@ -848,7 +962,7 @@ function openCustomModal(service) {
   pendingService = service;
 
   serviceOptionTitle.textContent =
-    service.name || "อื่นๆ";
+    getServiceDisplayName(service) || "อื่นๆ";
 
   choiceOptionsArea.classList.add(
     "hidden"

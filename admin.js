@@ -154,6 +154,10 @@ watchAuth(async (user) => {
     showAdmin();
     await loadBranches();
 
+    if (!selectedGroup) {
+      selectGroup("A");
+    }
+
   } catch (error) {
     console.error(error);
 
@@ -269,10 +273,23 @@ function renderGroupBranches() {
         branch.name || branch.id
     );
 
-  groupBranches.textContent =
-    names.length > 0
-      ? `สาขาในกลุ่ม ${selectedGroup}: ${names.join(" / ")}`
-      : `ยังไม่มีสาขาในกลุ่ม ${selectedGroup}`;
+  const branchCount =
+    names.length;
+
+  groupBranches.innerHTML = `
+    <div class="group-branch-label">
+      สาขาในกลุ่ม ${escapeHtml(selectedGroup)}
+      <span>${branchCount} สาขา</span>
+    </div>
+
+    <div class="group-branch-names">
+      ${
+        branchCount > 0
+          ? names.map(escapeHtml).join(" · ")
+          : "ยังไม่มีสาขาในกลุ่มนี้"
+      }
+    </div>
+  `;
 }
 
 
@@ -373,59 +390,104 @@ function renderServices() {
     return;
   }
 
-  services.forEach((service) => {
-    const card = document.createElement("div");
+  const header = document.createElement("div");
 
-    card.className = "service-card";
+  header.className = "service-table-head";
 
-    card.innerHTML = `
-      <div class="service-top">
-        <div>
-          <div class="service-name">
-            ${escapeHtml(service.name || "-")}
-          </div>
+  header.innerHTML = `
+    <div>#</div>
+    <div>ชื่อเมนู</div>
+    <div>ประเภท</div>
+    <div>ราคา</div>
+    <div>สถานะ</div>
+    <div>จัดการ</div>
+  `;
 
-          <div class="service-price">
-            ${escapeHtml(getServicePriceText(service))}
-          </div>
+  serviceList.appendChild(header);
+
+  services.forEach((service, index) => {
+    const row =
+      document.createElement("div");
+
+    row.className =
+      "service-table-row";
+
+    row.innerHTML = `
+      <div class="service-index">
+        ${index + 1}
+      </div>
+
+      <div class="service-main">
+        <div class="service-name">
+          ${escapeHtml(service.name || "-")}
         </div>
 
-        <div class="service-status">
-          ${service.active === true ? "เปิด" : "ปิด"}
+        <div class="service-code">
+          ${escapeHtml(service.serviceCode || service.type || "")}
         </div>
+      </div>
+
+      <div class="service-type">
+        ${escapeHtml(getServiceTypeLabel(service.type))}
+      </div>
+
+      <div class="service-price">
+        ${escapeHtml(getServicePriceText(service))}
+      </div>
+
+      <div>
+        <span class="service-status ${service.active === true ? "is-active" : "is-off"}">
+          ${service.active === true ? "เปิดใช้งาน" : "ปิดใช้งาน"}
+        </span>
       </div>
 
       <div class="service-actions">
         <button
           class="edit-button"
           type="button"
+          aria-label="แก้ไข"
+          title="แก้ไข"
         >
-          แก้ไข
+          ✎
         </button>
 
         <button
           class="delete-button"
           type="button"
+          aria-label="ลบ"
+          title="ลบ"
         >
-          ลบ
+          ⌫
         </button>
       </div>
     `;
 
-    card
+    row
       .querySelector(".edit-button")
       .addEventListener("click", () => {
         openEditService(service);
       });
 
-    card
+    row
       .querySelector(".delete-button")
       .addEventListener("click", () => {
         deleteService(service);
       });
 
-    serviceList.appendChild(card);
+    serviceList.appendChild(row);
   });
+}
+
+function getServiceTypeLabel(type) {
+  const labels = {
+    fixed: "ราคาปกติ",
+    choice: "ช่วงราคา",
+    custom: "กรอกราคา",
+    free_cut: "สิทธิ์พิเศษ",
+    half_cut: "ส่วนลด"
+  };
+
+  return labels[type] || type || "-";
 }
 
 

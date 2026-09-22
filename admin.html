@@ -4,645 +4,41 @@
   <meta charset="UTF-8">
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
 
   <title>BKK-CUTZ Admin</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    :root {
-      --ink: #171717;
-      --ink-2: #252525;
-      --muted: #848484;
-      --line: #dfdfdf;
-      --line-soft: #ebebeb;
-      --paper: #ffffff;
-      --canvas: #f3f3f1;
-      --soft: #f7f7f5;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Arial, "Noto Sans Thai", sans-serif;
-      background: var(--canvas);
-      color: var(--ink);
-    }
-
-    button,
-    input,
-    select {
-      font-family: inherit;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-
-    /* LOADING */
-    .loading-page {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 18px;
-    }
-
-    .loading-brand {
-      font-size: 24px;
-      font-weight: 900;
-      letter-spacing: 3px;
-    }
-
-    .spinner {
-      width: 42px;
-      height: 42px;
-      border: 4px solid #dddddd;
-      border-top-color: var(--ink);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
-
-    /* LOGIN */
-    .login-page {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .login-card {
-      width: 100%;
-      max-width: 440px;
-      padding: 34px;
-      border: 1px solid var(--line-soft);
-      border-radius: 24px;
-      background: var(--paper);
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
-    }
-
-    .brand {
-      margin-bottom: 24px;
-      text-align: center;
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: 2.5px;
-    }
-
-    .login-card h1 {
-      margin: 0 0 8px;
-      text-align: center;
-    }
-
-    .subtitle {
-      margin: 0 0 28px;
-      text-align: center;
-      color: var(--muted);
-    }
-
-    label {
-      display: block;
-      margin: 16px 0 7px;
-      font-weight: 700;
-    }
-
-    input,
-    select {
-      width: 100%;
-      min-height: 48px;
-      padding: 10px 13px;
-      border: 1px solid #d3d3d3;
-      border-radius: 10px;
-      background: var(--paper);
-      font-size: 16px;
-      outline: none;
-    }
-
-    input:focus,
-    select:focus {
-      border-color: var(--ink);
-      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.045);
-    }
-
-    .main-button {
-      width: 100%;
-      min-height: 54px;
-      margin-top: 22px;
-      border: none;
-      border-radius: 12px;
-      background: var(--ink);
-      color: #ffffff;
-      font-size: 17px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .error-box {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 10px;
-      background: #eeeeee;
-    }
-
-
-    /* ADMIN SHELL */
-    .admin-shell {
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: 260px minmax(0, 1fr);
-    }
-
-    .admin-sidebar {
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      padding: 24px 18px;
-      background: var(--ink);
-      color: #ffffff;
-    }
-
-    .sidebar-brand-row {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      padding: 0 8px 26px;
-    }
-
-    .sidebar-mark {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 42px;
-      height: 42px;
-      border: 1px solid #3c3c3c;
-      border-radius: 11px;
-      background: #242424;
-      font-size: 13px;
-      font-weight: 900;
-      letter-spacing: 0.5px;
-    }
-
-    .sidebar-brand {
-      font-size: 18px;
-      font-weight: 900;
-      letter-spacing: 1.8px;
-    }
-
-    .sidebar-caption {
-      margin-top: 2px;
-      color: #8f8f8f;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-    }
-
-    .sidebar-label {
-      padding: 0 10px 8px;
-      color: #747474;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-
-    .admin-nav {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-
-    .admin-nav-button {
-      width: 100%;
-      min-height: 48px;
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      padding: 10px 12px;
-      border: 1px solid transparent;
-      border-radius: 11px;
-      background: transparent;
-      color: #aaaaaa;
-      text-align: left;
-      font-size: 14px;
-      font-weight: 750;
-      cursor: pointer;
-    }
-
-    .admin-nav-button.active {
-      border-color: #383838;
-      background: #272727;
-      color: #ffffff;
-    }
-
-    .nav-icon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 25px;
-      height: 25px;
-      border-radius: 7px;
-      background: #343434;
-      font-size: 12px;
-      font-weight: 900;
-    }
-
-    .admin-main {
-      min-width: 0;
-      padding: 26px 30px 60px;
-    }
-
-    .admin-main-inner {
-      width: 100%;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-
-    /* TOP BAR */
-    .top-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      margin-bottom: 26px;
-    }
-
-    .page-kicker {
-      margin-bottom: 4px;
-      color: #939393;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 1.7px;
-    }
-
-    .top-title {
-      font-size: 30px;
-      font-weight: 900;
-      letter-spacing: -0.6px;
-    }
-
-    .top-subtitle {
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .logout-button {
-      min-height: 42px;
-      padding: 9px 14px;
-      border: 1px solid var(--line);
-      border-radius: 11px;
-      background: var(--paper);
-      color: var(--ink-2);
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-
-    /* GROUPS */
-    .group-card {
-      margin-bottom: 20px;
-      padding: 20px;
-      border: 1px solid var(--line-soft);
-      border-radius: 19px;
-      background: var(--paper);
-    }
-
-    .card-head {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 20px;
-      margin-bottom: 15px;
-    }
-
-    .card-head h2 {
-      margin: 0;
-      font-size: 21px;
-    }
-
-    .card-head p {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .group-buttons {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-      padding: 5px;
-      border-radius: 13px;
-      background: var(--soft);
-    }
-
-    .group-button {
-      min-height: 52px;
-      border: none;
-      border-radius: 10px;
-      background: transparent;
-      color: #747474;
-      font-size: 15px;
-      font-weight: 850;
-      cursor: pointer;
-    }
-
-    .group-button.active {
-      background: var(--ink);
-      color: #ffffff;
-      box-shadow: 0 4px 11px rgba(0, 0, 0, 0.12);
-    }
-
-    .group-branches {
-      margin-top: 14px;
-      padding: 12px 14px;
-      border: 1px solid #ececec;
-      border-radius: 11px;
-      background: #fafafa;
-      color: #696969;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-
-    /* SERVICES */
-    .service-section {
-      padding: 20px;
-      border: 1px solid var(--line-soft);
-      border-radius: 19px;
-      background: var(--paper);
-    }
-
-    .toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-      margin-bottom: 16px;
-      padding-bottom: 15px;
-      border-bottom: 1px solid #eeeeee;
-    }
-
-    .toolbar h2 {
-      margin: 0;
-      font-size: 21px;
-    }
-
-    .add-button {
-      min-height: 42px;
-      padding: 9px 15px;
-      border: none;
-      border-radius: 10px;
-      background: var(--ink);
-      color: #ffffff;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .add-button:disabled {
-      opacity: 0.35;
-      cursor: default;
-    }
-
-    .service-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .service-card {
-      padding: 14px 15px;
-      border: 1px solid #e7e7e7;
-      border-radius: 13px;
-      background: var(--soft);
-    }
-
-    .service-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-    }
-
-    .service-name {
-      font-size: 16px;
-      font-weight: 850;
-    }
-
-    .service-price {
-      margin-top: 4px;
-      color: #717171;
-      font-size: 13px;
-    }
-
-    .service-status {
-      flex: 0 0 auto;
-      padding: 5px 9px;
-      border-radius: 99px;
-      background: #e7e7e4;
-      color: #5f5f5f;
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .service-actions {
-      display: flex;
-      gap: 7px;
-      margin-top: 11px;
-    }
-
-    .edit-button,
-    .delete-button {
-      min-height: 34px;
-      padding: 7px 11px;
-      border: none;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 750;
-      cursor: pointer;
-    }
-
-    .edit-button {
-      background: #dededb;
-      color: var(--ink);
-    }
-
-    .delete-button {
-      background: transparent;
-      color: #888888;
-    }
-
-    .empty {
-      padding: 34px;
-      text-align: center;
-      color: #999999;
-      font-size: 14px;
-    }
-
-
-    /* EDITOR */
-    .editor {
-      margin-top: 18px;
-      padding: 20px;
-      border: 1px solid #dadada;
-      border-radius: 17px;
-      background: #fbfbfa;
-    }
-
-    .editor h2 {
-      margin: 0 0 16px;
-      font-size: 20px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
-
-    .grid label {
-      margin-top: 0;
-      font-size: 13px;
-    }
-
-    .checkbox-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 17px;
-      font-size: 13px;
-    }
-
-    .checkbox-row input {
-      width: auto;
-      min-height: auto;
-    }
-
-    .editor-actions {
-      display: flex;
-      gap: 9px;
-      margin-top: 20px;
-    }
-
-    .save-button {
-      flex: 1;
-      min-height: 48px;
-      border: none;
-      border-radius: 11px;
-      background: var(--ink);
-      color: #ffffff;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .cancel-button {
-      min-height: 48px;
-      padding: 0 18px;
-      border: none;
-      border-radius: 11px;
-      background: #e6e6e3;
-      color: #555555;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .status-box {
-      margin-top: 13px;
-      padding: 11px;
-      border-radius: 9px;
-      background: #eeeeec;
-      font-size: 13px;
-    }
-
-
-    @media (max-width: 760px) {
-      .admin-shell {
-        display: block;
-      }
-
-      .admin-sidebar {
-        position: static;
-        height: auto;
-        padding: 14px;
-      }
-
-      .sidebar-brand-row {
-        padding: 0 0 13px;
-      }
-
-      .sidebar-label {
-        display: none;
-      }
-
-      .admin-nav {
-        flex-direction: row;
-      }
-
-      .admin-nav-button {
-        width: auto;
-        flex: 1;
-      }
-
-      .admin-main {
-        padding: 20px 14px 46px;
-      }
-
-      .top-title {
-        font-size: 26px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .group-buttons {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .toolbar {
-        align-items: stretch;
-        flex-direction: column;
-      }
-
-      .add-button {
-        width: 100%;
-      }
-    }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <link
+    rel="stylesheet"
+    href="admin.css?v=20"
+  >
 </head>
 
 <body>
 
-  <section
-    id="loadingPage"
-    class="loading-page"
-  >
+  <!-- LOADING -->
+  <section id="loadingPage" class="loading-page">
     <div class="loading-brand">BKK-CUTZ</div>
     <div class="spinner"></div>
     <div>กำลังตรวจสอบบัญชี...</div>
   </section>
 
 
-  <section
-    id="loginPage"
-    class="login-page hidden"
-  >
-    <div class="login-card">
-      <div class="brand">BKK-CUTZ</div>
+  <!-- ADMIN LOGIN -->
+  <section id="loginPage" class="login-page hidden">
+    <form id="loginForm" class="login-card">
+      <div class="login-brand">BKK-CUTZ</div>
+      <div class="login-subbrand">ADMIN PANEL</div>
+
+      <div class="login-rule"></div>
 
       <h1>Admin</h1>
 
@@ -650,58 +46,57 @@
         ระบบจัดการ BKK-CUTZ
       </p>
 
-      <form id="loginForm">
-        <label>อีเมล</label>
+      <label for="emailInput">
+        อีเมล
+      </label>
 
-        <input
-          id="emailInput"
-          type="email"
-          autocomplete="username"
-          required
-        >
+      <input
+        id="emailInput"
+        type="email"
+        autocomplete="username"
+        required
+      >
 
-        <label>รหัสผ่าน</label>
+      <label for="passwordInput">
+        รหัสผ่าน
+      </label>
 
-        <input
-          id="passwordInput"
-          type="password"
-          autocomplete="current-password"
-          required
-        >
+      <input
+        id="passwordInput"
+        type="password"
+        autocomplete="current-password"
+        required
+      >
 
-        <div
-          id="loginError"
-          class="error-box hidden"
-        ></div>
+      <div
+        id="loginError"
+        class="error-box hidden"
+      ></div>
 
-        <button
-          id="loginButton"
-          class="main-button"
-          type="submit"
-        >
-          เข้าสู่ระบบ Admin
-        </button>
-      </form>
-    </div>
+      <button
+        id="loginButton"
+        class="primary-button"
+        type="submit"
+      >
+        เข้าสู่ระบบ Admin
+      </button>
+    </form>
   </section>
 
 
+  <!-- ADMIN APP -->
   <div
     id="adminApp"
     class="admin-shell hidden"
   >
 
     <aside class="admin-sidebar">
-      <div class="sidebar-brand-row">
-        <div class="sidebar-mark">BC</div>
-
-        <div>
-          <div class="sidebar-brand">BKK-CUTZ</div>
-          <div class="sidebar-caption">ADMIN PANEL</div>
-        </div>
+      <div>
+        <div class="sidebar-brand">BKK-CUTZ</div>
+        <div class="sidebar-subbrand">ADMIN PANEL</div>
       </div>
 
-      <div class="sidebar-label">
+      <div class="sidebar-menu-title">
         เมนูระบบ
       </div>
 
@@ -711,32 +106,41 @@
           data-admin-page="services"
           type="button"
         >
-          <span class="nav-icon">฿</span>
-          <span>เมนูบริการ / ราคา</span>
+          <span class="nav-icon">
+            ✂
+          </span>
+
+          <span>
+            เมนูบริการ / ราคา
+          </span>
+
+          <b>›</b>
         </button>
       </nav>
+
+      <div class="sidebar-footer">
+        <div>GOOD HAIR</div>
+        <div>BETTER PEOPLE</div>
+      </div>
     </aside>
 
 
     <main class="admin-main">
       <div class="admin-main-inner">
 
-        <div class="top-bar">
+        <header class="admin-topbar">
           <div>
-            <div class="page-kicker">
+            <div class="admin-kicker">
               BKK-CUTZ CONTROL
             </div>
 
-            <div
-              id="pageTitle"
-              class="top-title"
-            >
+            <h1 id="pageTitle">
               เมนูบริการ / ราคา
-            </div>
+            </h1>
 
             <div
               id="adminEmail"
-              class="top-subtitle"
+              class="admin-email"
             >
               -
             </div>
@@ -749,26 +153,53 @@
           >
             ออกจากระบบ
           </button>
-        </div>
+        </header>
 
 
         <section id="servicesAdminPage">
 
           <section class="group-card">
-            <div class="card-head">
+            <div class="group-heading">
               <div>
-                <h2>กลุ่มราคา</h2>
+                <h2>เลือกกลุ่มราคา</h2>
                 <p>
-                  เลือกกลุ่มที่ต้องการจัดการเมนูและราคา
+                  จัดการเมนูและราคาตามกลุ่มของสาขา
                 </p>
               </div>
             </div>
 
             <div class="group-buttons">
-              <button class="group-button" data-group="A" type="button">A</button>
-              <button class="group-button" data-group="B" type="button">B</button>
-              <button class="group-button" data-group="C" type="button">C</button>
-              <button class="group-button" data-group="D" type="button">D</button>
+              <button
+                class="group-button"
+                data-group="A"
+                type="button"
+              >
+                <strong>กลุ่มราคา A</strong>
+              </button>
+
+              <button
+                class="group-button"
+                data-group="B"
+                type="button"
+              >
+                <strong>กลุ่มราคา B</strong>
+              </button>
+
+              <button
+                class="group-button"
+                data-group="C"
+                type="button"
+              >
+                <strong>กลุ่มราคา C</strong>
+              </button>
+
+              <button
+                class="group-button"
+                data-group="D"
+                type="button"
+              >
+                <strong>กลุ่มราคา D</strong>
+              </button>
             </div>
 
             <div
@@ -780,125 +211,144 @@
           </section>
 
 
-          <section class="service-section">
-            <div class="toolbar">
-              <h2 id="serviceTitle">
-                เมนูบริการ
-              </h2>
+          <div class="admin-workspace">
 
-              <button
-                id="addServiceButton"
-                class="add-button"
-                type="button"
-                disabled
-              >
-                + เพิ่มเมนู
-              </button>
-            </div>
+            <section class="service-section">
+              <div class="service-toolbar">
+                <div>
+                  <h2 id="serviceTitle">
+                    เมนูบริการ
+                  </h2>
 
-            <div
-              id="serviceList"
-              class="service-list"
-            >
-              <div class="empty">
-                กรุณาเลือกกลุ่มราคา
+                  <p>
+                    จัดการรายการบริการ ราคา และสถานะ
+                  </p>
+                </div>
+
+                <button
+                  id="addServiceButton"
+                  class="add-button"
+                  type="button"
+                  disabled
+                >
+                  + เพิ่มเมนูบริการ
+                </button>
               </div>
-            </div>
+
+              <div
+                id="serviceList"
+                class="service-list"
+              >
+                <div class="empty">
+                  กรุณาเลือกกลุ่มราคา
+                </div>
+              </div>
+            </section>
 
 
             <section
               id="editor"
               class="editor hidden"
             >
-              <h2 id="editorTitle">
-                แก้ไขเมนู
-              </h2>
-
-              <div class="grid">
-
+              <div class="editor-heading">
                 <div>
-                  <label>ชื่อเมนู</label>
+                  <h2 id="editorTitle">
+                    เพิ่ม / แก้ไขเมนูบริการ
+                  </h2>
 
-                  <input
-                    id="serviceNameInput"
-                    type="text"
-                  >
+                  <p>
+                    ปรับข้อมูลรายการบริการ
+                  </p>
                 </div>
-
-                <div>
-                  <label>ประเภท</label>
-
-                  <select id="serviceTypeInput">
-                    <option value="fixed">
-                      ราคาปกติ
-                    </option>
-
-                    <option value="choice">
-                      เลือกราคา
-                    </option>
-
-                    <option value="custom">
-                      กรอกรายละเอียดและราคาเอง
-                    </option>
-
-                    <option value="free_cut">
-                      ตัดผมฟรี
-                    </option>
-
-                    <option value="half_cut">
-                      ส่วนลดค่าตัดผม
-                    </option>
-                  </select>
-                </div>
-
-                <div id="priceField">
-                  <label>ราคา</label>
-
-                  <input
-                    id="servicePriceInput"
-                    type="number"
-                    min="0"
-                  >
-                </div>
-
-                <div
-                  id="choiceField"
-                  class="hidden"
-                >
-                  <label>ช่วง/ตัวเลือกราคา</label>
-
-                  <input
-                    id="serviceChoicesInput"
-                    type="text"
-                    placeholder="เช่น 150, 200"
-                  >
-                </div>
-
-                <div
-                  id="discountField"
-                  class="hidden"
-                >
-                  <label>ส่วนลด %</label>
-
-                  <input
-                    id="discountPercentInput"
-                    type="number"
-                    min="0"
-                    max="100"
-                  >
-                </div>
-
-                <div>
-                  <label>ลำดับแสดง</label>
-
-                  <input
-                    id="sortOrderInput"
-                    type="number"
-                    min="1"
-                  >
-                </div>
-
               </div>
+
+              <label>
+                ชื่อเมนู
+              </label>
+
+              <input
+                id="serviceNameInput"
+                type="text"
+              >
+
+              <label>
+                ประเภท
+              </label>
+
+              <select id="serviceTypeInput">
+                <option value="fixed">
+                  ราคาปกติ
+                </option>
+
+                <option value="choice">
+                  ช่วง / ตัวเลือกราคา
+                </option>
+
+                <option value="custom">
+                  กรอกรายละเอียดและราคาเอง
+                </option>
+
+                <option value="free_cut">
+                  ตัดผมฟรี
+                </option>
+
+                <option value="half_cut">
+                  ส่วนลดค่าตัดผม
+                </option>
+              </select>
+
+              <div id="priceField">
+                <label>
+                  ราคา (บาท)
+                </label>
+
+                <input
+                  id="servicePriceInput"
+                  type="number"
+                  min="0"
+                >
+              </div>
+
+              <div
+                id="choiceField"
+                class="hidden"
+              >
+                <label>
+                  ช่วง / ตัวเลือกราคา
+                </label>
+
+                <input
+                  id="serviceChoicesInput"
+                  type="text"
+                  placeholder="เช่น 150, 200"
+                >
+              </div>
+
+              <div
+                id="discountField"
+                class="hidden"
+              >
+                <label>
+                  ส่วนลด %
+                </label>
+
+                <input
+                  id="discountPercentInput"
+                  type="number"
+                  min="0"
+                  max="100"
+                >
+              </div>
+
+              <label>
+                ลำดับแสดง
+              </label>
+
+              <input
+                id="sortOrderInput"
+                type="number"
+                min="1"
+              >
 
               <label class="checkbox-row">
                 <input
@@ -911,19 +361,19 @@
 
               <div class="editor-actions">
                 <button
-                  id="saveButton"
-                  class="save-button"
-                  type="button"
-                >
-                  บันทึก
-                </button>
-
-                <button
                   id="cancelButton"
                   class="cancel-button"
                   type="button"
                 >
                   ยกเลิก
+                </button>
+
+                <button
+                  id="saveButton"
+                  class="save-button"
+                  type="button"
+                >
+                  บันทึก
                 </button>
               </div>
 
@@ -932,17 +382,19 @@
                 class="status-box hidden"
               ></div>
             </section>
-          </section>
+
+          </div>
 
         </section>
 
       </div>
     </main>
+
   </div>
 
   <script
     type="module"
-    src="admin.js?v=3"
+    src="admin.js?v=20"
   ></script>
 </body>
 </html>
