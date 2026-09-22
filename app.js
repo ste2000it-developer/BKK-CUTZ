@@ -478,7 +478,7 @@ function getServiceIconMarkup(service) {
     haircut: "content_cut",
     kids: "child_care",
     trim: "health_and_beauty",
-    shave: "razor",
+    shave: "cleaning_services",
     wash: "shower",
     product: "inventory_2",
     custom: "more_horiz",
