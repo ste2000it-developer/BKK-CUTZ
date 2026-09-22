@@ -15,7 +15,11 @@ import {
   collection,
   query,
   where,
-  getDocs
+  getDocs,
+  doc,
+  setDoc,
+  onSnapshot,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
@@ -34,7 +38,10 @@ const TRUE_MONEY_QR_IMAGE = "";
 // ========================================
 
 let barbers = [];
+let activeBarbers = [];
 let services = [];
+
+let presenceUnsubscribe = null;
 
 
 // ========================================
@@ -192,6 +199,222 @@ async function loadBarbers() {
 }
 
 
+
+// ========================================
+// BARBER PRESENCE / TODAY
+// ========================================
+
+function getLocalDateKey() {
+  const now = new Date();
+
+  const year =
+    now.getFullYear();
+
+  const month =
+    String(
+      now.getMonth() + 1
+    ).padStart(2, "0");
+
+  const day =
+    String(
+      now.getDate()
+    ).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function stopPresenceWatcher() {
+  if (presenceUnsubscribe) {
+    presenceUnsubscribe();
+    presenceUnsubscribe = null;
+  }
+
+  activeBarbers = [];
+}
+
+function startPresenceWatcher(branchId) {
+  stopPresenceWatcher();
+
+  const today =
+    getLocalDateKey();
+
+  const presenceQuery = query(
+    collection(
+      db,
+      "barber_presence"
+    ),
+    where(
+      "branchId",
+      "==",
+      branchId
+    )
+  );
+
+  return new Promise(
+    (resolve, reject) => {
+      let firstSnapshot = true;
+
+      presenceUnsubscribe =
+        onSnapshot(
+          presenceQuery,
+          (snapshot) => {
+            const activeIds =
+              new Set(
+                snapshot.docs
+                  .map(
+                    (snapshot) => ({
+                      id: snapshot.id,
+                      ...snapshot.data()
+                    })
+                  )
+                  .filter(
+                    (presence) =>
+                      presence.active === true &&
+                      presence.dateKey === today
+                  )
+                  .map(
+                    (presence) =>
+                      presence.barberId
+                  )
+              );
+
+            activeBarbers =
+              barbers.filter(
+                (barber) =>
+                  activeIds.has(
+                    barber.id
+                  )
+              );
+
+            renderBarbers();
+
+            if (firstSnapshot) {
+              firstSnapshot = false;
+              resolve();
+            }
+          },
+          (error) => {
+            console.error(
+              "Presence watcher error:",
+              error
+            );
+
+            if (firstSnapshot) {
+              firstSnapshot = false;
+              reject(error);
+            }
+          }
+        );
+    }
+  );
+}
+
+function findBarberByPin(pin) {
+  const matches =
+    barbers.filter(
+      (barber) =>
+        String(
+          barber.pin ?? ""
+        ).trim() === pin
+    );
+
+  if (matches.length === 0) {
+    return {
+      barber: null,
+      error:
+        "ไม่พบช่างที่ใช้ PIN นี้"
+    };
+  }
+
+  if (matches.length > 1) {
+    return {
+      barber: null,
+      error:
+        "PIN นี้ซ้ำกับช่างมากกว่า 1 คน กรุณาแก้ PIN ในระบบ"
+    };
+  }
+
+  return {
+    barber: matches[0],
+    error: null
+  };
+}
+
+async function checkInBarberByPin(pin) {
+  if (!currentBranch) {
+    throw new Error(
+      "ยังไม่พบข้อมูลสาขา"
+    );
+  }
+
+  const result =
+    findBarberByPin(pin);
+
+  if (!result.barber) {
+    throw new Error(
+      result.error
+    );
+  }
+
+  const barber =
+    result.barber;
+
+  const alreadyActive =
+    activeBarbers.some(
+      (activeBarber) =>
+        activeBarber.id === barber.id
+    );
+
+  if (alreadyActive) {
+    return {
+      barber,
+      alreadyActive: true
+    };
+  }
+
+  await setDoc(
+    doc(
+      db,
+      "barber_presence",
+      barber.id
+    ),
+    {
+      barberId:
+        barber.id,
+
+      barberName:
+        barber.name || "",
+
+      branchId:
+        currentBranch.id,
+
+      branchName:
+        currentBranch.name || "",
+
+      dateKey:
+        getLocalDateKey(),
+
+      active:
+        true,
+
+      checkInAt:
+        serverTimestamp(),
+
+      updatedAt:
+        serverTimestamp()
+    },
+    {
+      merge: true
+    }
+  );
+
+  return {
+    barber,
+    alreadyActive: false
+  };
+}
+
+
 // ========================================
 // LOAD SERVICES BY GROUP
 // ========================================
@@ -288,9 +511,12 @@ if (logoutButton) {
 
 watchAuth(async (user) => {
   if (!user) {
+    stopPresenceWatcher();
+
     currentUserProfile = null;
     currentBranch = null;
     barbers = [];
+    activeBarbers = [];
     services = [];
 
     showLoginPage();
@@ -338,6 +564,10 @@ watchAuth(async (user) => {
     await loadBarbers();
     await loadServices(
       branch.serviceGroup
+    );
+
+    await startPresenceWatcher(
+      branch.id
     );
 
     currentBranchName.textContent =
@@ -416,7 +646,7 @@ function hideAllPages() {
 function renderBarbers() {
   barberList.innerHTML = "";
 
-  if (barbers.length === 0) {
+  if (activeBarbers.length === 0) {
     barberList.classList.add("hidden");
     noShiftState.classList.remove("hidden");
     return;
@@ -425,7 +655,7 @@ function renderBarbers() {
   noShiftState.classList.add("hidden");
   barberList.classList.remove("hidden");
 
-  barbers.forEach((barber) => {
+  activeBarbers.forEach((barber) => {
     const button =
       document.createElement("button");
 
@@ -1795,10 +2025,22 @@ if (
 ) {
   shiftCheckInButton.addEventListener(
     "click",
-    () => {
-      if (shiftPinInput.value.length !== 4) {
+    async () => {
+      const pin =
+        shiftPinInput.value.trim();
+
+      shiftStatus.classList.remove(
+        "is-error",
+        "is-success"
+      );
+
+      if (pin.length !== 4) {
         shiftStatus.textContent =
           "กรุณาใส่ PIN ให้ครบ 4 หลัก";
+
+        shiftStatus.classList.add(
+          "is-error"
+        );
 
         shiftStatus.classList.remove(
           "hidden"
@@ -1807,12 +2049,62 @@ if (
         return;
       }
 
-      shiftStatus.textContent =
-        "หน้าเข้ากะพร้อมแล้ว — ขั้นถัดไปจะเชื่อม PIN กับข้อมูลช่างจริง";
+      shiftCheckInButton.disabled =
+        true;
 
-      shiftStatus.classList.remove(
-        "hidden"
-      );
+      shiftCheckInButton.textContent =
+        "กำลังตรวจสอบ...";
+
+      try {
+        const result =
+          await checkInBarberByPin(
+            pin
+          );
+
+        if (result.alreadyActive) {
+          shiftStatus.textContent =
+            `${result.barber.name} เข้างานอยู่แล้ว`;
+        } else {
+          shiftStatus.textContent =
+            `${result.barber.name} เข้างานเรียบร้อย`;
+        }
+
+        shiftStatus.classList.add(
+          "is-success"
+        );
+
+        shiftStatus.classList.remove(
+          "hidden"
+        );
+
+        shiftPinInput.value = "";
+        shiftPinInput.focus();
+
+      } catch (error) {
+        console.error(
+          "Check-in error:",
+          error
+        );
+
+        shiftStatus.textContent =
+          error.message ||
+          "ไม่สามารถเข้างานได้";
+
+        shiftStatus.classList.add(
+          "is-error"
+        );
+
+        shiftStatus.classList.remove(
+          "hidden"
+        );
+
+      } finally {
+        shiftCheckInButton.disabled =
+          false;
+
+        shiftCheckInButton.textContent =
+          "ยืนยันเข้างาน";
+      }
     }
   );
 }
