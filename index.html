@@ -28,7 +28,7 @@
 
   <link
     rel="stylesheet"
-    href="pos.css?v=34"
+    href="pos.css?v=33"
   >
 </head>
 
@@ -553,14 +553,6 @@
           ยืนยันเข้างาน
         </button>
 
-        <button
-          id="openCheckOutButton"
-          class="secondary-button shift-checkout-button"
-          type="button"
-        >
-          ออกงาน
-        </button>
-
         <div
           id="shiftStatus"
           class="shift-status hidden"
@@ -588,63 +580,6 @@
 
 
 
-
-
-  <!-- BARBER CHECK-OUT POPUP -->
-  <div
-    id="checkOutModal"
-    class="modal hidden"
-  >
-    <div
-      id="checkOutBackdrop"
-      class="modal-backdrop"
-    ></div>
-
-    <section class="check-out-modal-card">
-      <button
-        id="checkOutCancelButton"
-        class="modal-close"
-        type="button"
-        aria-label="ปิด"
-      >
-        ×
-      </button>
-
-      <h2>กรุณาใส่ PIN เพื่อออกงาน</h2>
-
-      <input
-        id="checkOutPinInput"
-        class="shift-pin-input"
-        type="text"
-        inputmode="numeric"
-        maxlength="4"
-        pattern="[0-9]*"
-        placeholder="••••"
-        autocomplete="off"
-      >
-
-      <div
-        id="checkOutStatus"
-        class="shift-status hidden"
-      ></div>
-
-      <button
-        id="confirmCheckOutButton"
-        class="primary-button"
-        type="button"
-      >
-        ยืนยันออกงาน
-      </button>
-
-      <button
-        id="backToShiftFromCheckOutButton"
-        class="secondary-button check-out-back-button"
-        type="button"
-      >
-        กลับ
-      </button>
-    </section>
-  </div>
 
   <!-- CLOSE STORE POPUP -->
   <div
@@ -922,7 +857,7 @@
 
   <script
     type="module"
-    src="app.js?v=34"
+    src="app.js?v=33"
   ></script>
 </body>
 </html>
