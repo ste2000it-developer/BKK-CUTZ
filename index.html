@@ -28,7 +28,7 @@
 
   <link
     rel="stylesheet"
-    href="pos.css?v=32"
+    href="pos.css?v=33"
   >
 </head>
 
@@ -148,20 +148,30 @@
         </div>
       </div>
 
-      <button
-        id="shiftButton"
-        class="shift-header-button"
-        type="button"
-        aria-label="จัดการช่างวันนี้"
-        title="จัดการช่างวันนี้"
-      >
-        <span
-          class="material-symbols-outlined"
-          aria-hidden="true"
+      <div class="header-actions">
+        <div
+          id="posDateTime"
+          class="pos-datetime"
+          aria-label="วันที่และเวลาปัจจุบัน"
         >
-          person_check
-        </span>
-      </button>
+          -
+        </div>
+
+        <button
+          id="shiftButton"
+          class="shift-header-button"
+          type="button"
+          aria-label="จัดการช่างวันนี้"
+          title="จัดการช่างวันนี้"
+        >
+          <span
+            class="material-symbols-outlined"
+            aria-hidden="true"
+          >
+            person_check
+          </span>
+        </button>
+      </div>
     </header>
 
 
@@ -467,6 +477,11 @@
             <span>ชำระด้วย</span>
             <strong id="successPaymentMethod">-</strong>
           </div>
+
+          <div class="success-row">
+            <span>วันที่ / เวลา</span>
+            <strong id="successDateTime">-</strong>
+          </div>
         </div>
 
         <button
@@ -543,6 +558,90 @@
           class="shift-status hidden"
         ></div>
       </div>
+
+      <div class="shift-divider"></div>
+
+      <div class="close-store-section">
+        <div>
+          <strong>สิ้นสุดการทำงานวันนี้</strong>
+          <p>ปิดร้านและออกงานช่างทุกคนในสาขานี้</p>
+        </div>
+
+        <button
+          id="openCloseStoreButton"
+          class="close-store-button"
+          type="button"
+        >
+          ปิดร้านวันนี้
+        </button>
+      </div>
+    </section>
+  </div>
+
+
+
+
+  <!-- CLOSE STORE POPUP -->
+  <div
+    id="closeStoreModal"
+    class="modal hidden"
+  >
+    <div
+      id="closeStoreBackdrop"
+      class="modal-backdrop"
+    ></div>
+
+    <section class="close-store-modal-card">
+      <button
+        id="closeStoreCancelButton"
+        class="modal-close"
+        type="button"
+        aria-label="ปิด"
+      >
+        ×
+      </button>
+
+      <div class="close-store-kicker">
+        สิ้นสุดการทำงานวันนี้
+      </div>
+
+      <h2>ปิดร้านวันนี้</h2>
+
+      <p class="close-store-description">
+        กรุณาใส่ PIN ของช่างที่เป็นผู้ปิดร้าน
+      </p>
+
+      <input
+        id="closeStorePinInput"
+        class="shift-pin-input"
+        type="text"
+        inputmode="numeric"
+        maxlength="4"
+        pattern="[0-9]*"
+        placeholder="••••"
+        autocomplete="off"
+      >
+
+      <div
+        id="closeStoreStatus"
+        class="shift-status hidden"
+      ></div>
+
+      <button
+        id="confirmCloseStoreButton"
+        class="close-store-confirm-button"
+        type="button"
+      >
+        ยืนยันปิดร้าน
+      </button>
+
+      <button
+        id="backToShiftButton"
+        class="secondary-button close-store-back-button"
+        type="button"
+      >
+        กลับ
+      </button>
     </section>
   </div>
 
@@ -758,7 +857,7 @@
 
   <script
     type="module"
-    src="app.js?v=32"
+    src="app.js?v=33"
   ></script>
 </body>
 </html>

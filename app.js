@@ -19,7 +19,8 @@ import {
   doc,
   setDoc,
   onSnapshot,
-  serverTimestamp
+  serverTimestamp,
+  writeBatch
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
 
@@ -61,6 +62,7 @@ const loginError = document.getElementById("loginError");
 
 const logoutButton = document.getElementById("logoutButton");
 const currentBranchName = document.getElementById("currentBranchName");
+const posDateTime = document.getElementById("posDateTime");
 
 
 const shiftButton = document.getElementById("shiftButton");
@@ -70,6 +72,30 @@ const shiftCloseButton = document.getElementById("shiftCloseButton");
 const shiftPinInput = document.getElementById("shiftPinInput");
 const shiftCheckInButton = document.getElementById("shiftCheckInButton");
 const shiftStatus = document.getElementById("shiftStatus");
+
+const openCloseStoreButton =
+  document.getElementById("openCloseStoreButton");
+
+const closeStoreModal =
+  document.getElementById("closeStoreModal");
+
+const closeStoreBackdrop =
+  document.getElementById("closeStoreBackdrop");
+
+const closeStoreCancelButton =
+  document.getElementById("closeStoreCancelButton");
+
+const closeStorePinInput =
+  document.getElementById("closeStorePinInput");
+
+const closeStoreStatus =
+  document.getElementById("closeStoreStatus");
+
+const confirmCloseStoreButton =
+  document.getElementById("confirmCloseStoreButton");
+
+const backToShiftButton =
+  document.getElementById("backToShiftButton");
 
 const barberPage = document.getElementById("barberPage");
 const servicePage = document.getElementById("servicePage");
@@ -108,6 +134,9 @@ const successServiceList = document.getElementById("successServiceList");
 const successTotal = document.getElementById("successTotal");
 const successPaymentMethod =
   document.getElementById("successPaymentMethod");
+
+const successDateTime =
+  document.getElementById("successDateTime");
 const homeButton = document.getElementById("homeButton");
 
 const serviceOptionModal =
@@ -166,6 +195,75 @@ let selectedBarber = null;
 const selectedServices = new Map();
 
 let pendingService = null;
+
+
+
+// ========================================
+// DATE / TIME
+// ========================================
+
+function formatThaiDateTime(
+  value,
+  includeSeconds = false
+) {
+  const date =
+    value instanceof Date
+      ? value
+      : new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return "-";
+  }
+
+  const dateText =
+    date.toLocaleDateString(
+      "th-TH",
+      {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      }
+    );
+
+  const timeText =
+    date.toLocaleTimeString(
+      "th-TH",
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+        second:
+          includeSeconds
+            ? "2-digit"
+            : undefined,
+        hour12: false
+      }
+    );
+
+  return `${dateText} • ${timeText}`;
+}
+
+function updatePosDateTime() {
+  if (!posDateTime) {
+    return;
+  }
+
+  posDateTime.textContent =
+    formatThaiDateTime(
+      new Date(),
+      false
+    );
+}
+
+updatePosDateTime();
+
+window.setInterval(
+  updatePosDateTime,
+  1000
+);
 
 
 // ========================================
@@ -412,6 +510,106 @@ async function checkInBarberByPin(pin) {
     barber,
     alreadyActive: false
   };
+}
+
+
+
+async function closeStoreByPin(pin) {
+  if (!currentBranch) {
+    throw new Error(
+      "ยังไม่พบข้อมูลสาขา"
+    );
+  }
+
+  const result =
+    findBarberByPin(pin);
+
+  if (!result.barber) {
+    throw new Error(
+      result.error
+    );
+  }
+
+  const closer =
+    result.barber;
+
+  const isWorkingHere =
+    activeBarbers.some(
+      (barber) =>
+        barber.id === closer.id
+    );
+
+  if (!isWorkingHere) {
+    throw new Error(
+      "PIN นี้ไม่ใช่ช่างที่กำลังเข้างานอยู่ในสาขานี้"
+    );
+  }
+
+  const dateKey =
+    getLocalDateKey();
+
+  const batch =
+    writeBatch(db);
+
+  activeBarbers.forEach(
+    (barber) => {
+      batch.set(
+        doc(
+          db,
+          "barber_presence",
+          barber.id
+        ),
+        {
+          active: false,
+          checkOutAt:
+            serverTimestamp(),
+          updatedAt:
+            serverTimestamp(),
+          checkOutReason:
+            "store_closed"
+        },
+        {
+          merge: true
+        }
+      );
+    }
+  );
+
+  batch.set(
+    doc(
+      db,
+      "daily_closings",
+      `${currentBranch.id}_${dateKey}`
+    ),
+    {
+      branchId:
+        currentBranch.id,
+
+      branchName:
+        currentBranch.name || "",
+
+      dateKey,
+
+      closedByBarberId:
+        closer.id,
+
+      closedByBarberName:
+        closer.name || "",
+
+      closedAt:
+        serverTimestamp(),
+
+      closedBarberCount:
+        activeBarbers.length
+    },
+    {
+      merge: true
+    }
+  );
+
+  await batch.commit();
+
+  return closer;
 }
 
 
@@ -1777,6 +1975,14 @@ function showSuccessPage(transaction) {
       ? "เงินสด"
       : "สแกนจ่าย";
 
+  if (successDateTime) {
+    successDateTime.textContent =
+      formatThaiDateTime(
+        transaction.createdAt,
+        true
+      );
+  }
+
   successServiceList.innerHTML = "";
 
   transaction.services.forEach((service) => {
@@ -1933,6 +2139,192 @@ if (
   );
 }
 
+
+
+
+// ========================================
+// CLOSE STORE
+// ========================================
+
+function openCloseStoreModal() {
+  if (
+    !closeStoreModal ||
+    !closeStorePinInput ||
+    !closeStoreStatus
+  ) {
+    return;
+  }
+
+  closeShiftModal();
+
+  closeStorePinInput.value = "";
+
+  closeStoreStatus.textContent = "";
+  closeStoreStatus.classList.add(
+    "hidden"
+  );
+
+  closeStoreStatus.classList.remove(
+    "is-error",
+    "is-success"
+  );
+
+  closeStoreModal.classList.remove(
+    "hidden"
+  );
+
+  document.body.classList.add(
+    "modal-open"
+  );
+
+  setTimeout(
+    () =>
+      closeStorePinInput.focus(),
+    50
+  );
+}
+
+function closeCloseStoreModal() {
+  if (!closeStoreModal) {
+    return;
+  }
+
+  closeStoreModal.classList.add(
+    "hidden"
+  );
+
+  if (
+    paymentModal.classList.contains("hidden") &&
+    serviceOptionModal.classList.contains("hidden") &&
+    noticeModal.classList.contains("hidden") &&
+    shiftModal.classList.contains("hidden")
+  ) {
+    document.body.classList.remove(
+      "modal-open"
+    );
+  }
+}
+
+if (openCloseStoreButton) {
+  openCloseStoreButton.addEventListener(
+    "click",
+    openCloseStoreModal
+  );
+}
+
+if (closeStoreCancelButton) {
+  closeStoreCancelButton.addEventListener(
+    "click",
+    closeCloseStoreModal
+  );
+}
+
+if (closeStoreBackdrop) {
+  closeStoreBackdrop.addEventListener(
+    "click",
+    closeCloseStoreModal
+  );
+}
+
+if (backToShiftButton) {
+  backToShiftButton.addEventListener(
+    "click",
+    () => {
+      closeCloseStoreModal();
+      openShiftModal();
+    }
+  );
+}
+
+if (closeStorePinInput) {
+  closeStorePinInput.addEventListener(
+    "input",
+    () => {
+      closeStorePinInput.value =
+        closeStorePinInput.value
+          .replace(/\D/g, "")
+          .slice(0, 4);
+    }
+  );
+}
+
+if (
+  confirmCloseStoreButton &&
+  closeStorePinInput &&
+  closeStoreStatus
+) {
+  confirmCloseStoreButton.addEventListener(
+    "click",
+    async () => {
+      const pin =
+        closeStorePinInput.value.trim();
+
+      closeStoreStatus.classList.remove(
+        "is-error",
+        "is-success"
+      );
+
+      if (pin.length !== 4) {
+        closeStoreStatus.textContent =
+          "กรุณาใส่ PIN ให้ครบ 4 หลัก";
+
+        closeStoreStatus.classList.add(
+          "is-error"
+        );
+
+        closeStoreStatus.classList.remove(
+          "hidden"
+        );
+
+        return;
+      }
+
+      confirmCloseStoreButton.disabled =
+        true;
+
+      confirmCloseStoreButton.textContent =
+        "กำลังปิดร้าน...";
+
+      try {
+        const closer =
+          await closeStoreByPin(pin);
+
+        closeCloseStoreModal();
+        closeShiftModal();
+
+        showNotice(
+          `ปิดร้านเรียบร้อย โดย ${closer.name}`,
+          "ปิดร้านเรียบร้อย"
+        );
+
+      } catch (error) {
+        console.error(
+          "Close store error:",
+          error
+        );
+
+        closeStoreStatus.textContent =
+          error.message ||
+          "ไม่สามารถปิดร้านได้";
+
+        closeStoreStatus.classList.add(
+          "is-error"
+        );
+
+        closeStoreStatus.classList.remove(
+          "hidden"
+        );
+
+      } finally {
+        confirmCloseStoreButton.disabled =
+          false;
+
+        confirmCloseStoreButton.textContent =
+          "ยืนยันปิดร้าน";
+      }
+    }
+  );
+}
 
 
 // ========================================
