@@ -55,12 +55,27 @@ const loginError = document.getElementById("loginError");
 const logoutButton = document.getElementById("logoutButton");
 const currentBranchName = document.getElementById("currentBranchName");
 
+
+const shiftButton = document.getElementById("shiftButton");
+const shiftModal = document.getElementById("shiftModal");
+const shiftBackdrop = document.getElementById("shiftBackdrop");
+const shiftCloseButton = document.getElementById("shiftCloseButton");
+const shiftPinInput = document.getElementById("shiftPinInput");
+const shiftCheckInButton = document.getElementById("shiftCheckInButton");
+const shiftStatus = document.getElementById("shiftStatus");
+
 const barberPage = document.getElementById("barberPage");
 const servicePage = document.getElementById("servicePage");
 const qrPage = document.getElementById("qrPage");
 const successPage = document.getElementById("successPage");
 
 const barberList = document.getElementById("barberList");
+
+const noShiftState =
+  document.getElementById("noShiftState");
+
+const openShiftFromEmptyButton =
+  document.getElementById("openShiftFromEmptyButton");
 const serviceList = document.getElementById("serviceList");
 const summaryList = document.getElementById("summaryList");
 const totalPrice = document.getElementById("totalPrice");
@@ -401,30 +416,45 @@ function hideAllPages() {
 function renderBarbers() {
   barberList.innerHTML = "";
 
-  if (barbers.length === 0) {
-    barberList.innerHTML = `
-      <p
-        class="empty-summary"
-        style="grid-column: 1 / -1;"
-      >
-        ยังไม่มีรายชื่อช่าง
-      </p>
-    `;
+  const visibleBarbers =
+    Array.isArray(barbers)
+      ? barbers
+      : [];
+
+  if (visibleBarbers.length === 0) {
+    barberList.classList.add("hidden");
+    noShiftState.classList.remove("hidden");
     return;
   }
 
-  barbers.forEach((barber) => {
+  noShiftState.classList.add("hidden");
+  barberList.classList.remove("hidden");
+
+  visibleBarbers.forEach((barber) => {
     const button =
       document.createElement("button");
 
-    button.type = "button";
-    button.className = "barber-button";
-    button.textContent = barber.name;
+    button.className =
+      "barber-button";
+
+    button.type =
+      "button";
+
+    button.textContent =
+      barber.name || "-";
 
     button.addEventListener(
       "click",
       () => {
-        selectBarber(barber);
+        selectedBarber = barber;
+        selectedServices.clear();
+
+        selectedBarberName.textContent =
+          selectedBarber.name;
+
+        renderServices();
+        renderSummary();
+        showPage(servicePage);
       }
     );
 
@@ -1690,6 +1720,92 @@ if (
     }
   );
 }
+
+
+
+// ========================================
+// TODAY BARBERS POPUP
+// UI shell only — Firestore/PIN logic comes next.
+// ========================================
+
+function openShiftModal() {
+  shiftStatus.classList.add("hidden");
+  shiftStatus.textContent = "";
+  shiftPinInput.value = "";
+
+  shiftModal.classList.remove("hidden");
+  document.body.classList.add("modal-open");
+
+  setTimeout(
+    () => shiftPinInput.focus(),
+    50
+  );
+}
+
+function closeShiftModal() {
+  shiftModal.classList.add("hidden");
+
+  if (
+    paymentModal.classList.contains("hidden") &&
+    serviceOptionModal.classList.contains("hidden") &&
+    noticeModal.classList.contains("hidden")
+  ) {
+    document.body.classList.remove("modal-open");
+  }
+}
+
+shiftButton.addEventListener(
+  "click",
+  openShiftModal
+);
+
+openShiftFromEmptyButton.addEventListener(
+  "click",
+  openShiftModal
+);
+
+shiftCloseButton.addEventListener(
+  "click",
+  closeShiftModal
+);
+
+shiftBackdrop.addEventListener(
+  "click",
+  closeShiftModal
+);
+
+shiftPinInput.addEventListener(
+  "input",
+  () => {
+    shiftPinInput.value =
+      shiftPinInput.value
+        .replace(/\D/g, "")
+        .slice(0, 4);
+  }
+);
+
+shiftCheckInButton.addEventListener(
+  "click",
+  () => {
+    if (shiftPinInput.value.length !== 4) {
+      shiftStatus.textContent =
+        "กรุณาใส่ PIN ให้ครบ 4 หลัก";
+
+      shiftStatus.classList.remove(
+        "hidden"
+      );
+
+      return;
+    }
+
+    shiftStatus.textContent =
+      "หน้าเข้ากะพร้อมแล้ว — ขั้นถัดไปจะเชื่อม PIN กับข้อมูลช่างจริง";
+
+    shiftStatus.classList.remove(
+      "hidden"
+    );
+  }
+);
 
 
 // ========================================

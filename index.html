@@ -28,7 +28,7 @@
 
   <link
     rel="stylesheet"
-    href="pos.css?v=27"
+    href="pos.css?v=29"
   >
 </head>
 
@@ -180,6 +180,32 @@
             <b>เสร็จสิ้น</b>
           </div>
         </div>
+      </div>
+
+      <div
+        id="noShiftState"
+        class="no-shift-state hidden"
+      >
+        <span
+          class="material-symbols-outlined no-shift-icon"
+          aria-hidden="true"
+        >
+          person_check
+        </span>
+
+        <h2>ยังไม่มีช่างเข้ากะ</h2>
+
+        <p>
+          กรุณาให้ช่างเข้ากะก่อนเริ่มใช้งาน POS
+        </p>
+
+        <button
+          id="openShiftFromEmptyButton"
+          class="primary-button no-shift-button"
+          type="button"
+        >
+          เข้ากะช่าง
+        </button>
       </div>
 
       <div
@@ -442,6 +468,96 @@
   </main>
 
 
+
+  <!-- TODAY BARBERS POPUP -->
+  <div
+    id="shiftModal"
+    class="modal hidden"
+  >
+    <div
+      id="shiftBackdrop"
+      class="modal-backdrop"
+    ></div>
+
+    <section class="shift-modal-card">
+      <header class="shift-modal-header">
+        <div>
+          <div class="shift-modal-kicker">
+            สาขาปัจจุบัน
+          </div>
+
+          <h2>ช่างวันนี้</h2>
+
+          <p>
+            เข้ากะเพื่อให้ชื่อแสดงในหน้าเลือกช่าง
+          </p>
+        </div>
+
+        <button
+          id="shiftCloseButton"
+          class="modal-close"
+          type="button"
+          aria-label="ปิด"
+        >
+          ×
+        </button>
+      </header>
+
+      <div class="shift-section">
+        <div class="shift-section-title">
+          <span>กำลังเข้ากะ</span>
+          <strong id="shiftActiveCount">0 คน</strong>
+        </div>
+
+        <div
+          id="shiftActiveList"
+          class="shift-active-list"
+        >
+          <div class="shift-empty-state">
+            ยังไม่มีช่างเข้ากะวันนี้
+          </div>
+        </div>
+      </div>
+
+      <div class="shift-divider"></div>
+
+      <div class="shift-checkin">
+        <div class="shift-section-title">
+          <span>เข้ากะ</span>
+        </div>
+
+        <p>
+          ใส่ PIN 4 หลักของช่าง
+        </p>
+
+        <input
+          id="shiftPinInput"
+          class="shift-pin-input"
+          type="password"
+          inputmode="numeric"
+          maxlength="4"
+          pattern="[0-9]*"
+          placeholder="••••"
+          autocomplete="off"
+        >
+
+        <button
+          id="shiftCheckInButton"
+          class="primary-button"
+          type="button"
+        >
+          ยืนยันเข้ากะ
+        </button>
+
+        <div
+          id="shiftStatus"
+          class="shift-status hidden"
+        ></div>
+      </div>
+    </section>
+  </div>
+
+
   <!-- PAYMENT MODAL -->
   <div
     id="paymentModal"
@@ -653,7 +769,7 @@
 
   <script
     type="module"
-    src="app.js?v=27"
+    src="app.js?v=29"
   ></script>
 </body>
 </html>
