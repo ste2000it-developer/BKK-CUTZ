@@ -28,7 +28,7 @@
 
   <link
     rel="stylesheet"
-    href="pos.css?v=30"
+    href="pos.css?v=31"
   >
 </head>
 
@@ -518,37 +518,19 @@
         </button>
       </header>
 
-      <div class="shift-section">
-        <div class="shift-section-title">
-          <span>กำลังเข้ากะ</span>
-          <strong id="shiftActiveCount">0 คน</strong>
-        </div>
-
-        <div
-          id="shiftActiveList"
-          class="shift-active-list"
-        >
-          <div class="shift-empty-state">
-            ยังไม่มีช่างเข้ากะวันนี้
-          </div>
-        </div>
-      </div>
-
-      <div class="shift-divider"></div>
-
       <div class="shift-checkin">
         <div class="shift-section-title">
-          <span>เข้ากะ</span>
+          <span>เข้างาน</span>
         </div>
 
         <p>
-          ใส่ PIN 4 หลักของช่าง
+          ใส่ PIN 4 หลักของช่างเพื่อเข้างาน
         </p>
 
         <input
           id="shiftPinInput"
           class="shift-pin-input"
-          type="password"
+          type="text"
           inputmode="numeric"
           maxlength="4"
           pattern="[0-9]*"
@@ -561,7 +543,7 @@
           class="primary-button"
           type="button"
         >
-          ยืนยันเข้ากะ
+          ยืนยันเข้างาน
         </button>
 
         <div
@@ -784,7 +766,7 @@
 
   <script
     type="module"
-    src="app.js?v=30"
+    src="app.js?v=31"
   ></script>
 </body>
 </html>
