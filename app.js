@@ -117,6 +117,22 @@ const serviceOptionCancelButton =
   document.getElementById("serviceOptionCancelButton");
 
 
+const noticeModal =
+  document.getElementById("noticeModal");
+
+const noticeBackdrop =
+  document.getElementById("noticeBackdrop");
+
+const noticeTitle =
+  document.getElementById("noticeTitle");
+
+const noticeMessage =
+  document.getElementById("noticeMessage");
+
+const noticeCloseButton =
+  document.getElementById("noticeCloseButton");
+
+
 // ========================================
 // STATE
 // ========================================
@@ -660,9 +676,12 @@ function removeService(service) {
   );
 
   if (
-    service.serviceCode === "haircut"
+    service.serviceCode === "haircut" ||
+    service.serviceCode === "kids"
   ) {
-    removeHaircutDiscounts();
+    removeDiscountForTarget(
+      service.serviceCode
+    );
   }
 
   renderServices();
@@ -760,6 +779,56 @@ function openChoiceModal(service) {
     "modal-open"
   );
 }
+
+
+
+// ========================================
+// APP NOTICE POPUP
+// ========================================
+
+function showNotice(
+  message,
+  title = "แจ้งเตือน"
+) {
+  noticeTitle.textContent =
+    title;
+
+  noticeMessage.textContent =
+    message;
+
+  noticeModal.classList.remove(
+    "hidden"
+  );
+
+  document.body.classList.add(
+    "modal-open"
+  );
+}
+
+function closeNotice() {
+  noticeModal.classList.add(
+    "hidden"
+  );
+
+  if (
+    paymentModal.classList.contains("hidden") &&
+    serviceOptionModal.classList.contains("hidden")
+  ) {
+    document.body.classList.remove(
+      "modal-open"
+    );
+  }
+}
+
+noticeCloseButton.addEventListener(
+  "click",
+  closeNotice
+);
+
+noticeBackdrop.addEventListener(
+  "click",
+  closeNotice
+);
 
 
 // ========================================
@@ -866,7 +935,7 @@ rangeConfirmButton.addEventListener(
       price < minPrice ||
       price > maxPrice
     ) {
-      window.alert(
+      showNotice(
         `กรุณาใส่จำนวนเต็มตั้งแต่ ${formatMoney(minPrice)} ถึง ${formatMoney(maxPrice)} บาท`
       );
       return;
@@ -947,7 +1016,7 @@ customConfirmButton.addEventListener(
       );
 
     if (!detail) {
-      window.alert(
+      showNotice(
         "กรุณาใส่รายละเอียด"
       );
       return;
@@ -957,7 +1026,7 @@ customConfirmButton.addEventListener(
       !Number.isFinite(price) ||
       price < 0
     ) {
-      window.alert(
+      showNotice(
         "กรุณาใส่ราคาให้ถูกต้อง"
       );
       return;
@@ -986,15 +1055,21 @@ customConfirmButton.addEventListener(
 // HAIRCUT DISCOUNT
 // ========================================
 
-function getSelectedHaircut() {
-  return Array
-    .from(
-      selectedServices.values()
-    )
-    .find(
-      (service) =>
-        service.serviceCode === "haircut"
-    );
+function getSelectedDiscountTarget() {
+  const eligible =
+    Array
+      .from(
+        selectedServices.values()
+      )
+      .filter(
+        (selectedService) =>
+          selectedService.serviceCode === "haircut" ||
+          selectedService.serviceCode === "kids"
+      );
+
+  return eligible.length > 0
+    ? eligible[eligible.length - 1]
+    : null;
 }
 
 function removeHaircutDiscounts() {
@@ -1003,10 +1078,32 @@ function removeHaircutDiscounts() {
       selectedServices.entries()
     )
     .forEach(
-      ([id, service]) => {
+      ([id, selectedService]) => {
         if (
-          service.type === "free_cut" ||
-          service.type === "half_cut"
+          selectedService.type === "free_cut" ||
+          selectedService.type === "half_cut"
+        ) {
+          selectedServices.delete(id);
+        }
+      }
+    );
+}
+
+function removeDiscountForTarget(
+  targetServiceCode
+) {
+  Array
+    .from(
+      selectedServices.entries()
+    )
+    .forEach(
+      ([id, selectedService]) => {
+        if (
+          (
+            selectedService.type === "free_cut" ||
+            selectedService.type === "half_cut"
+          ) &&
+          selectedService.targetServiceCode === targetServiceCode
         ) {
           selectedServices.delete(id);
         }
@@ -1015,12 +1112,12 @@ function removeHaircutDiscounts() {
 }
 
 function applyHaircutDiscount(service) {
-  const haircut =
-    getSelectedHaircut();
+  const target =
+    getSelectedDiscountTarget();
 
-  if (!haircut) {
-    window.alert(
-      "กรุณาเลือกเมนูตัดผมก่อนใช้ส่วนลด"
+  if (!target) {
+    showNotice(
+      "กรุณาเลือก ตัดผม หรือ ตัดผมเด็ก ก่อนใช้ส่วนลด"
     );
     return;
   }
@@ -1033,7 +1130,7 @@ function applyHaircutDiscount(service) {
     service.type === "free_cut"
   ) {
     discountAmount =
-      haircut.price;
+      target.price;
   }
 
   if (
@@ -1046,7 +1143,7 @@ function applyHaircutDiscount(service) {
 
     discountAmount =
       Math.round(
-        haircut.price *
+        target.price *
         percent /
         100
       );
@@ -1060,8 +1157,7 @@ function applyHaircutDiscount(service) {
       {
         discountAmount,
         targetServiceCode:
-          service.targetServiceCode ||
-          "haircut",
+          target.serviceCode,
         discountPercent:
           Number(
             service.discountPercent || 0
