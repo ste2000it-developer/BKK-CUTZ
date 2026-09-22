@@ -416,12 +416,7 @@ function hideAllPages() {
 function renderBarbers() {
   barberList.innerHTML = "";
 
-  const visibleBarbers =
-    Array.isArray(barbers)
-      ? barbers
-      : [];
-
-  if (visibleBarbers.length === 0) {
+  if (barbers.length === 0) {
     barberList.classList.add("hidden");
     noShiftState.classList.remove("hidden");
     return;
@@ -430,31 +425,18 @@ function renderBarbers() {
   noShiftState.classList.add("hidden");
   barberList.classList.remove("hidden");
 
-  visibleBarbers.forEach((barber) => {
+  barbers.forEach((barber) => {
     const button =
       document.createElement("button");
 
-    button.className =
-      "barber-button";
-
-    button.type =
-      "button";
-
-    button.textContent =
-      barber.name || "-";
+    button.type = "button";
+    button.className = "barber-button";
+    button.textContent = barber.name;
 
     button.addEventListener(
       "click",
       () => {
-        selectedBarber = barber;
-        selectedServices.clear();
-
-        selectedBarberName.textContent =
-          selectedBarber.name;
-
-        renderServices();
-        renderSummary();
-        showPage(servicePage);
+        selectBarber(barber);
       }
     );
 
@@ -1729,6 +1711,14 @@ if (
 // ========================================
 
 function openShiftModal() {
+  if (
+    !shiftModal ||
+    !shiftStatus ||
+    !shiftPinInput
+  ) {
+    return;
+  }
+
   shiftStatus.classList.add("hidden");
   shiftStatus.textContent = "";
   shiftPinInput.value = "";
@@ -1743,6 +1733,10 @@ function openShiftModal() {
 }
 
 function closeShiftModal() {
+  if (!shiftModal) {
+    return;
+  }
+
   shiftModal.classList.add("hidden");
 
   if (
@@ -1754,58 +1748,74 @@ function closeShiftModal() {
   }
 }
 
-shiftButton.addEventListener(
-  "click",
-  openShiftModal
-);
+if (shiftButton) {
+  shiftButton.addEventListener(
+    "click",
+    openShiftModal
+  );
+}
 
-openShiftFromEmptyButton.addEventListener(
-  "click",
-  openShiftModal
-);
+if (openShiftFromEmptyButton) {
+  openShiftFromEmptyButton.addEventListener(
+    "click",
+    openShiftModal
+  );
+}
 
-shiftCloseButton.addEventListener(
-  "click",
-  closeShiftModal
-);
+if (shiftCloseButton) {
+  shiftCloseButton.addEventListener(
+    "click",
+    closeShiftModal
+  );
+}
 
-shiftBackdrop.addEventListener(
-  "click",
-  closeShiftModal
-);
+if (shiftBackdrop) {
+  shiftBackdrop.addEventListener(
+    "click",
+    closeShiftModal
+  );
+}
 
-shiftPinInput.addEventListener(
-  "input",
-  () => {
-    shiftPinInput.value =
-      shiftPinInput.value
-        .replace(/\D/g, "")
-        .slice(0, 4);
-  }
-);
+if (shiftPinInput) {
+  shiftPinInput.addEventListener(
+    "input",
+    () => {
+      shiftPinInput.value =
+        shiftPinInput.value
+          .replace(/\D/g, "")
+          .slice(0, 4);
+    }
+  );
+}
 
-shiftCheckInButton.addEventListener(
-  "click",
-  () => {
-    if (shiftPinInput.value.length !== 4) {
+if (
+  shiftCheckInButton &&
+  shiftPinInput &&
+  shiftStatus
+) {
+  shiftCheckInButton.addEventListener(
+    "click",
+    () => {
+      if (shiftPinInput.value.length !== 4) {
+        shiftStatus.textContent =
+          "กรุณาใส่ PIN ให้ครบ 4 หลัก";
+
+        shiftStatus.classList.remove(
+          "hidden"
+        );
+
+        return;
+      }
+
       shiftStatus.textContent =
-        "กรุณาใส่ PIN ให้ครบ 4 หลัก";
+        "หน้าเข้ากะพร้อมแล้ว — ขั้นถัดไปจะเชื่อม PIN กับข้อมูลช่างจริง";
 
       shiftStatus.classList.remove(
         "hidden"
       );
-
-      return;
     }
-
-    shiftStatus.textContent =
-      "หน้าเข้ากะพร้อมแล้ว — ขั้นถัดไปจะเชื่อม PIN กับข้อมูลช่างจริง";
-
-    shiftStatus.classList.remove(
-      "hidden"
-    );
-  }
-);
+  );
+}
 
 
 // ========================================

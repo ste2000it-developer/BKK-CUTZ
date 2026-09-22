@@ -1585,3 +1585,10 @@ svg {
 .no-shift-button {
   width: min(280px, 100%);
 }
+
+
+/* v30: lock shift icon into former logout position */
+.app-header .shift-header-button {
+  grid-column: 3;
+  justify-self: end;
+}
