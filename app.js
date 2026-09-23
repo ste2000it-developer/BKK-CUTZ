@@ -43,6 +43,8 @@ let activeBarbers = [];
 let services = [];
 
 let presenceUnsubscribe = null;
+let readerScanUnsubscribe = null;
+const processedReaderScanIds = new Set();
 
 
 // ========================================
@@ -407,6 +409,283 @@ function startPresenceWatcher(branchId) {
   );
 }
 
+
+// ========================================
+// RFID READER SCANS
+// ========================================
+
+function stopReaderScanWatcher() {
+  if (readerScanUnsubscribe) {
+    readerScanUnsubscribe();
+    readerScanUnsubscribe = null;
+  }
+
+  processedReaderScanIds.clear();
+}
+
+function normalizeRfidUid(value) {
+  return String(value || "")
+    .trim()
+    .toUpperCase()
+    .replace(/[^0-9A-F]/g, "");
+}
+
+function findBarberByRfid(cardUid) {
+  const normalizedCardUid =
+    normalizeRfidUid(cardUid);
+
+  if (!normalizedCardUid) {
+    return {
+      barber: null,
+      error: "ไม่พบ UID ของบัตร"
+    };
+  }
+
+  const matches =
+    barbers.filter(
+      (barber) =>
+        normalizeRfidUid(
+          barber.rfidUid
+        ) === normalizedCardUid
+    );
+
+  if (matches.length === 0) {
+    return {
+      barber: null,
+      error: "ไม่พบบัตรนี้ในระบบ"
+    };
+  }
+
+  if (matches.length > 1) {
+    return {
+      barber: null,
+      error:
+        "บัตร RFID นี้ถูกผูกกับช่างมากกว่า 1 คน กรุณาแก้ข้อมูลในระบบ"
+    };
+  }
+
+  return {
+    barber: matches[0],
+    error: null
+  };
+}
+
+async function checkInBarberByRfid(cardUid) {
+  if (!currentBranch) {
+    throw new Error(
+      "ยังไม่พบข้อมูลสาขา"
+    );
+  }
+
+  const result =
+    findBarberByRfid(cardUid);
+
+  if (!result.barber) {
+    throw new Error(
+      result.error
+    );
+  }
+
+  const barber =
+    result.barber;
+
+  const alreadyActive =
+    activeBarbers.some(
+      (activeBarber) =>
+        activeBarber.id === barber.id
+    );
+
+  if (alreadyActive) {
+    return {
+      barber,
+      alreadyActive: true
+    };
+  }
+
+  await setDoc(
+    doc(
+      db,
+      "barber_presence",
+      barber.id
+    ),
+    {
+      barberId:
+        barber.id,
+
+      barberName:
+        barber.name || "",
+
+      branchId:
+        currentBranch.id,
+
+      branchName:
+        currentBranch.name || "",
+
+      dateKey:
+        getLocalDateKey(),
+
+      active:
+        true,
+
+      checkInAt:
+        serverTimestamp(),
+
+      updatedAt:
+        serverTimestamp(),
+
+      checkInMethod:
+        "rfid"
+    },
+    {
+      merge: true
+    }
+  );
+
+  return {
+    barber,
+    alreadyActive: false
+  };
+}
+
+function startReaderScanWatcher(branchId) {
+  stopReaderScanWatcher();
+
+  const scanQuery = query(
+    collection(
+      db,
+      "reader_scans"
+    ),
+    where(
+      "branchId",
+      "==",
+      branchId
+    )
+  );
+
+  let firstSnapshot = true;
+
+  readerScanUnsubscribe =
+    onSnapshot(
+      scanQuery,
+      async (snapshot) => {
+        // ตอนเปิด POS ครั้งแรก ให้จำ scan เก่าไว้เฉย ๆ
+        // เพื่อไม่ให้ refresh แล้วนำบัตรเก่ามาเข้างานซ้ำ
+        if (firstSnapshot) {
+          snapshot.docs.forEach(
+            (snapshot) => {
+              const data =
+                snapshot.data();
+
+              const scanId =
+                String(
+                  data.scanId || ""
+                ).trim();
+
+              if (scanId) {
+                processedReaderScanIds.add(
+                  `${snapshot.id}:${scanId}`
+                );
+              }
+            }
+          );
+
+          firstSnapshot = false;
+          return;
+        }
+
+        for (
+          const change of snapshot.docChanges()
+        ) {
+          if (change.type === "removed") {
+            continue;
+          }
+
+          const scan = {
+            id: change.doc.id,
+            ...change.doc.data()
+          };
+
+          const scanId =
+            String(
+              scan.scanId || ""
+            ).trim();
+
+          if (!scanId) {
+            continue;
+          }
+
+          const processedKey =
+            `${scan.id}:${scanId}`;
+
+          if (
+            processedReaderScanIds.has(
+              processedKey
+            )
+          ) {
+            continue;
+          }
+
+          processedReaderScanIds.add(
+            processedKey
+          );
+
+          if (
+            processedReaderScanIds.size > 300
+          ) {
+            const firstKey =
+              processedReaderScanIds
+                .values()
+                .next()
+                .value;
+
+            if (firstKey) {
+              processedReaderScanIds.delete(
+                firstKey
+              );
+            }
+          }
+
+          try {
+            const result =
+              await checkInBarberByRfid(
+                scan.cardUid
+              );
+
+            showNotice(
+              result.alreadyActive
+                ? `${result.barber.name} เข้างานอยู่แล้ว`
+                : `${result.barber.name} เข้างานเรียบร้อย`,
+              "RFID"
+            );
+
+          } catch (error) {
+            console.error(
+              "RFID check-in error:",
+              error
+            );
+
+            showNotice(
+              error.message ||
+                "ไม่สามารถเข้างานด้วยบัตร RFID ได้",
+              "RFID"
+            );
+          }
+        }
+      },
+      (error) => {
+        console.error(
+          "Reader scan watcher error:",
+          error
+        );
+      }
+    );
+}
+
+
+// ========================================
+// PIN CHECK-IN
+// ========================================
+
 function findBarberByPin(pin) {
   const matches =
     barbers.filter(
@@ -710,6 +989,7 @@ if (logoutButton) {
 watchAuth(async (user) => {
   if (!user) {
     stopPresenceWatcher();
+    stopReaderScanWatcher();
 
     currentUserProfile = null;
     currentBranch = null;
@@ -765,6 +1045,10 @@ watchAuth(async (user) => {
     );
 
     await startPresenceWatcher(
+      branch.id
+    );
+
+    startReaderScanWatcher(
       branch.id
     );
 
