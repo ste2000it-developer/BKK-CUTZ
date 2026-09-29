@@ -3,7 +3,8 @@ import {
   logout,
   watchAuth,
   getUserProfile,
-  getBranch
+  getBranch,
+  uploadPaymentSlip
 } from "./firebase.js";
 
 import {
@@ -131,9 +132,41 @@ const trueMoneyQrImage = document.getElementById("trueMoneyQrImage");
 const trueMoneyQrPlaceholder =
   document.getElementById("trueMoneyQrPlaceholder");
 
+const tipToggleButton =
+  document.getElementById("tipToggleButton");
+const tipEntry =
+  document.getElementById("tipEntry");
+const tipInput =
+  document.getElementById("tipInput");
+const tipAmountText =
+  document.getElementById("tipAmountText");
+const qrGrandTotal =
+  document.getElementById("qrGrandTotal");
+const tipQuickButtons =
+  document.querySelectorAll("[data-tip-amount]");
+
+const slipFileInput =
+  document.getElementById("slipFileInput");
+const slipCaptureButton =
+  document.getElementById("slipCaptureButton");
+const slipCaptureButtonText =
+  document.getElementById("slipCaptureButtonText");
+const slipPreview =
+  document.getElementById("slipPreview");
+const slipPreviewImage =
+  document.getElementById("slipPreviewImage");
+const slipStatus =
+  document.getElementById("slipStatus");
+
 const successBarberName = document.getElementById("successBarberName");
 const successServiceList = document.getElementById("successServiceList");
 const successTotal = document.getElementById("successTotal");
+const successTipRow =
+  document.getElementById("successTipRow");
+const successTipAmount =
+  document.getElementById("successTipAmount");
+const successGrandTotal =
+  document.getElementById("successGrandTotal");
 const successPaymentMethod =
   document.getElementById("successPaymentMethod");
 
@@ -197,6 +230,11 @@ let selectedBarber = null;
 const selectedServices = new Map();
 
 let pendingService = null;
+
+let paymentTipAmount = 0;
+let pendingSlipFile = null;
+let pendingSlipPreviewUrl = null;
+let isCompletingTransaction = false;
 
 
 
@@ -2100,9 +2138,9 @@ function closePaymentModal() {
 
 cashPaymentButton.addEventListener(
   "click",
-  () => {
+  async () => {
     closePaymentModal();
-    completeTransaction("cash");
+    await completeTransaction("cash");
   }
 );
 
@@ -2118,6 +2156,409 @@ cancelPaymentButton.addEventListener(
   "click",
   closePaymentModal
 );
+
+
+// ========================================
+// TIP + SLIP
+// ========================================
+
+function getTipAmount() {
+  const value =
+    Number(paymentTipAmount || 0);
+
+  if (
+    !Number.isFinite(value) ||
+    value < 0
+  ) {
+    return 0;
+  }
+
+  return Math.round(value);
+}
+
+function updateQrPaymentSummary() {
+  const serviceTotal =
+    calculateTotal();
+
+  const tipAmount =
+    getTipAmount();
+
+  tipAmountText.textContent =
+    `${formatMoney(tipAmount)} บาท`;
+
+  qrGrandTotal.textContent =
+    `${formatMoney(serviceTotal + tipAmount)} บาท`;
+
+  tipQuickButtons.forEach(
+    (button) => {
+      button.classList.toggle(
+        "active",
+        Number(button.dataset.tipAmount) === tipAmount
+      );
+    }
+  );
+}
+
+function setPaymentTipAmount(value) {
+  const amount =
+    Math.max(
+      0,
+      Math.round(
+        Number(value || 0)
+      )
+    );
+
+  paymentTipAmount =
+    Number.isFinite(amount)
+      ? amount
+      : 0;
+
+  tipInput.value =
+    paymentTipAmount > 0
+      ? String(paymentTipAmount)
+      : "";
+
+  updateQrPaymentSummary();
+}
+
+function clearSlipSelection() {
+  pendingSlipFile = null;
+
+  if (pendingSlipPreviewUrl) {
+    URL.revokeObjectURL(
+      pendingSlipPreviewUrl
+    );
+
+    pendingSlipPreviewUrl = null;
+  }
+
+  slipFileInput.value = "";
+  slipPreviewImage.removeAttribute("src");
+  slipPreview.classList.add("hidden");
+  slipStatus.textContent = "พร้อมบันทึก";
+  slipCaptureButtonText.textContent = "ถ่ายสลิป";
+}
+
+function resetPaymentExtras() {
+  paymentTipAmount = 0;
+  tipInput.value = "";
+  tipEntry.classList.add("hidden");
+  tipToggleButton.textContent = "+ เพิ่มทิป";
+
+  clearSlipSelection();
+  updateQrPaymentSummary();
+}
+
+function createTransactionId() {
+  if (
+    typeof crypto !== "undefined" &&
+    typeof crypto.randomUUID === "function"
+  ) {
+    return crypto.randomUUID();
+  }
+
+  return (
+    "tx_" +
+    Date.now().toString(36) +
+    "_" +
+    Math.random()
+      .toString(36)
+      .slice(2, 10)
+  );
+}
+
+function loadImageFromFile(file) {
+  return new Promise(
+    (resolve, reject) => {
+      const objectUrl =
+        URL.createObjectURL(file);
+
+      const image =
+        new Image();
+
+      image.onload = () => {
+        URL.revokeObjectURL(
+          objectUrl
+        );
+
+        resolve(image);
+      };
+
+      image.onerror = () => {
+        URL.revokeObjectURL(
+          objectUrl
+        );
+
+        reject(
+          new Error(
+            "ไม่สามารถอ่านรูปสลิปได้"
+          )
+        );
+      };
+
+      image.src = objectUrl;
+    }
+  );
+}
+
+function canvasToJpegBlob(
+  canvas,
+  quality
+) {
+  return new Promise(
+    (resolve, reject) => {
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(
+              new Error(
+                "ไม่สามารถเตรียมรูปสลิปได้"
+              )
+            );
+            return;
+          }
+
+          resolve(blob);
+        },
+        "image/jpeg",
+        quality
+      );
+    }
+  );
+}
+
+async function compressSlipImage(file) {
+  if (
+    !file ||
+    !String(file.type || "").startsWith("image/")
+  ) {
+    throw new Error(
+      "กรุณาเลือกไฟล์รูปภาพ"
+    );
+  }
+
+  const image =
+    await loadImageFromFile(file);
+
+  const maxDimension = 1600;
+
+  const sourceWidth =
+    image.naturalWidth || image.width;
+
+  const sourceHeight =
+    image.naturalHeight || image.height;
+
+  const ratio =
+    Math.min(
+      1,
+      maxDimension /
+        Math.max(
+          sourceWidth,
+          sourceHeight
+        )
+    );
+
+  const width =
+    Math.max(
+      1,
+      Math.round(
+        sourceWidth * ratio
+      )
+    );
+
+  const height =
+    Math.max(
+      1,
+      Math.round(
+        sourceHeight * ratio
+      )
+    );
+
+  const canvas =
+    document.createElement("canvas");
+
+  canvas.width = width;
+  canvas.height = height;
+
+  const context =
+    canvas.getContext("2d");
+
+  if (!context) {
+    throw new Error(
+      "อุปกรณ์นี้ไม่สามารถเตรียมรูปสลิปได้"
+    );
+  }
+
+  context.drawImage(
+    image,
+    0,
+    0,
+    width,
+    height
+  );
+
+  let quality = 0.82;
+  let blob =
+    await canvasToJpegBlob(
+      canvas,
+      quality
+    );
+
+  const maxBytes =
+    5 * 1024 * 1024;
+
+  while (
+    blob.size >= maxBytes &&
+    quality > 0.52
+  ) {
+    quality -= 0.08;
+
+    blob =
+      await canvasToJpegBlob(
+        canvas,
+        quality
+      );
+  }
+
+  if (blob.size >= maxBytes) {
+    throw new Error(
+      "รูปสลิปมีขนาดใหญ่เกินไป กรุณาถ่ายใหม่"
+    );
+  }
+
+  return blob;
+}
+
+function setQrPaidLoading(isLoading) {
+  qrPaidButton.disabled =
+    isLoading;
+
+  qrPaidButton.innerHTML =
+    isLoading
+      ? "กำลังบันทึกรูปสลิป..."
+      : `
+          ตรวจสลิปแล้ว — ชำระแล้ว
+          <span>→</span>
+        `;
+}
+
+if (
+  tipToggleButton &&
+  tipEntry
+) {
+  tipToggleButton.addEventListener(
+    "click",
+    () => {
+      const willOpen =
+        tipEntry.classList.contains(
+          "hidden"
+        );
+
+      tipEntry.classList.toggle(
+        "hidden",
+        !willOpen
+      );
+
+      tipToggleButton.textContent =
+        willOpen
+          ? "ปิดช่องทิป"
+          : "+ เพิ่มทิป";
+
+      if (willOpen) {
+        setTimeout(
+          () => tipInput.focus(),
+          0
+        );
+      }
+    }
+  );
+}
+
+if (tipInput) {
+  tipInput.addEventListener(
+    "input",
+    () => {
+      setPaymentTipAmount(
+        tipInput.value
+      );
+    }
+  );
+}
+
+tipQuickButtons.forEach(
+  (button) => {
+    button.addEventListener(
+      "click",
+      () => {
+        setPaymentTipAmount(
+          button.dataset.tipAmount
+        );
+      }
+    );
+  }
+);
+
+if (
+  slipCaptureButton &&
+  slipFileInput
+) {
+  slipCaptureButton.addEventListener(
+    "click",
+    () => {
+      slipFileInput.click();
+    }
+  );
+}
+
+if (slipFileInput) {
+  slipFileInput.addEventListener(
+    "change",
+    () => {
+      const file =
+        slipFileInput.files?.[0];
+
+      if (!file) {
+        return;
+      }
+
+      if (
+        !String(file.type || "").startsWith("image/")
+      ) {
+        clearSlipSelection();
+
+        showNotice(
+          "กรุณาเลือกไฟล์รูปภาพ"
+        );
+
+        return;
+      }
+
+      pendingSlipFile = file;
+
+      if (pendingSlipPreviewUrl) {
+        URL.revokeObjectURL(
+          pendingSlipPreviewUrl
+        );
+      }
+
+      pendingSlipPreviewUrl =
+        URL.createObjectURL(file);
+
+      slipPreviewImage.src =
+        pendingSlipPreviewUrl;
+
+      slipPreview.classList.remove(
+        "hidden"
+      );
+
+      slipStatus.textContent =
+        "ถ่ายสลิปแล้ว • พร้อมบันทึก";
+
+      slipCaptureButtonText.textContent =
+        "ถ่ายใหม่";
+    }
+  );
+}
 
 
 // ========================================
@@ -2153,6 +2594,7 @@ function showQrPage() {
   qrTotal.textContent =
     `${formatMoney(calculateTotal())} บาท`;
 
+  updateQrPaymentSummary();
   renderTrueMoneyQr();
 
   hideAllPages();
@@ -2166,14 +2608,18 @@ function showQrPage() {
 
 qrPaidButton.addEventListener(
   "click",
-  () => {
-    completeTransaction("scan");
+  async () => {
+    await completeTransaction("scan");
   }
 );
 
 qrBackButton.addEventListener(
   "click",
   () => {
+    if (isCompletingTransaction) {
+      return;
+    }
+
     qrPage.classList.add("hidden");
     servicePage.classList.remove("hidden");
 
@@ -2186,54 +2632,179 @@ qrBackButton.addEventListener(
 // COMPLETE TRANSACTION
 // ========================================
 
-function completeTransaction(paymentMethod) {
+async function completeTransaction(paymentMethod) {
   const selected =
     getSelectedServiceList();
 
   if (
     !selectedBarber ||
     selected.length === 0 ||
-    !currentBranch
+    !currentBranch ||
+    isCompletingTransaction
   ) {
     return;
   }
 
-  const transaction = {
-    branchId:
-      currentBranch.id,
+  if (
+    paymentMethod === "scan" &&
+    !pendingSlipFile
+  ) {
+    showNotice(
+      "กรุณาถ่ายรูปสลิปก่อนยืนยันการชำระเงิน",
+      "ยังไม่มีรูปสลิป"
+    );
 
-    branchName:
-      currentBranch.name,
+    return;
+  }
 
-    serviceGroup:
-      currentBranch.serviceGroup,
+  isCompletingTransaction = true;
 
-    barberId:
-      selectedBarber.id,
+  if (paymentMethod === "scan") {
+    setQrPaidLoading(true);
+  }
 
-    barberName:
-      selectedBarber.name,
+  try {
+    const createdAt =
+      new Date().toISOString();
 
-    services:
-      selected,
+    const transactionId =
+      createTransactionId();
 
-    total:
-      calculateTotal(),
+    const serviceTotal =
+      calculateTotal();
 
-    paymentMethod,
+    const tipAmount =
+      paymentMethod === "scan"
+        ? getTipAmount()
+        : 0;
 
-    createdAt:
-      new Date().toISOString()
-  };
+    const grandTotal =
+      serviceTotal + tipAmount;
 
-  console.log(
-    "รายการทดลอง:",
-    transaction
-  );
+    let slipStoragePath = null;
 
-  showSuccessPage(
-    transaction
-  );
+    if (
+      paymentMethod === "scan" &&
+      pendingSlipFile
+    ) {
+      slipStatus.textContent =
+        "กำลังบันทึกรูปสลิป...";
+
+      const slipBlob =
+        await compressSlipImage(
+          pendingSlipFile
+        );
+
+      const uploadResult =
+        await uploadPaymentSlip({
+          branchId:
+            currentBranch.id,
+
+          dateKey:
+            getLocalDateKey(),
+
+          transactionId,
+
+          blob:
+            slipBlob,
+
+          metadata: {
+            transactionId,
+            branchId:
+              currentBranch.id,
+            barberId:
+              selectedBarber.id,
+            barberName:
+              selectedBarber.name || "",
+            serviceTotal,
+            tipAmount,
+            grandTotal,
+            paymentMethod,
+            createdAt
+          }
+        });
+
+      slipStoragePath =
+        uploadResult.path;
+
+      slipStatus.textContent =
+        "บันทึกรูปสลิปแล้ว";
+    }
+
+    const transaction = {
+      id:
+        transactionId,
+
+      branchId:
+        currentBranch.id,
+
+      branchName:
+        currentBranch.name,
+
+      serviceGroup:
+        currentBranch.serviceGroup,
+
+      barberId:
+        selectedBarber.id,
+
+      barberName:
+        selectedBarber.name,
+
+      services:
+        selected,
+
+      serviceTotal,
+
+      total:
+        serviceTotal,
+
+      tipAmount,
+
+      grandTotal,
+
+      paymentMethod,
+
+      slipStoragePath,
+
+      createdAt
+    };
+
+    console.log(
+      "รายการทดลอง:",
+      transaction
+    );
+
+    showSuccessPage(
+      transaction
+    );
+
+  } catch (error) {
+    console.error(
+      "Complete transaction error:",
+      error
+    );
+
+    if (
+      paymentMethod === "scan" &&
+      slipStatus
+    ) {
+      slipStatus.textContent =
+        "บันทึกรูปสลิปไม่สำเร็จ";
+    }
+
+    showNotice(
+      error?.message ||
+        "บันทึกรูปสลิปไม่สำเร็จ กรุณาลองอีกครั้ง",
+      "บันทึกไม่สำเร็จ"
+    );
+
+  } finally {
+    isCompletingTransaction = false;
+
+    if (paymentMethod === "scan") {
+      setQrPaidLoading(false);
+    }
+  }
 }
 
 
@@ -2252,7 +2823,27 @@ function showSuccessPage(transaction) {
     transaction.barberName;
 
   successTotal.textContent =
-    `${formatMoney(transaction.total)} บาท`;
+    `${formatMoney(transaction.serviceTotal ?? transaction.total)} บาท`;
+
+  const tipAmount =
+    Number(transaction.tipAmount || 0);
+
+  successTipAmount.textContent =
+    `${formatMoney(tipAmount)} บาท`;
+
+  successTipRow.classList.toggle(
+    "hidden",
+    tipAmount <= 0
+  );
+
+  successGrandTotal.textContent =
+    `${formatMoney(
+      transaction.grandTotal ??
+      (
+        Number(transaction.total || 0) +
+        tipAmount
+      )
+    )} บาท`;
 
   successPaymentMethod.textContent =
     transaction.paymentMethod === "cash"
@@ -2311,6 +2902,7 @@ function resetTransaction() {
 
   closePaymentModal();
   closeServiceOptionModal();
+  resetPaymentExtras();
 
   hideAllPages();
   barberPage.classList.remove("hidden");

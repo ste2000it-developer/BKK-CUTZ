@@ -24,6 +24,12 @@ import {
   getDoc
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
 
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes
+} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-storage.js";
+
 
 
 // ========================================
@@ -59,6 +65,10 @@ const auth =
 
 const db =
   getFirestore(app);
+
+
+const storage =
+  getStorage(app);
 
 
 
@@ -222,6 +232,108 @@ export async function getBranch(
       snapshot.id,
 
     ...snapshot.data()
+  };
+
+}
+
+
+
+// ========================================
+// อัปโหลดรูปสลิปการชำระเงิน
+// payment_slips/{branchId}/{dateKey}/{transactionId}.jpg
+// ========================================
+
+function sanitizeStorageSegment(
+  value,
+  fallback = "unknown"
+) {
+
+  const cleaned =
+    String(value || "")
+      .trim()
+      .replace(
+        /[^a-zA-Z0-9_-]/g,
+        "_"
+      );
+
+  return cleaned || fallback;
+
+}
+
+
+export async function uploadPaymentSlip({
+  branchId,
+  dateKey,
+  transactionId,
+  blob,
+  metadata = {}
+}) {
+
+  if (!blob) {
+    throw new Error(
+      "ไม่พบไฟล์สลิปสำหรับอัปโหลด"
+    );
+  }
+
+  const safeBranchId =
+    sanitizeStorageSegment(
+      branchId,
+      "branch"
+    );
+
+  const safeDateKey =
+    sanitizeStorageSegment(
+      dateKey,
+      "date"
+    );
+
+  const safeTransactionId =
+    sanitizeStorageSegment(
+      transactionId,
+      "transaction"
+    );
+
+  const fullPath =
+    `payment_slips/${safeBranchId}/${safeDateKey}/${safeTransactionId}.jpg`;
+
+  const customMetadata = {};
+
+  Object.entries(metadata).forEach(
+    ([key, value]) => {
+      if (
+        value !== undefined &&
+        value !== null
+      ) {
+        customMetadata[key] =
+          String(value);
+      }
+    }
+  );
+
+  const fileRef =
+    storageRef(
+      storage,
+      fullPath
+    );
+
+  const result =
+    await uploadBytes(
+      fileRef,
+      blob,
+      {
+        contentType: "image/jpeg",
+        cacheControl:
+          "private,max-age=0,no-transform",
+        customMetadata
+      }
+    );
+
+  return {
+    path:
+      result.metadata.fullPath,
+
+    size:
+      result.metadata.size
   };
 
 }

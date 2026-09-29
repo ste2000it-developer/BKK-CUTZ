@@ -944,7 +944,7 @@ svg {
 }
 
 .payment-page-card {
-  width: min(560px, 100%);
+  width: min(620px, 100%);
   margin: 0 auto;
   padding: 32px;
   border: 1px solid #e1e1e1;
@@ -1055,6 +1055,177 @@ svg {
 }
 
 
+.payment-extras {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0;
+  text-align: left;
+}
+
+.payment-extra-block {
+  padding: 17px 18px;
+  border: 1px solid #e3e3e3;
+  border-radius: 12px;
+  background: #fafaf9;
+}
+
+.payment-extra-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.payment-extra-head strong {
+  display: block;
+  font-size: 16px;
+}
+
+.payment-extra-head small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.payment-extra-action {
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid #d5d5d5;
+  border-radius: 9px;
+  background: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.tip-entry {
+  margin-top: 14px;
+}
+
+.tip-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.tip-quick-grid button {
+  min-height: 42px;
+  border: 1px solid #d8d8d8;
+  border-radius: 9px;
+  background: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tip-quick-grid button.active {
+  border-color: #111111;
+  background: #111111;
+  color: #ffffff;
+}
+
+.tip-input-shell {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 9px;
+  padding: 0 13px;
+  border: 1px solid #d8d8d8;
+  border-radius: 9px;
+  background: #ffffff;
+}
+
+.tip-input-shell span {
+  color: #555555;
+  font-weight: 800;
+}
+
+.tip-input-shell input {
+  min-width: 0;
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 16px;
+}
+
+.payment-extra-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 12px;
+  color: #555555;
+}
+
+.payment-extra-summary strong {
+  color: #111111;
+}
+
+.payment-extra-summary.grand {
+  padding-top: 10px;
+  border-top: 1px solid #e6e6e6;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.payment-extra-summary.grand strong {
+  font-size: 20px;
+}
+
+.slip-capture-button {
+  width: 100%;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+  border: 1px solid #111111;
+  border-radius: 10px;
+  background: #111111;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.slip-capture-button .material-symbols-outlined {
+  font-size: 21px;
+}
+
+.slip-preview {
+  display: grid;
+  grid-template-columns: 86px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid #dedede;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.slip-preview img {
+  width: 86px;
+  height: 86px;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f0f0f0;
+}
+
+.slip-status {
+  color: #444444;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+#qrPaidButton:disabled {
+  opacity: .58;
+  cursor: wait;
+}
+
+
 /* SUCCESS */
 
 .success-wrap {
@@ -1140,6 +1311,26 @@ svg {
 
 
 /* TABLET / MOBILE */
+
+@media (max-width: 620px) {
+  .payment-page-card {
+    padding: 24px 18px;
+  }
+
+  .payment-extra-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .payment-extra-action {
+    width: 100%;
+  }
+
+  .tip-quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 
 @media (max-width: 1050px) {
   .app-header {

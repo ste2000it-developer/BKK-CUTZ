@@ -28,7 +28,7 @@
 
   <link
     rel="stylesheet"
-    href="pos.css?v=33"
+    href="pos.css?v=34"
   >
 </head>
 
@@ -420,12 +420,121 @@
           </div>
         </div>
 
+        <div class="payment-extras">
+          <section class="payment-extra-block">
+            <div class="payment-extra-head">
+              <div>
+                <strong>ทิปช่าง</strong>
+                <small>กรอกเฉพาะกรณีลูกค้าโอนทิปเพิ่ม</small>
+              </div>
+
+              <button
+                id="tipToggleButton"
+                class="payment-extra-action"
+                type="button"
+              >
+                + เพิ่มทิป
+              </button>
+            </div>
+
+            <div
+              id="tipEntry"
+              class="tip-entry hidden"
+            >
+              <div class="tip-quick-grid">
+                <button type="button" data-tip-amount="20">20</button>
+                <button type="button" data-tip-amount="50">50</button>
+                <button type="button" data-tip-amount="100">100</button>
+                <button type="button" data-tip-amount="200">200</button>
+              </div>
+
+              <label
+                class="tip-input-shell"
+                for="tipInput"
+              >
+                <span>฿</span>
+
+                <input
+                  id="tipInput"
+                  type="number"
+                  min="0"
+                  step="1"
+                  inputmode="numeric"
+                  placeholder="ระบุจำนวนทิป"
+                >
+              </label>
+            </div>
+
+            <div class="payment-extra-summary">
+              <span>ทิป</span>
+              <strong id="tipAmountText">0 บาท</strong>
+            </div>
+
+            <div class="payment-extra-summary grand">
+              <span>ยอดรับรวม</span>
+              <strong id="qrGrandTotal">0 บาท</strong>
+            </div>
+          </section>
+
+          <section class="payment-extra-block">
+            <div class="payment-extra-head">
+              <div>
+                <strong>รูปสลิป</strong>
+                <small>ถ่ายรูปสลิปเพื่อเก็บเป็นหลักฐาน</small>
+              </div>
+            </div>
+
+            <input
+              id="slipFileInput"
+              class="hidden"
+              type="file"
+              accept="image/*"
+              capture="environment"
+            >
+
+            <button
+              id="slipCaptureButton"
+              class="slip-capture-button"
+              type="button"
+            >
+              <span
+                class="material-symbols-outlined"
+                aria-hidden="true"
+              >
+                photo_camera
+              </span>
+
+              <span id="slipCaptureButtonText">
+                ถ่ายสลิป
+              </span>
+            </button>
+
+            <div
+              id="slipPreview"
+              class="slip-preview hidden"
+            >
+              <img
+                id="slipPreviewImage"
+                alt="ตัวอย่างสลิป"
+              >
+
+              <div
+                id="slipStatus"
+                class="slip-status"
+              >
+                พร้อมบันทึก
+              </div>
+            </div>
+          </section>
+        </div>
+
         <div class="check-card">
           <strong>ตรวจสอบก่อนยืนยัน</strong>
 
           <div><span>✓</span> ยอดเงินถูกต้อง</div>
           <div><span>✓</span> ชื่อผู้รับถูกต้อง</div>
           <div><span>✓</span> เวลาในสลิปถูกต้อง</div>
+          <div><span>✓</span> ถ่ายรูปสลิปแล้ว</div>
         </div>
 
         <button
@@ -468,9 +577,22 @@
             class="success-service-list"
           ></div>
 
-          <div class="success-row success-total">
-            <span>รวมทั้งหมด</span>
+          <div class="success-row">
+            <span>ค่าบริการ</span>
             <strong id="successTotal">0 บาท</strong>
+          </div>
+
+          <div
+            id="successTipRow"
+            class="success-row hidden"
+          >
+            <span>ทิปช่าง</span>
+            <strong id="successTipAmount">0 บาท</strong>
+          </div>
+
+          <div class="success-row success-total">
+            <span>รับทั้งหมด</span>
+            <strong id="successGrandTotal">0 บาท</strong>
           </div>
 
           <div class="success-row">
@@ -857,7 +979,7 @@
 
   <script
     type="module"
-    src="app.js?v=33"
+    src="app.js?v=34"
   ></script>
 </body>
 </html>
