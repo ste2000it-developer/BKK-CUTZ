@@ -27,7 +27,8 @@ import {
 import {
   getStorage,
   ref as storageRef,
-  uploadBytes
+  uploadBytes,
+  getDownloadURL
 } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-storage.js";
 
 
@@ -335,5 +336,34 @@ export async function uploadPaymentSlip({
     size:
       result.metadata.size
   };
+
+}
+
+
+
+// ========================================
+// ขอ URL สำหรับดูรูปสลิป
+// ต้องผ่าน Firebase Storage Rules ก่อน
+// ========================================
+
+export async function loadPaymentSlipUrl(
+  fullPath
+) {
+
+  if (!fullPath) {
+    throw new Error(
+      "ไม่พบตำแหน่งไฟล์สลิป"
+    );
+  }
+
+  const fileRef =
+    storageRef(
+      storage,
+      fullPath
+    );
+
+  return await getDownloadURL(
+    fileRef
+  );
 
 }

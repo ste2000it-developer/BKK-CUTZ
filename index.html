@@ -28,7 +28,7 @@
 
   <link
     rel="stylesheet"
-    href="pos.css?v=34"
+    href="pos.css?v=35"
   >
 </head>
 
@@ -156,6 +156,21 @@
         >
           -
         </div>
+
+        <button
+          id="historyButton"
+          class="history-header-button"
+          type="button"
+          aria-label="ประวัติรายการ"
+          title="ประวัติรายการ"
+        >
+          <span
+            class="material-symbols-outlined"
+            aria-hidden="true"
+          >
+            receipt_long
+          </span>
+        </button>
 
         <button
           id="shiftButton"
@@ -545,6 +560,85 @@
           ตรวจสลิปแล้ว — ชำระแล้ว
           <span>→</span>
         </button>
+      </div>
+    </section>
+
+
+    <!-- TRANSACTION HISTORY -->
+    <section id="historyPage" class="page hidden">
+      <div class="history-page-head">
+        <div class="history-title-row">
+          <button
+            id="historyBackButton"
+            class="square-back"
+            type="button"
+            aria-label="กลับ"
+          >
+            ←
+          </button>
+
+          <div>
+            <div class="page-kicker">ประวัติของสาขานี้</div>
+            <h1>ประวัติรายการ</h1>
+            <p>ดูรายการขายย้อนหลังของช่างในสาขาปัจจุบัน</p>
+          </div>
+        </div>
+
+        <div class="history-controls">
+          <label class="history-control">
+            <span>วันที่</span>
+            <input
+              id="historyDateInput"
+              type="date"
+            >
+          </label>
+
+          <label class="history-control">
+            <span>ช่าง</span>
+            <select id="historyBarberFilter">
+              <option value="all">ช่างทุกคน</option>
+            </select>
+          </label>
+
+          <button
+            id="historyRefreshButton"
+            class="history-refresh-button"
+            type="button"
+          >
+            รีเฟรช
+          </button>
+        </div>
+      </div>
+
+      <div class="history-summary-grid">
+        <div class="history-summary-card">
+          <span>จำนวนรายการ</span>
+          <strong id="historyCount">0</strong>
+        </div>
+
+        <div class="history-summary-card">
+          <span>ค่าบริการ</span>
+          <strong id="historyServiceTotal">0 บาท</strong>
+        </div>
+
+        <div class="history-summary-card">
+          <span>ทิปช่าง</span>
+          <strong id="historyTipTotal">0 บาท</strong>
+        </div>
+
+        <div class="history-summary-card emphasized">
+          <span>รับทั้งหมด</span>
+          <strong id="historyGrandTotal">0 บาท</strong>
+        </div>
+      </div>
+
+      <div
+        id="historyList"
+        class="history-list"
+      >
+        <div class="history-loading">
+          กำลังโหลดประวัติ...
+        </div>
       </div>
     </section>
 
@@ -977,9 +1071,52 @@
   </div>
 
 
+  <!-- HISTORY SLIP VIEWER -->
+  <div
+    id="historySlipModal"
+    class="history-slip-modal hidden"
+  >
+    <div
+      id="historySlipBackdrop"
+      class="history-slip-backdrop"
+    ></div>
+
+    <div class="history-slip-card">
+      <div class="history-slip-head">
+        <div>
+          <div class="page-kicker">หลักฐานการชำระเงิน</div>
+          <h2>รูปสลิป</h2>
+        </div>
+
+        <button
+          id="historySlipCloseButton"
+          class="modal-close"
+          type="button"
+          aria-label="ปิด"
+        >
+          ×
+        </button>
+      </div>
+
+      <div
+        id="historySlipStatus"
+        class="history-slip-status"
+      >
+        กำลังโหลดรูปสลิป...
+      </div>
+
+      <img
+        id="historySlipImage"
+        class="history-slip-image"
+        alt="รูปสลิปการชำระเงิน"
+      >
+    </div>
+  </div>
+
+
   <script
     type="module"
-    src="app.js?v=34"
+    src="app.js?v=35"
   ></script>
 </body>
 </html>

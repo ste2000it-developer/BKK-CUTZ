@@ -4,8 +4,9 @@ import {
   watchAuth,
   getUserProfile,
   getBranch,
-  uploadPaymentSlip
-} from "./firebase.js";
+  uploadPaymentSlip,
+  loadPaymentSlipUrl
+} from "./firebase.js?v=35";
 
 import {
   getApp
@@ -69,6 +70,7 @@ const posDateTime = document.getElementById("posDateTime");
 
 
 const shiftButton = document.getElementById("shiftButton");
+const historyButton = document.getElementById("historyButton");
 const shiftModal = document.getElementById("shiftModal");
 const shiftBackdrop = document.getElementById("shiftBackdrop");
 const shiftCloseButton = document.getElementById("shiftCloseButton");
@@ -104,6 +106,7 @@ const barberPage = document.getElementById("barberPage");
 const servicePage = document.getElementById("servicePage");
 const qrPage = document.getElementById("qrPage");
 const successPage = document.getElementById("successPage");
+const historyPage = document.getElementById("historyPage");
 
 const barberList = document.getElementById("barberList");
 
@@ -173,6 +176,36 @@ const successPaymentMethod =
 const successDateTime =
   document.getElementById("successDateTime");
 const homeButton = document.getElementById("homeButton");
+
+const historyBackButton =
+  document.getElementById("historyBackButton");
+const historyDateInput =
+  document.getElementById("historyDateInput");
+const historyRefreshButton =
+  document.getElementById("historyRefreshButton");
+const historyBarberFilter =
+  document.getElementById("historyBarberFilter");
+const historyList =
+  document.getElementById("historyList");
+const historyCount =
+  document.getElementById("historyCount");
+const historyServiceTotal =
+  document.getElementById("historyServiceTotal");
+const historyTipTotal =
+  document.getElementById("historyTipTotal");
+const historyGrandTotal =
+  document.getElementById("historyGrandTotal");
+
+const historySlipModal =
+  document.getElementById("historySlipModal");
+const historySlipBackdrop =
+  document.getElementById("historySlipBackdrop");
+const historySlipCloseButton =
+  document.getElementById("historySlipCloseButton");
+const historySlipImage =
+  document.getElementById("historySlipImage");
+const historySlipStatus =
+  document.getElementById("historySlipStatus");
 
 const serviceOptionModal =
   document.getElementById("serviceOptionModal");
@@ -1156,6 +1189,7 @@ function hideAllPages() {
   servicePage.classList.add("hidden");
   qrPage.classList.add("hidden");
   successPage.classList.add("hidden");
+  historyPage.classList.add("hidden");
 }
 
 
@@ -2659,6 +2693,8 @@ async function completeTransaction(paymentMethod) {
 
   isCompletingTransaction = true;
 
+  let slipUploaded = false;
+
   if (paymentMethod === "scan") {
     setQrPaidLoading(true);
   }
@@ -2727,6 +2763,8 @@ async function completeTransaction(paymentMethod) {
       slipStoragePath =
         uploadResult.path;
 
+      slipUploaded = true;
+
       slipStatus.textContent =
         "บันทึกรูปสลิปแล้ว";
     }
@@ -2739,7 +2777,7 @@ async function completeTransaction(paymentMethod) {
         currentBranch.id,
 
       branchName:
-        currentBranch.name,
+        currentBranch.name || currentBranch.id,
 
       serviceGroup:
         currentBranch.serviceGroup,
@@ -2748,7 +2786,7 @@ async function completeTransaction(paymentMethod) {
         selectedBarber.id,
 
       barberName:
-        selectedBarber.name,
+        selectedBarber.name || selectedBarber.id,
 
       services:
         selected,
@@ -2766,11 +2804,29 @@ async function completeTransaction(paymentMethod) {
 
       slipStoragePath,
 
-      createdAt
+      dateKey:
+        getLocalDateKey(),
+
+      createdAt,
+
+      createdAtServer:
+        serverTimestamp(),
+
+      source:
+        "pos"
     };
 
+    await setDoc(
+      doc(
+        db,
+        "transactions",
+        transactionId
+      ),
+      transaction
+    );
+
     console.log(
-      "รายการทดลอง:",
+      "บันทึกประวัติรายการแล้ว:",
       transaction
     );
 
@@ -2786,7 +2842,8 @@ async function completeTransaction(paymentMethod) {
 
     if (
       paymentMethod === "scan" &&
-      slipStatus
+      slipStatus &&
+      !slipUploaded
     ) {
       slipStatus.textContent =
         "บันทึกรูปสลิปไม่สำเร็จ";
@@ -2794,7 +2851,7 @@ async function completeTransaction(paymentMethod) {
 
     showNotice(
       error?.message ||
-        "บันทึกรูปสลิปไม่สำเร็จ กรุณาลองอีกครั้ง",
+        "บันทึกรายการไม่สำเร็จ กรุณาลองอีกครั้ง",
       "บันทึกไม่สำเร็จ"
     );
 
@@ -2889,6 +2946,589 @@ function showSuccessPage(transaction) {
     top: 0,
     behavior: "smooth"
   });
+}
+
+
+// ========================================
+// TRANSACTION HISTORY
+// ========================================
+
+function getVisiblePosPage() {
+  const pages = [
+    barberPage,
+    servicePage,
+    qrPage,
+    successPage
+  ];
+
+  return pages.find(
+    (page) =>
+      page &&
+      !page.classList.contains("hidden")
+  ) || barberPage;
+}
+
+function getHistoryDateKey() {
+  return (
+    historyDateInput?.value ||
+    getLocalDateKey()
+  );
+}
+
+function setHistoryLoading(isLoading) {
+  isLoadingHistory = isLoading;
+
+  if (historyRefreshButton) {
+    historyRefreshButton.disabled =
+      isLoading;
+
+    historyRefreshButton.textContent =
+      isLoading
+        ? "กำลังโหลด..."
+        : "รีเฟรช";
+  }
+}
+
+function populateHistoryBarberFilter() {
+  if (!historyBarberFilter) {
+    return;
+  }
+
+  const previousValue =
+    historyBarberFilter.value || "all";
+
+  const barberMap = new Map();
+
+  historyTransactions.forEach(
+    (transaction) => {
+      const id =
+        String(
+          transaction.barberId || ""
+        );
+
+      if (!id) {
+        return;
+      }
+
+      barberMap.set(
+        id,
+        transaction.barberName || id
+      );
+    }
+  );
+
+  const options = [
+    `<option value="all">ช่างทุกคน</option>`
+  ];
+
+  Array.from(barberMap.entries())
+    .sort(
+      (a, b) =>
+        String(a[1]).localeCompare(
+          String(b[1]),
+          "th"
+        )
+    )
+    .forEach(([id, name]) => {
+      options.push(`
+        <option value="${escapeHtml(id)}">
+          ${escapeHtml(name)}
+        </option>
+      `);
+    });
+
+  historyBarberFilter.innerHTML =
+    options.join("");
+
+  const stillExists =
+    previousValue === "all" ||
+    barberMap.has(previousValue);
+
+  historyBarberFilter.value =
+    stillExists
+      ? previousValue
+      : "all";
+}
+
+function getFilteredHistoryTransactions() {
+  const barberId =
+    historyBarberFilter?.value || "all";
+
+  if (barberId === "all") {
+    return historyTransactions;
+  }
+
+  return historyTransactions.filter(
+    (transaction) =>
+      String(transaction.barberId || "") ===
+      barberId
+  );
+}
+
+function renderHistorySummary(
+  transactions
+) {
+  const serviceTotal =
+    transactions.reduce(
+      (sum, transaction) =>
+        sum + Number(
+          transaction.serviceTotal ??
+          transaction.total ??
+          0
+        ),
+      0
+    );
+
+  const tipTotal =
+    transactions.reduce(
+      (sum, transaction) =>
+        sum + Number(
+          transaction.tipAmount || 0
+        ),
+      0
+    );
+
+  const grandTotal =
+    transactions.reduce(
+      (sum, transaction) =>
+        sum + Number(
+          transaction.grandTotal ??
+          (
+            Number(
+              transaction.serviceTotal ??
+              transaction.total ??
+              0
+            ) +
+            Number(
+              transaction.tipAmount || 0
+            )
+          )
+        ),
+      0
+    );
+
+  historyCount.textContent =
+    String(transactions.length);
+
+  historyServiceTotal.textContent =
+    `${formatMoney(serviceTotal)} บาท`;
+
+  historyTipTotal.textContent =
+    `${formatMoney(tipTotal)} บาท`;
+
+  historyGrandTotal.textContent =
+    `${formatMoney(grandTotal)} บาท`;
+}
+
+function getHistoryServiceText(transaction) {
+  const items =
+    Array.isArray(transaction.services)
+      ? transaction.services
+      : [];
+
+  if (items.length === 0) {
+    return "ไม่มีรายละเอียดบริการ";
+  }
+
+  return items
+    .map((service) => {
+      const detail =
+        service.detail
+          ? ` (${service.detail})`
+          : "";
+
+      return `${service.name || "รายการ"}${detail}`;
+    })
+    .join(" · ");
+}
+
+function renderTransactionHistory() {
+  const transactions =
+    getFilteredHistoryTransactions();
+
+  renderHistorySummary(
+    transactions
+  );
+
+  historyList.innerHTML = "";
+
+  if (transactions.length === 0) {
+    historyList.innerHTML = `
+      <div class="history-empty">
+        <span class="material-symbols-outlined">
+          receipt_long
+        </span>
+        <strong>ยังไม่มีประวัติในวันที่เลือก</strong>
+        <p>รายการที่ชำระสำเร็จจะมาแสดงตรงนี้</p>
+      </div>
+    `;
+
+    return;
+  }
+
+  transactions.forEach(
+    (transaction) => {
+      const card =
+        document.createElement("article");
+
+      card.className =
+        "history-item";
+
+      const serviceTotal =
+        Number(
+          transaction.serviceTotal ??
+          transaction.total ??
+          0
+        );
+
+      const tipAmount =
+        Number(
+          transaction.tipAmount || 0
+        );
+
+      const grandTotal =
+        Number(
+          transaction.grandTotal ??
+          serviceTotal + tipAmount
+        );
+
+      const paymentText =
+        transaction.paymentMethod === "cash"
+          ? "เงินสด"
+          : "สแกนจ่าย";
+
+      const slipButtonHtml =
+        transaction.slipStoragePath
+          ? `
+            <button
+              class="history-slip-button"
+              type="button"
+              data-slip-path="${escapeHtml(transaction.slipStoragePath)}"
+            >
+              <span class="material-symbols-outlined">image</span>
+              ดูสลิป
+            </button>
+          `
+          : "";
+
+      const tipHtml =
+        tipAmount > 0
+          ? `
+            <div>
+              <span>ทิปช่าง</span>
+              <strong>${formatMoney(tipAmount)} บาท</strong>
+            </div>
+          `
+          : "";
+
+      card.innerHTML = `
+        <div class="history-item-head">
+          <div>
+            <div class="history-time">
+              ${escapeHtml(formatThaiDateTime(transaction.createdAt, true))}
+            </div>
+            <h3>${escapeHtml(transaction.barberName || "-")}</h3>
+          </div>
+
+          <span class="history-payment-badge">
+            ${paymentText}
+          </span>
+        </div>
+
+        <div class="history-services-text">
+          ${escapeHtml(getHistoryServiceText(transaction))}
+        </div>
+
+        <div class="history-money-grid">
+          <div>
+            <span>ค่าบริการ</span>
+            <strong>${formatMoney(serviceTotal)} บาท</strong>
+          </div>
+
+          ${tipHtml}
+
+          <div class="grand">
+            <span>รับทั้งหมด</span>
+            <strong>${formatMoney(grandTotal)} บาท</strong>
+          </div>
+        </div>
+
+        <div class="history-item-foot">
+          <small>
+            #${escapeHtml(transaction.id || "-")}
+          </small>
+          ${slipButtonHtml}
+        </div>
+      `;
+
+      historyList.appendChild(card);
+    }
+  );
+
+  historyList
+    .querySelectorAll(
+      "[data-slip-path]"
+    )
+    .forEach((button) => {
+      button.addEventListener(
+        "click",
+        async () => {
+          await openHistorySlip(
+            button.dataset.slipPath,
+            button
+          );
+        }
+      );
+    });
+}
+
+async function loadTransactionHistory() {
+  if (
+    !currentBranch ||
+    isLoadingHistory
+  ) {
+    return;
+  }
+
+  setHistoryLoading(true);
+
+  historyList.innerHTML = `
+    <div class="history-loading">
+      กำลังโหลดประวัติ...
+    </div>
+  `;
+
+  try {
+    const dateKey =
+      getHistoryDateKey();
+
+    const historyQuery = query(
+      collection(db, "transactions"),
+      where(
+        "branchId",
+        "==",
+        currentBranch.id
+      ),
+      where(
+        "dateKey",
+        "==",
+        dateKey
+      )
+    );
+
+    const snapshot =
+      await getDocs(
+        historyQuery
+      );
+
+    historyTransactions =
+      snapshot.docs
+        .map((snapshot) => ({
+          id: snapshot.id,
+          ...snapshot.data()
+        }))
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt || 0) -
+            new Date(a.createdAt || 0)
+        );
+
+    populateHistoryBarberFilter();
+    renderTransactionHistory();
+
+  } catch (error) {
+    console.error(
+      "Load transaction history error:",
+      error
+    );
+
+    historyTransactions = [];
+    renderHistorySummary([]);
+
+    historyList.innerHTML = `
+      <div class="history-empty">
+        <strong>โหลดประวัติไม่สำเร็จ</strong>
+        <p>กรุณาลองรีเฟรชอีกครั้ง</p>
+      </div>
+    `;
+
+    showNotice(
+      error?.message ||
+        "โหลดประวัติไม่สำเร็จ",
+      "ประวัติรายการ"
+    );
+
+  } finally {
+    setHistoryLoading(false);
+  }
+}
+
+async function openTransactionHistory() {
+  const visiblePage =
+    getVisiblePosPage();
+
+  if (visiblePage !== historyPage) {
+    historyReturnPage = visiblePage;
+  }
+
+  if (historyDateInput) {
+    historyDateInput.value =
+      historyDateInput.value ||
+      getLocalDateKey();
+  }
+
+  hideAllPages();
+  historyPage.classList.remove("hidden");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+  await loadTransactionHistory();
+}
+
+function closeTransactionHistory() {
+  historyPage.classList.add("hidden");
+
+  const target =
+    historyReturnPage &&
+    historyReturnPage !== historyPage
+      ? historyReturnPage
+      : barberPage;
+
+  target.classList.remove("hidden");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+function closeHistorySlip() {
+  historySlipModal.classList.add(
+    "hidden"
+  );
+
+  document.body.classList.remove(
+    "modal-open"
+  );
+
+  historySlipImage.removeAttribute(
+    "src"
+  );
+
+}
+
+async function openHistorySlip(
+  fullPath,
+  button
+) {
+  if (!fullPath) {
+    return;
+  }
+
+  const oldHtml =
+    button.innerHTML;
+
+  button.disabled = true;
+  button.textContent =
+    "กำลังโหลด...";
+
+  try {
+    historySlipImage.removeAttribute(
+      "src"
+    );
+
+    historySlipStatus.textContent =
+      "กำลังโหลดรูปสลิป...";
+
+    historySlipModal.classList.remove(
+      "hidden"
+    );
+
+    document.body.classList.add(
+      "modal-open"
+    );
+
+    const slipUrl =
+      await loadPaymentSlipUrl(
+        fullPath
+      );
+
+    historySlipImage.src =
+      slipUrl;
+
+    historySlipStatus.textContent =
+      "";
+
+  } catch (error) {
+    console.error(
+      "Load slip error:",
+      error
+    );
+
+    closeHistorySlip();
+
+    showNotice(
+      error?.message ||
+        "เปิดรูปสลิปไม่สำเร็จ",
+      "รูปสลิป"
+    );
+
+  } finally {
+    button.disabled = false;
+    button.innerHTML = oldHtml;
+  }
+}
+
+if (historyButton) {
+  historyButton.addEventListener(
+    "click",
+    openTransactionHistory
+  );
+}
+
+if (historyBackButton) {
+  historyBackButton.addEventListener(
+    "click",
+    closeTransactionHistory
+  );
+}
+
+if (historyDateInput) {
+  historyDateInput.addEventListener(
+    "change",
+    loadTransactionHistory
+  );
+}
+
+if (historyRefreshButton) {
+  historyRefreshButton.addEventListener(
+    "click",
+    loadTransactionHistory
+  );
+}
+
+if (historyBarberFilter) {
+  historyBarberFilter.addEventListener(
+    "change",
+    renderTransactionHistory
+  );
+}
+
+if (historySlipCloseButton) {
+  historySlipCloseButton.addEventListener(
+    "click",
+    closeHistorySlip
+  );
+}
+
+if (historySlipBackdrop) {
+  historySlipBackdrop.addEventListener(
+    "click",
+    closeHistorySlip
+  );
 }
 
 
