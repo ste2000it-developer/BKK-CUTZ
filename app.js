@@ -298,6 +298,11 @@ let pendingSlipFile = null;
 let pendingSlipPreviewUrl = null;
 let isCompletingTransaction = false;
 
+// HISTORY STATE
+let historyTransactions = [];
+let isLoadingHistory = false;
+let historyReturnPage = null;
+
 
 
 // ========================================
