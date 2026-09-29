@@ -23,7 +23,7 @@
 
   <link
     rel="stylesheet"
-    href="admin.css?v=22"
+    href="admin.css?v=23"
   >
 </head>
 
@@ -311,7 +311,7 @@
                 ประเภท
               </label>
 
-              <select id="serviceTypeInput">
+              <select id="serviceTypeInput" class="native-app-select">
                 <option value="fixed">
                   ราคาปกติ
                 </option>
@@ -455,6 +455,7 @@
 
               <select
                 id="payoutCycleSelect"
+                class="native-app-select"
                 aria-label="เลือกรอบจ่าย"
               ></select>
 
@@ -467,6 +468,15 @@
                 ›
               </button>
             </div>
+          </section>
+
+          <section
+            id="payoutEmptyState"
+            class="payout-empty-state hidden"
+          >
+            <div class="payout-empty-icon">฿</div>
+            <strong>ยังไม่มีข้อมูลสำหรับรอบจ่าย</strong>
+            <p>เมื่อมีรายการขายหรือมีช่างเข้างาน ระบบจะแสดงรอบจ่ายให้อัตโนมัติ</p>
           </section>
 
           <div
@@ -601,7 +611,7 @@
 
   <script
     type="module"
-    src="admin.js?v=22"
+    src="admin.js?v=23"
   ></script>
 </body>
 </html>

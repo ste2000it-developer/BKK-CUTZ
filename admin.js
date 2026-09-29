@@ -81,6 +81,21 @@ const payoutAdminPage =
 const payoutCycleSelect =
   document.getElementById("payoutCycleSelect");
 
+const payoutEmptyState =
+  document.getElementById("payoutEmptyState");
+
+const payoutSummaryGrid =
+  payoutAdminPage.querySelector(".payout-summary-grid");
+
+const payoutRuleNote =
+  payoutAdminPage.querySelector(".payout-rule-note");
+
+const payoutTableCard =
+  payoutAdminPage.querySelector(".payout-table-card");
+
+const payoutDataNote =
+  payoutAdminPage.querySelector(".payout-data-note");
+
 const previousPayoutCycleButton =
   document.getElementById("previousPayoutCycleButton");
 
@@ -147,6 +162,7 @@ let selectedPayoutCycleIndex = 0;
 let payoutRows = [];
 let payoutPaidMap = new Map();
 let payoutLoading = false;
+let payoutCyclesLoaded = false;
 
 
 
@@ -207,10 +223,14 @@ adminNavButtons.forEach((button) => {
 
     if (page === "payouts") {
       pageTitle.textContent = "จ่ายเงินช่าง";
-      ensurePayoutCycles();
 
       try {
-        await loadPayoutData();
+        const hasCycles =
+          await ensurePayoutCycles();
+
+        if (hasCycles) {
+          await loadPayoutData();
+        }
       } catch (error) {
         console.error(error);
       }
@@ -671,6 +691,10 @@ serviceTypeInput.addEventListener(
 );
 
 function updateEditorFields() {
+  refreshCustomSelect(
+    serviceTypeInput
+  );
+
   const type = serviceTypeInput.value;
 
   priceField.classList.add("hidden");
@@ -893,6 +917,295 @@ function showSaveStatus(text) {
 
 
 
+
+// ========================================
+// CUSTOM DROPDOWN
+// ========================================
+
+const customSelectRegistry =
+  new Map();
+
+function closeAllCustomSelects(
+  except = null
+) {
+  customSelectRegistry.forEach(
+    (state) => {
+      if (
+        state.wrapper !== except
+      ) {
+        state.wrapper.classList.remove(
+          "open"
+        );
+
+        state.trigger.setAttribute(
+          "aria-expanded",
+          "false"
+        );
+      }
+    }
+  );
+}
+
+function setupCustomSelect(
+  select
+) {
+  if (!select) {
+    return;
+  }
+
+  if (
+    customSelectRegistry.has(
+      select
+    )
+  ) {
+    refreshCustomSelect(
+      select
+    );
+    return;
+  }
+
+  select.classList.add(
+    "native-app-select"
+  );
+
+  const wrapper =
+    document.createElement("div");
+
+  wrapper.className =
+    "app-select";
+
+  const trigger =
+    document.createElement("button");
+
+  trigger.type = "button";
+  trigger.className =
+    "app-select-trigger";
+
+  trigger.setAttribute(
+    "aria-haspopup",
+    "listbox"
+  );
+
+  trigger.setAttribute(
+    "aria-expanded",
+    "false"
+  );
+
+  trigger.innerHTML = `
+    <span class="app-select-value">-</span>
+    <i
+      class="fa-solid fa-chevron-down"
+      aria-hidden="true"
+    ></i>
+  `;
+
+  const menu =
+    document.createElement("div");
+
+  menu.className =
+    "app-select-menu";
+
+  menu.setAttribute(
+    "role",
+    "listbox"
+  );
+
+  wrapper.appendChild(
+    trigger
+  );
+
+  wrapper.appendChild(
+    menu
+  );
+
+  select.insertAdjacentElement(
+    "afterend",
+    wrapper
+  );
+
+  const state = {
+    wrapper,
+    trigger,
+    menu,
+    value:
+      trigger.querySelector(
+        ".app-select-value"
+      )
+  };
+
+  customSelectRegistry.set(
+    select,
+    state
+  );
+
+  trigger.addEventListener(
+    "click",
+    (event) => {
+      event.stopPropagation();
+
+      if (trigger.disabled) {
+        return;
+      }
+
+      const willOpen =
+        !wrapper.classList.contains(
+          "open"
+        );
+
+      closeAllCustomSelects(
+        willOpen
+          ? wrapper
+          : null
+      );
+
+      wrapper.classList.toggle(
+        "open",
+        willOpen
+      );
+
+      trigger.setAttribute(
+        "aria-expanded",
+        String(willOpen)
+      );
+    }
+  );
+
+  refreshCustomSelect(
+    select
+  );
+}
+
+function refreshCustomSelect(
+  select
+) {
+  const state =
+    customSelectRegistry.get(
+      select
+    );
+
+  if (!state) {
+    return;
+  }
+
+  const options =
+    Array.from(
+      select.options
+    );
+
+  const selectedOption =
+    options.find(
+      (option) =>
+        option.selected
+    ) ||
+    options[0] ||
+    null;
+
+  state.value.textContent =
+    selectedOption
+      ?.textContent
+      ?.trim() ||
+    "ยังไม่มีข้อมูล";
+
+  state.trigger.disabled =
+    select.disabled ||
+    options.length === 0;
+
+  state.menu.innerHTML = "";
+
+  options.forEach(
+    (option) => {
+      const button =
+        document.createElement(
+          "button"
+        );
+
+      button.type = "button";
+
+      button.className =
+        "app-select-option";
+
+      button.dataset.value =
+        option.value;
+
+      button.setAttribute(
+        "role",
+        "option"
+      );
+
+      const isSelected =
+        option.value ===
+        select.value;
+
+      button.classList.toggle(
+        "selected",
+        isSelected
+      );
+
+      button.setAttribute(
+        "aria-selected",
+        String(isSelected)
+      );
+
+      button.innerHTML = `
+        <span>
+          ${escapeHtml(
+            option
+              .textContent
+              .trim()
+          )}
+        </span>
+
+        <i
+          class="fa-solid fa-check"
+          aria-hidden="true"
+        ></i>
+      `;
+
+      button.addEventListener(
+        "click",
+        () => {
+          select.value =
+            option.value;
+
+          select.dispatchEvent(
+            new Event(
+              "change",
+              {
+                bubbles:
+                  true
+              }
+            )
+          );
+
+          refreshCustomSelect(
+            select
+          );
+
+          closeAllCustomSelects();
+        }
+      );
+
+      state.menu.appendChild(
+        button
+      );
+    }
+  );
+}
+
+document.addEventListener(
+  "click",
+  () => {
+    closeAllCustomSelects();
+  }
+);
+
+document
+  .querySelectorAll("select")
+  .forEach(
+    setupCustomSelect
+  );
+
+
 // ========================================
 // BARBER PAYOUT
 // ========================================
@@ -1060,49 +1373,315 @@ function getCurrentPayoutCycle() {
   ] || null;
 }
 
-function ensurePayoutCycles() {
-  if (payoutCycles.length > 0) {
-    return;
+function getPayoutCycleForWorkDate(
+  dateKey
+) {
+  const workDate =
+    fromDateKey(dateKey);
+
+  if (
+    !Number.isFinite(
+      workDate.getTime()
+    )
+  ) {
+    return null;
   }
 
-  const upcoming =
-    getUpcomingPayoutDate();
+  const payoutDate =
+    workDate.getDate() <= 15
+      ? new Date(
+          workDate.getFullYear(),
+          workDate.getMonth(),
+          16
+        )
+      : new Date(
+          workDate.getFullYear(),
+          workDate.getMonth() + 1,
+          1
+        );
 
-  const dates = [upcoming];
-
-  let cursor = upcoming;
-
-  for (let i = 0; i < 12; i += 1) {
-    cursor =
-      getPreviousPayoutDate(cursor);
-
-    dates.unshift(cursor);
-  }
-
-  dates.push(
-    getNextPayoutDate(upcoming)
+  return getPayoutCycle(
+    payoutDate
   );
+}
 
-  payoutCycles =
-    dates.map(getPayoutCycle);
-
-  selectedPayoutCycleIndex =
-    payoutCycles.findIndex(
-      (cycle) =>
-        cycle.payoutDateKey ===
-        toDateKey(upcoming)
+function setPayoutContentVisible(
+  visible
+) {
+  payoutEmptyState
+    .classList
+    .toggle(
+      "hidden",
+      visible
     );
 
-  renderPayoutCycleSelect();
+  payoutPeriodText
+    .classList
+    .toggle(
+      "hidden",
+      !visible
+    );
+
+  payoutSummaryGrid
+    .classList
+    .toggle(
+      "hidden",
+      !visible
+    );
+
+  payoutRuleNote
+    .classList
+    .toggle(
+      "hidden",
+      !visible
+    );
+
+  payoutTableCard
+    .classList
+    .toggle(
+      "hidden",
+      !visible
+    );
+
+  payoutDataNote
+    .classList
+    .toggle(
+      "hidden",
+      !visible
+    );
+
+  if (!visible) {
+    payoutDetailPanel
+      .classList
+      .add("hidden");
+  }
+}
+
+async function ensurePayoutCycles(
+  forceReload = false
+) {
+  if (
+    payoutCyclesLoaded &&
+    !forceReload
+  ) {
+    return (
+      payoutCycles.length > 0
+    );
+  }
+
+  payoutCycleSelect.innerHTML =
+    "";
+
+  payoutCycleSelect.disabled =
+    true;
+
+  refreshCustomSelect(
+    payoutCycleSelect
+  );
+
+  previousPayoutCycleButton
+    .disabled = true;
+
+  nextPayoutCycleButton
+    .disabled = true;
+
+  setPayoutContentVisible(
+    false
+  );
+
+  try {
+    const [
+      transactionSnapshot,
+      attendanceSnapshot,
+      payoutSnapshot
+    ] =
+      await Promise.all([
+        getDocs(
+          collection(
+            db,
+            "transactions"
+          )
+        ),
+
+        getDocs(
+          collection(
+            db,
+            "barber_attendance"
+          )
+        ),
+
+        getDocs(
+          collection(
+            db,
+            "barber_payouts"
+          )
+        )
+      ]);
+
+    const cycleMap =
+      new Map();
+
+    const addWorkDate =
+      (dateKey) => {
+        const normalized =
+          String(
+            dateKey || ""
+          ).trim();
+
+        if (!normalized) {
+          return;
+        }
+
+        const cycle =
+          getPayoutCycleForWorkDate(
+            normalized
+          );
+
+        if (cycle) {
+          cycleMap.set(
+            cycle.payoutDateKey,
+            cycle
+          );
+        }
+      };
+
+    transactionSnapshot
+      .docs
+      .forEach(
+        (snapshot) => {
+          addWorkDate(
+            snapshot
+              .data()
+              .dateKey
+          );
+        }
+      );
+
+    attendanceSnapshot
+      .docs
+      .forEach(
+        (snapshot) => {
+          addWorkDate(
+            snapshot
+              .data()
+              .dateKey
+          );
+        }
+      );
+
+    payoutSnapshot
+      .docs
+      .forEach(
+        (snapshot) => {
+          const payoutCycleId =
+            String(
+              snapshot
+                .data()
+                .payoutCycleId ||
+              ""
+            ).trim();
+
+          if (!payoutCycleId) {
+            return;
+          }
+
+          const payoutDate =
+            fromDateKey(
+              payoutCycleId
+            );
+
+          if (
+            Number.isFinite(
+              payoutDate
+                .getTime()
+            )
+          ) {
+            cycleMap.set(
+              payoutCycleId,
+              getPayoutCycle(
+                payoutDate
+              )
+            );
+          }
+        }
+      );
+
+    payoutCycles =
+      Array.from(
+        cycleMap.values()
+      )
+        .sort(
+          (a, b) =>
+            a.payoutDateKey
+              .localeCompare(
+                b.payoutDateKey
+              )
+        );
+
+    selectedPayoutCycleIndex =
+      Math.max(
+        0,
+        payoutCycles.length - 1
+      );
+
+    payoutCyclesLoaded =
+      true;
+
+    renderPayoutCycleSelect();
+
+    const hasCycles =
+      payoutCycles.length > 0;
+
+    setPayoutContentVisible(
+      hasCycles
+    );
+
+    return hasCycles;
+
+  } catch (error) {
+    payoutCyclesLoaded =
+      false;
+
+    payoutCycles = [];
+
+    selectedPayoutCycleIndex =
+      0;
+
+    renderPayoutCycleSelect();
+
+    setPayoutContentVisible(
+      false
+    );
+
+    payoutEmptyState
+      .classList
+      .remove("hidden");
+
+    payoutEmptyState
+      .querySelector("strong")
+      .textContent =
+        "โหลดรอบจ่ายไม่สำเร็จ";
+
+    payoutEmptyState
+      .querySelector("p")
+      .textContent =
+        error.message ||
+        "กรุณาลองใหม่อีกครั้ง";
+
+    throw error;
+  }
 }
 
 function renderPayoutCycleSelect() {
-  payoutCycleSelect.innerHTML = "";
+  payoutCycleSelect.innerHTML =
+    "";
 
   payoutCycles.forEach(
     (cycle, index) => {
       const option =
-        document.createElement("option");
+        document.createElement(
+          "option"
+        );
 
       option.value =
         String(index);
@@ -1112,14 +1691,26 @@ function renderPayoutCycleSelect() {
           cycle.payoutDate
         )}`;
 
-      payoutCycleSelect.appendChild(
-        option
-      );
+      payoutCycleSelect
+        .appendChild(option);
     }
   );
 
-  payoutCycleSelect.value =
-    String(selectedPayoutCycleIndex);
+  payoutCycleSelect.disabled =
+    payoutCycles.length === 0;
+
+  if (
+    payoutCycles.length > 0
+  ) {
+    payoutCycleSelect.value =
+      String(
+        selectedPayoutCycleIndex
+      );
+  }
+
+  refreshCustomSelect(
+    payoutCycleSelect
+  );
 
   updatePayoutCycleControls();
 }
@@ -1129,11 +1720,30 @@ function updatePayoutCycleControls() {
     getCurrentPayoutCycle();
 
   if (!cycle) {
+    payoutPeriodText.textContent =
+      "";
+
+    previousPayoutCycleButton
+      .disabled = true;
+
+    nextPayoutCycleButton
+      .disabled = true;
+
+    refreshCustomSelect(
+      payoutCycleSelect
+    );
+
     return;
   }
 
   payoutCycleSelect.value =
-    String(selectedPayoutCycleIndex);
+    String(
+      selectedPayoutCycleIndex
+    );
+
+  refreshCustomSelect(
+    payoutCycleSelect
+  );
 
   previousPayoutCycleButton.disabled =
     selectedPayoutCycleIndex <= 0;
@@ -2117,7 +2727,7 @@ payoutCycleSelect.addEventListener(
   async () => {
     selectedPayoutCycleIndex =
       Number(
-        payoutCycleSelect.value || 0
+        payoutCycleSelect.value
       );
 
     updatePayoutCycleControls();
@@ -2158,7 +2768,16 @@ nextPayoutCycleButton.addEventListener(
 
 refreshPayoutButton.addEventListener(
   "click",
-  loadPayoutData
+  async () => {
+    const hasCycles =
+      await ensurePayoutCycles(
+        true
+      );
+
+    if (hasCycles) {
+      await loadPayoutData();
+    }
+  }
 );
 
 closePayoutDetailButton.addEventListener(

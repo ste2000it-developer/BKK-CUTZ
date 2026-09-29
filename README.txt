@@ -1,16 +1,14 @@
-BKK-CUTZ ADMIN PAYOUT V22
+BKK-CUTZ ADMIN PAYOUT V23
 
 วางทับ:
-- admin.html -> admin.html
-- admin.js   -> admin.js
-- admin.css  -> admin.css
-- app.js     -> app.js  (POS: เพิ่มประวัติเข้างานรายวันสำหรับประกันมือ)
+admin.html -> admin.html
+admin.js   -> admin.js
+admin.css  -> admin.css
 
-Firestore:
-- firestore.rules เป็นไฟล์อ้างอิง Rules เต็มล่าสุด
-- คัดลอกไปวางใน Firebase > Firestore Database > Rules แล้ว Publish
+แก้:
+- Dropdown ทั้งหมดใน Admin เป็น custom BKK-CUTZ
+- ไม่สร้างรอบจ่ายย้อนหลังเปล่าๆ
+- แสดงเฉพาะรอบที่มีข้อมูลจริง
+- ไม่มีข้อมูล = ซ่อนยอด 0 และตาราง
 
-ไม่ได้แก้:
-- firebase.js
-- index.html
-- pos.css
+ไม่ต้องเปลี่ยน app.js / firebase.js / Firestore Rules จาก V22

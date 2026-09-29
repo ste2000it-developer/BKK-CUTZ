@@ -783,16 +783,6 @@ select {
   align-items: center;
 }
 
-.payout-cycle-controls select {
-  height: 44px;
-  padding: 0 12px;
-  border: 1px solid #d7d7d7;
-  border-radius: 10px;
-  background: #ffffff;
-  font-weight: 700;
-  outline: none;
-}
-
 .secondary-button {
   height: 44px;
   border: 1px solid #d7d7d7;
@@ -1180,4 +1170,192 @@ select {
   .secondary-text-button {
     justify-content: center;
   }
+}
+
+
+/* CUSTOM DROPDOWN */
+
+.native-app-select {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.app-select {
+  position: relative;
+  width: 100%;
+  z-index: 30;
+}
+
+.app-select.open {
+  z-index: 80;
+}
+
+.app-select-trigger {
+  width: 100%;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 0 14px;
+  border: 1px solid #d7d7d7;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111111;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color .16s ease,
+    box-shadow .16s ease,
+    background .16s ease;
+}
+
+.app-select-trigger:hover {
+  border-color: #a9a9a9;
+}
+
+.app-select.open
+.app-select-trigger {
+  border-color: #111111;
+  box-shadow:
+    0 0 0 2px
+    rgba(17, 17, 17, .06);
+}
+
+.app-select-trigger i {
+  color: #777777;
+  font-size: 11px;
+  transition:
+    transform .16s ease;
+}
+
+.app-select.open
+.app-select-trigger i {
+  transform:
+    rotate(180deg);
+}
+
+.app-select-trigger:disabled {
+  background: #f2f2f1;
+  color: #a0a0a0;
+  cursor: default;
+}
+
+.app-select-menu {
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 0;
+  right: 0;
+  max-height: 272px;
+  display: none;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid #d8d8d8;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow:
+    0 14px 34px
+    rgba(0, 0, 0, .12);
+}
+
+.app-select.open
+.app-select-menu {
+  display: block;
+}
+
+.app-select-option {
+  width: 100%;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #222222;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.app-select-option:hover {
+  background: #f1f1f0;
+}
+
+.app-select-option.selected {
+  background: #111111;
+  color: #ffffff;
+}
+
+.app-select-option i {
+  display: none;
+  font-size: 11px;
+}
+
+.app-select-option.selected i {
+  display: block;
+}
+
+.payout-cycle-controls
+.app-select-trigger {
+  height: 44px;
+  min-height: 44px;
+}
+
+.payout-cycle-controls
+.app-select-menu {
+  min-width: 270px;
+}
+
+.payout-empty-state {
+  margin-top: 16px;
+  padding: 44px 24px;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.payout-empty-icon {
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: #111111;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.payout-empty-state strong {
+  display: block;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.payout-empty-state p {
+  max-width: 520px;
+  margin: 5px auto 0;
+  color: #888888;
+  font-size: 12px;
+  line-height: 1.7;
 }
