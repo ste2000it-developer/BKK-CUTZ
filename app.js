@@ -6,7 +6,7 @@ import {
   getBranch,
   uploadPaymentSlip,
   loadPaymentSlipUrl
-} from "./firebase.js?v=35";
+} from "./firebase.js?v=36";
 
 import {
   getApp
@@ -250,6 +250,35 @@ const noticeMessage =
 
 const noticeCloseButton =
   document.getElementById("noticeCloseButton");
+
+
+// ========================================
+// PRIMARY ACTION BINDINGS
+// Bind these early so the main POS buttons remain responsive
+// even if a later optional UI section has a runtime problem.
+// ========================================
+
+if (historyButton) {
+  historyButton.addEventListener(
+    "click",
+    () => {
+      openTransactionHistory().catch(
+        (error) => {
+          console.error(
+            "Open history error:",
+            error
+          );
+
+          showNotice(
+            error?.message ||
+              "ไม่สามารถเปิดประวัติรายการได้",
+            "ประวัติรายการ"
+          );
+        }
+      );
+    }
+  );
+}
 
 
 // ========================================
@@ -3480,13 +3509,6 @@ async function openHistorySlip(
     button.disabled = false;
     button.innerHTML = oldHtml;
   }
-}
-
-if (historyButton) {
-  historyButton.addEventListener(
-    "click",
-    openTransactionHistory
-  );
 }
 
 if (historyBackButton) {
