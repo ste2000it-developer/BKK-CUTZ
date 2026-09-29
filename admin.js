@@ -72,6 +72,64 @@ const saveButton = document.getElementById("saveButton");
 const cancelButton = document.getElementById("cancelButton");
 const saveStatus = document.getElementById("saveStatus");
 
+const servicesAdminPage =
+  document.getElementById("servicesAdminPage");
+
+const payoutAdminPage =
+  document.getElementById("payoutAdminPage");
+
+const payoutCycleSelect =
+  document.getElementById("payoutCycleSelect");
+
+const previousPayoutCycleButton =
+  document.getElementById("previousPayoutCycleButton");
+
+const nextPayoutCycleButton =
+  document.getElementById("nextPayoutCycleButton");
+
+const payoutPeriodText =
+  document.getElementById("payoutPeriodText");
+
+const payoutBarberCount =
+  document.getElementById("payoutBarberCount");
+
+const payoutLaborTotal =
+  document.getElementById("payoutLaborTotal");
+
+const payoutTipTotal =
+  document.getElementById("payoutTipTotal");
+
+const payoutGrandTotal =
+  document.getElementById("payoutGrandTotal");
+
+const refreshPayoutButton =
+  document.getElementById("refreshPayoutButton");
+
+const payoutStatus =
+  document.getElementById("payoutStatus");
+
+const payoutList =
+  document.getElementById("payoutList");
+
+const payoutDetailPanel =
+  document.getElementById("payoutDetailPanel");
+
+const payoutDetailTitle =
+  document.getElementById("payoutDetailTitle");
+
+const payoutDetailSubtitle =
+  document.getElementById("payoutDetailSubtitle");
+
+const payoutDetailSummary =
+  document.getElementById("payoutDetailSummary");
+
+const payoutDailyList =
+  document.getElementById("payoutDailyList");
+
+const closePayoutDetailButton =
+  document.getElementById("closePayoutDetailButton");
+
+
 
 // ========================================
 // STATE
@@ -81,6 +139,15 @@ let branches = [];
 let services = [];
 let selectedGroup = "";
 let editingServiceId = null;
+
+let currentAdminUser = null;
+
+let payoutCycles = [];
+let selectedPayoutCycleIndex = 0;
+let payoutRows = [];
+let payoutPaidMap = new Map();
+let payoutLoading = false;
+
 
 
 // ========================================
@@ -111,7 +178,7 @@ function showAdmin() {
 // ========================================
 
 adminNavButtons.forEach((button) => {
-  button.addEventListener("click", () => {
+  button.addEventListener("click", async () => {
     const page = button.dataset.adminPage;
 
     adminNavButtons.forEach((item) => {
@@ -121,8 +188,32 @@ adminNavButtons.forEach((button) => {
       );
     });
 
+    servicesAdminPage.classList.toggle(
+      "hidden",
+      page !== "services"
+    );
+
+    payoutAdminPage.classList.toggle(
+      "hidden",
+      page !== "payouts"
+    );
+
+    payoutDetailPanel.classList.add("hidden");
+
     if (page === "services") {
       pageTitle.textContent = "เมนูบริการ / ราคา";
+      return;
+    }
+
+    if (page === "payouts") {
+      pageTitle.textContent = "จ่ายเงินช่าง";
+      ensurePayoutCycles();
+
+      try {
+        await loadPayoutData();
+      } catch (error) {
+        console.error(error);
+      }
     }
   });
 });
@@ -148,6 +239,8 @@ watchAuth(async (user) => {
       await logout();
       throw new Error("บัญชีนี้ไม่ใช่ Admin");
     }
+
+    currentAdminUser = user;
 
     adminEmail.textContent = user.email || "Admin";
 
@@ -796,6 +889,1286 @@ function showSaveStatus(text) {
   saveStatus.textContent = text;
   saveStatus.classList.remove("hidden");
 }
+
+
+
+
+// ========================================
+// BARBER PAYOUT
+// ========================================
+
+function pad2(value) {
+  return String(value).padStart(2, "0");
+}
+
+function toDateKey(date) {
+  return [
+    date.getFullYear(),
+    pad2(date.getMonth() + 1),
+    pad2(date.getDate())
+  ].join("-");
+}
+
+function fromDateKey(value) {
+  const [year, month, day] =
+    String(value || "")
+      .split("-")
+      .map(Number);
+
+  return new Date(
+    year,
+    month - 1,
+    day
+  );
+}
+
+function getUpcomingPayoutDate(baseDate = new Date()) {
+  const year = baseDate.getFullYear();
+  const month = baseDate.getMonth();
+  const day = baseDate.getDate();
+
+  if (day <= 1) {
+    return new Date(year, month, 1);
+  }
+
+  if (day <= 16) {
+    return new Date(year, month, 16);
+  }
+
+  return new Date(year, month + 1, 1);
+}
+
+function getPreviousPayoutDate(date) {
+  if (date.getDate() === 16) {
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      1
+    );
+  }
+
+  return new Date(
+    date.getFullYear(),
+    date.getMonth() - 1,
+    16
+  );
+}
+
+function getNextPayoutDate(date) {
+  if (date.getDate() === 1) {
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      16
+    );
+  }
+
+  return new Date(
+    date.getFullYear(),
+    date.getMonth() + 1,
+    1
+  );
+}
+
+function getPayoutCycle(payoutDate) {
+  let startDate;
+  let endDate;
+
+  if (payoutDate.getDate() === 1) {
+    startDate = new Date(
+      payoutDate.getFullYear(),
+      payoutDate.getMonth() - 1,
+      16
+    );
+
+    endDate = new Date(
+      payoutDate.getFullYear(),
+      payoutDate.getMonth(),
+      0
+    );
+
+  } else {
+    startDate = new Date(
+      payoutDate.getFullYear(),
+      payoutDate.getMonth(),
+      1
+    );
+
+    endDate = new Date(
+      payoutDate.getFullYear(),
+      payoutDate.getMonth(),
+      15
+    );
+  }
+
+  return {
+    payoutDateKey: toDateKey(payoutDate),
+    startKey: toDateKey(startDate),
+    endKey: toDateKey(endDate),
+    payoutDate,
+    startDate,
+    endDate
+  };
+}
+
+function formatThaiDateShort(dateOrKey) {
+  const date =
+    typeof dateOrKey === "string"
+      ? fromDateKey(dateOrKey)
+      : dateOrKey;
+
+  return new Intl.DateTimeFormat(
+    "th-TH-u-ca-buddhist",
+    {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    }
+  ).format(date);
+}
+
+function formatThaiDateLong(dateOrKey) {
+  const date =
+    typeof dateOrKey === "string"
+      ? fromDateKey(dateOrKey)
+      : dateOrKey;
+
+  return new Intl.DateTimeFormat(
+    "th-TH-u-ca-buddhist",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }
+  ).format(date);
+}
+
+function formatMoney(value) {
+  return Number(value || 0)
+    .toLocaleString(
+      "th-TH",
+      {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      }
+    );
+}
+
+function getCurrentPayoutCycle() {
+  return payoutCycles[
+    selectedPayoutCycleIndex
+  ] || null;
+}
+
+function ensurePayoutCycles() {
+  if (payoutCycles.length > 0) {
+    return;
+  }
+
+  const upcoming =
+    getUpcomingPayoutDate();
+
+  const dates = [upcoming];
+
+  let cursor = upcoming;
+
+  for (let i = 0; i < 12; i += 1) {
+    cursor =
+      getPreviousPayoutDate(cursor);
+
+    dates.unshift(cursor);
+  }
+
+  dates.push(
+    getNextPayoutDate(upcoming)
+  );
+
+  payoutCycles =
+    dates.map(getPayoutCycle);
+
+  selectedPayoutCycleIndex =
+    payoutCycles.findIndex(
+      (cycle) =>
+        cycle.payoutDateKey ===
+        toDateKey(upcoming)
+    );
+
+  renderPayoutCycleSelect();
+}
+
+function renderPayoutCycleSelect() {
+  payoutCycleSelect.innerHTML = "";
+
+  payoutCycles.forEach(
+    (cycle, index) => {
+      const option =
+        document.createElement("option");
+
+      option.value =
+        String(index);
+
+      option.textContent =
+        `รอบจ่าย ${formatThaiDateLong(
+          cycle.payoutDate
+        )}`;
+
+      payoutCycleSelect.appendChild(
+        option
+      );
+    }
+  );
+
+  payoutCycleSelect.value =
+    String(selectedPayoutCycleIndex);
+
+  updatePayoutCycleControls();
+}
+
+function updatePayoutCycleControls() {
+  const cycle =
+    getCurrentPayoutCycle();
+
+  if (!cycle) {
+    return;
+  }
+
+  payoutCycleSelect.value =
+    String(selectedPayoutCycleIndex);
+
+  previousPayoutCycleButton.disabled =
+    selectedPayoutCycleIndex <= 0;
+
+  nextPayoutCycleButton.disabled =
+    selectedPayoutCycleIndex >=
+    payoutCycles.length - 1;
+
+  payoutPeriodText.textContent =
+    `คิดผลงาน ${formatThaiDateLong(
+      cycle.startDate
+    )} – ${formatThaiDateLong(
+      cycle.endDate
+    )} · จ่ายวันที่ ${formatThaiDateLong(
+      cycle.payoutDate
+    )}`;
+}
+
+function getPayoutDocumentId(
+  cycle,
+  barberId
+) {
+  return `${cycle.payoutDateKey}_${barberId}`;
+}
+
+function getCommissionableServices(services) {
+  return (
+    Array.isArray(services)
+      ? services
+      : []
+  ).filter(
+    (service) =>
+      Number(service.price || 0) > 0
+  );
+}
+
+function calculateTransactionCommission(
+  transaction
+) {
+  return getCommissionableServices(
+    transaction.services
+  ).reduce(
+    (sum, service) => {
+      const price =
+        Math.max(
+          0,
+          Number(service.price || 0)
+        );
+
+      const commission =
+        Math.min(
+          price / 2,
+          100
+        );
+
+      return sum + commission;
+    },
+    0
+  );
+}
+
+function getGuaranteeBase(barberId) {
+  return barberId === "barber01"
+    ? 500
+    : 400;
+}
+
+function getOrCreateBarberRow(
+  rowsByBarber,
+  barberId,
+  barberName
+) {
+  if (!rowsByBarber.has(barberId)) {
+    rowsByBarber.set(
+      barberId,
+      {
+        barberId,
+        barberName:
+          barberName || barberId,
+        days: new Map(),
+        transactionIds: []
+      }
+    );
+  }
+
+  const row =
+    rowsByBarber.get(barberId);
+
+  if (
+    barberName &&
+    (
+      !row.barberName ||
+      row.barberName === barberId
+    )
+  ) {
+    row.barberName =
+      barberName;
+  }
+
+  return row;
+}
+
+function getOrCreateDailyRow(
+  barberRow,
+  dateKey
+) {
+  if (!barberRow.days.has(dateKey)) {
+    barberRow.days.set(
+      dateKey,
+      {
+        dateKey,
+        worked: false,
+        branches: new Set(),
+        transactionCount: 0,
+        commissionAmount: 0,
+        guaranteeAmount: 0,
+        tipAmount: 0,
+        totalAmount: 0
+      }
+    );
+  }
+
+  return barberRow.days.get(dateKey);
+}
+
+function buildPayoutRows(
+  transactions,
+  attendance
+) {
+  const rowsByBarber =
+    new Map();
+
+  transactions.forEach(
+    (transaction) => {
+      const barberId =
+        String(
+          transaction.barberId || ""
+        ).trim();
+
+      const dateKey =
+        String(
+          transaction.dateKey || ""
+        ).trim();
+
+      if (
+        !barberId ||
+        !dateKey
+      ) {
+        return;
+      }
+
+      const barberRow =
+        getOrCreateBarberRow(
+          rowsByBarber,
+          barberId,
+          transaction.barberName
+        );
+
+      const day =
+        getOrCreateDailyRow(
+          barberRow,
+          dateKey
+        );
+
+      day.worked = true;
+      day.transactionCount += 1;
+      day.commissionAmount +=
+        calculateTransactionCommission(
+          transaction
+        );
+      day.tipAmount +=
+        Number(
+          transaction.tipAmount || 0
+        );
+
+      if (transaction.branchName) {
+        day.branches.add(
+          transaction.branchName
+        );
+      } else if (transaction.branchId) {
+        day.branches.add(
+          transaction.branchId
+        );
+      }
+
+      barberRow.transactionIds.push(
+        transaction.id
+      );
+    }
+  );
+
+  attendance.forEach(
+    (record) => {
+      const barberId =
+        String(
+          record.barberId || ""
+        ).trim();
+
+      const dateKey =
+        String(
+          record.dateKey || ""
+        ).trim();
+
+      if (
+        !barberId ||
+        !dateKey
+      ) {
+        return;
+      }
+
+      const barberRow =
+        getOrCreateBarberRow(
+          rowsByBarber,
+          barberId,
+          record.barberName
+        );
+
+      const day =
+        getOrCreateDailyRow(
+          barberRow,
+          dateKey
+        );
+
+      day.worked = true;
+
+      if (record.branchName) {
+        day.branches.add(
+          record.branchName
+        );
+      } else if (record.branchId) {
+        day.branches.add(
+          record.branchId
+        );
+      }
+    }
+  );
+
+  return Array.from(
+    rowsByBarber.values()
+  )
+    .map((barberRow) => {
+      const guaranteeBase =
+        getGuaranteeBase(
+          barberRow.barberId
+        );
+
+      const dailyBreakdown =
+        Array.from(
+          barberRow.days.values()
+        )
+          .filter(
+            (day) => day.worked
+          )
+          .map((day) => {
+            day.guaranteeAmount =
+              Math.max(
+                0,
+                guaranteeBase -
+                day.commissionAmount
+              );
+
+            day.totalAmount =
+              day.commissionAmount +
+              day.guaranteeAmount +
+              day.tipAmount;
+
+            return {
+              ...day,
+              branches:
+                Array.from(day.branches)
+            };
+          })
+          .sort(
+            (a, b) =>
+              a.dateKey.localeCompare(
+                b.dateKey
+              )
+          );
+
+      const totals =
+        dailyBreakdown.reduce(
+          (result, day) => {
+            result.workDays += 1;
+            result.transactionCount +=
+              day.transactionCount;
+            result.commissionAmount +=
+              day.commissionAmount;
+            result.guaranteeAmount +=
+              day.guaranteeAmount;
+            result.tipAmount +=
+              day.tipAmount;
+            result.totalAmount +=
+              day.totalAmount;
+
+            return result;
+          },
+          {
+            workDays: 0,
+            transactionCount: 0,
+            commissionAmount: 0,
+            guaranteeAmount: 0,
+            tipAmount: 0,
+            totalAmount: 0
+          }
+        );
+
+      return {
+        ...barberRow,
+        ...totals,
+        guaranteeBase,
+        dailyBreakdown
+      };
+    })
+    .sort(
+      (a, b) =>
+        String(a.barberName)
+          .localeCompare(
+            String(b.barberName),
+            "th"
+          )
+    );
+}
+
+async function loadPayoutData() {
+  if (payoutLoading) {
+    return;
+  }
+
+  const cycle =
+    getCurrentPayoutCycle();
+
+  if (!cycle) {
+    return;
+  }
+
+  payoutLoading = true;
+
+  payoutDetailPanel.classList.add(
+    "hidden"
+  );
+
+  payoutStatus.classList.add(
+    "hidden"
+  );
+
+  payoutList.innerHTML = `
+    <div class="empty">
+      กำลังคำนวณยอดจ่าย...
+    </div>
+  `;
+
+  updatePayoutCycleControls();
+
+  try {
+    const transactionQuery =
+      query(
+        collection(
+          db,
+          "transactions"
+        ),
+        where(
+          "dateKey",
+          ">=",
+          cycle.startKey
+        ),
+        where(
+          "dateKey",
+          "<=",
+          cycle.endKey
+        )
+      );
+
+    const attendanceQuery =
+      query(
+        collection(
+          db,
+          "barber_attendance"
+        ),
+        where(
+          "dateKey",
+          ">=",
+          cycle.startKey
+        ),
+        where(
+          "dateKey",
+          "<=",
+          cycle.endKey
+        )
+      );
+
+    const paidQuery =
+      query(
+        collection(
+          db,
+          "barber_payouts"
+        ),
+        where(
+          "payoutCycleId",
+          "==",
+          cycle.payoutDateKey
+        )
+      );
+
+    const [
+      transactionSnapshot,
+      attendanceSnapshot,
+      paidSnapshot
+    ] =
+      await Promise.all([
+        getDocs(transactionQuery),
+        getDocs(attendanceQuery),
+        getDocs(paidQuery)
+      ]);
+
+    const transactions =
+      transactionSnapshot.docs.map(
+        (snapshot) => ({
+          id: snapshot.id,
+          ...snapshot.data()
+        })
+      );
+
+    const attendance =
+      attendanceSnapshot.docs.map(
+        (snapshot) => ({
+          id: snapshot.id,
+          ...snapshot.data()
+        })
+      );
+
+    payoutPaidMap =
+      new Map(
+        paidSnapshot.docs.map(
+          (snapshot) => [
+            snapshot.data().barberId,
+            {
+              id: snapshot.id,
+              ...snapshot.data()
+            }
+          ]
+        )
+      );
+
+    payoutRows =
+      buildPayoutRows(
+        transactions,
+        attendance
+      );
+
+    renderPayoutSummary();
+    renderPayoutList();
+
+  } catch (error) {
+    console.error(
+      "Load payout error:",
+      error
+    );
+
+    payoutRows = [];
+    payoutPaidMap = new Map();
+
+    renderPayoutSummary();
+
+    payoutList.innerHTML = `
+      <div class="empty payout-error">
+        โหลดข้อมูลจ่ายเงินช่างไม่สำเร็จ
+        <br>
+        <small>${escapeHtml(
+          error.message || "Unknown error"
+        )}</small>
+      </div>
+    `;
+
+    payoutStatus.textContent =
+      error.message ||
+      "โหลดข้อมูลไม่สำเร็จ";
+
+    payoutStatus.classList.remove(
+      "hidden"
+    );
+
+  } finally {
+    payoutLoading = false;
+  }
+}
+
+function renderPayoutSummary() {
+  const totals =
+    payoutRows.reduce(
+      (result, row) => {
+        result.labor +=
+          row.commissionAmount +
+          row.guaranteeAmount;
+
+        result.tip +=
+          row.tipAmount;
+
+        result.grand +=
+          row.totalAmount;
+
+        return result;
+      },
+      {
+        labor: 0,
+        tip: 0,
+        grand: 0
+      }
+    );
+
+  payoutBarberCount.textContent =
+    formatMoney(
+      payoutRows.length
+    );
+
+  payoutLaborTotal.textContent =
+    formatMoney(totals.labor);
+
+  payoutTipTotal.textContent =
+    formatMoney(totals.tip);
+
+  payoutGrandTotal.textContent =
+    formatMoney(totals.grand);
+}
+
+function getPaidStatusHtml(row) {
+  const paid =
+    payoutPaidMap.get(
+      row.barberId
+    );
+
+  if (!paid) {
+    return `
+      <span class="payout-badge unpaid">
+        ยังไม่จ่าย
+      </span>
+    `;
+  }
+
+  return `
+    <span class="payout-badge paid">
+      จ่ายแล้ว
+    </span>
+  `;
+}
+
+function renderPayoutList() {
+  payoutList.innerHTML = "";
+
+  if (payoutRows.length === 0) {
+    payoutList.innerHTML = `
+      <div class="empty">
+        ยังไม่มีข้อมูลช่างในรอบนี้
+      </div>
+    `;
+    return;
+  }
+
+  const header =
+    document.createElement("div");
+
+  header.className =
+    "payout-table-head";
+
+  header.innerHTML = `
+    <div>ช่าง</div>
+    <div>วันทำงาน</div>
+    <div>ค่ามือ</div>
+    <div>ประกันมือ</div>
+    <div>ทิป</div>
+    <div>รวมจ่าย</div>
+    <div>สถานะ</div>
+    <div>จัดการ</div>
+  `;
+
+  payoutList.appendChild(
+    header
+  );
+
+  payoutRows.forEach(
+    (row) => {
+      const paid =
+        payoutPaidMap.has(
+          row.barberId
+        );
+
+      const item =
+        document.createElement("div");
+
+      item.className =
+        "payout-table-row";
+
+      item.innerHTML = `
+        <div class="payout-barber-cell">
+          <strong>
+            ${escapeHtml(row.barberName)}
+          </strong>
+          <small>
+            ${escapeHtml(row.barberId)}
+            · ${row.transactionCount} รายการ
+          </small>
+        </div>
+
+        <div>
+          <strong>${row.workDays}</strong>
+          <small>วัน</small>
+        </div>
+
+        <div>
+          ${formatMoney(row.commissionAmount)}
+        </div>
+
+        <div>
+          ${formatMoney(row.guaranteeAmount)}
+        </div>
+
+        <div>
+          ${formatMoney(row.tipAmount)}
+        </div>
+
+        <div class="payout-total-cell">
+          ${formatMoney(row.totalAmount)}
+        </div>
+
+        <div>
+          ${getPaidStatusHtml(row)}
+        </div>
+
+        <div class="payout-actions">
+          <button
+            class="payout-detail-button"
+            type="button"
+          >
+            รายละเอียด
+          </button>
+
+          <button
+            class="payout-paid-button"
+            type="button"
+            ${paid ? "disabled" : ""}
+          >
+            ${paid ? "จ่ายแล้ว" : "ยืนยันจ่าย"}
+          </button>
+        </div>
+      `;
+
+      item
+        .querySelector(
+          ".payout-detail-button"
+        )
+        .addEventListener(
+          "click",
+          () => {
+            openPayoutDetail(row);
+          }
+        );
+
+      item
+        .querySelector(
+          ".payout-paid-button"
+        )
+        .addEventListener(
+          "click",
+          () => {
+            markPayoutPaid(
+              row,
+              item.querySelector(
+                ".payout-paid-button"
+              )
+            );
+          }
+        );
+
+      payoutList.appendChild(
+        item
+      );
+    }
+  );
+}
+
+function openPayoutDetail(row) {
+  const cycle =
+    getCurrentPayoutCycle();
+
+  payoutDetailTitle.textContent =
+    row.barberName;
+
+  payoutDetailSubtitle.textContent =
+    `รอบ ${formatThaiDateShort(
+      cycle.startDate
+    )} – ${formatThaiDateShort(
+      cycle.endDate
+    )}`;
+
+  payoutDetailSummary.innerHTML = `
+    <div>
+      <span>ค่ามือ</span>
+      <strong>
+        ${formatMoney(row.commissionAmount)} บาท
+      </strong>
+    </div>
+
+    <div>
+      <span>ประกันมือ</span>
+      <strong>
+        ${formatMoney(row.guaranteeAmount)} บาท
+      </strong>
+    </div>
+
+    <div>
+      <span>ทิป</span>
+      <strong>
+        ${formatMoney(row.tipAmount)} บาท
+      </strong>
+    </div>
+
+    <div class="grand">
+      <span>รวมจ่าย</span>
+      <strong>
+        ${formatMoney(row.totalAmount)} บาท
+      </strong>
+    </div>
+  `;
+
+  payoutDailyList.innerHTML = "";
+
+  const header =
+    document.createElement("div");
+
+  header.className =
+    "payout-daily-head";
+
+  header.innerHTML = `
+    <div>วันที่</div>
+    <div>สาขา</div>
+    <div>รายการ</div>
+    <div>ค่ามือ</div>
+    <div>ประกัน</div>
+    <div>ทิป</div>
+    <div>รวม</div>
+  `;
+
+  payoutDailyList.appendChild(
+    header
+  );
+
+  row.dailyBreakdown.forEach(
+    (day) => {
+      const item =
+        document.createElement("div");
+
+      item.className =
+        "payout-daily-row";
+
+      item.innerHTML = `
+        <div>
+          ${escapeHtml(
+            formatThaiDateShort(
+              day.dateKey
+            )
+          )}
+        </div>
+
+        <div class="payout-daily-branch">
+          ${escapeHtml(
+            day.branches.join(" · ") || "-"
+          )}
+        </div>
+
+        <div>
+          ${day.transactionCount}
+        </div>
+
+        <div>
+          ${formatMoney(
+            day.commissionAmount
+          )}
+        </div>
+
+        <div>
+          ${formatMoney(
+            day.guaranteeAmount
+          )}
+        </div>
+
+        <div>
+          ${formatMoney(
+            day.tipAmount
+          )}
+        </div>
+
+        <div class="payout-daily-total">
+          ${formatMoney(
+            day.totalAmount
+          )}
+        </div>
+      `;
+
+      payoutDailyList.appendChild(
+        item
+      );
+    }
+  );
+
+  payoutDetailPanel.classList.remove(
+    "hidden"
+  );
+
+  payoutDetailPanel.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+async function markPayoutPaid(
+  row,
+  button
+) {
+  const cycle =
+    getCurrentPayoutCycle();
+
+  if (!cycle) {
+    return;
+  }
+
+  if (
+    payoutPaidMap.has(
+      row.barberId
+    )
+  ) {
+    return;
+  }
+
+  const confirmed =
+    window.confirm(
+      `ยืนยันจ่ายเงิน ${row.barberName} จำนวน ${formatMoney(
+        row.totalAmount
+      )} บาท สำหรับรอบนี้ใช่ไหม?`
+    );
+
+  if (!confirmed) {
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent =
+    "กำลังบันทึก...";
+
+  const payoutId =
+    getPayoutDocumentId(
+      cycle,
+      row.barberId
+    );
+
+  const payoutData = {
+    payoutCycleId:
+      cycle.payoutDateKey,
+
+    payoutDate:
+      cycle.payoutDateKey,
+
+    periodStart:
+      cycle.startKey,
+
+    periodEnd:
+      cycle.endKey,
+
+    barberId:
+      row.barberId,
+
+    barberName:
+      row.barberName,
+
+    workDays:
+      row.workDays,
+
+    transactionCount:
+      row.transactionCount,
+
+    commissionAmount:
+      row.commissionAmount,
+
+    guaranteeAmount:
+      row.guaranteeAmount,
+
+    tipAmount:
+      row.tipAmount,
+
+    totalAmount:
+      row.totalAmount,
+
+    guaranteeBase:
+      row.guaranteeBase,
+
+    dailyBreakdown:
+      row.dailyBreakdown.map(
+        (day) => ({
+          dateKey:
+            day.dateKey,
+
+          branches:
+            day.branches,
+
+          transactionCount:
+            day.transactionCount,
+
+          commissionAmount:
+            day.commissionAmount,
+
+          guaranteeAmount:
+            day.guaranteeAmount,
+
+          tipAmount:
+            day.tipAmount,
+
+          totalAmount:
+            day.totalAmount
+        })
+      ),
+
+    transactionIds:
+      row.transactionIds,
+
+    status:
+      "paid",
+
+    paidAt:
+      serverTimestamp(),
+
+    paidByUid:
+      currentAdminUser?.uid || "",
+
+    paidByEmail:
+      currentAdminUser?.email || ""
+  };
+
+  try {
+    await setDoc(
+      doc(
+        db,
+        "barber_payouts",
+        payoutId
+      ),
+      payoutData
+    );
+
+    payoutPaidMap.set(
+      row.barberId,
+      {
+        id: payoutId,
+        ...payoutData
+      }
+    );
+
+    renderPayoutList();
+
+    payoutStatus.textContent =
+      `บันทึกการจ่าย ${row.barberName} เรียบร้อย`;
+
+    payoutStatus.classList.remove(
+      "hidden"
+    );
+
+  } catch (error) {
+    console.error(
+      "Save payout error:",
+      error
+    );
+
+    window.alert(
+      `บันทึกการจ่ายไม่สำเร็จ: ${error.message}`
+    );
+
+    button.disabled = false;
+    button.textContent =
+      "ยืนยันจ่าย";
+  }
+}
+
+payoutCycleSelect.addEventListener(
+  "change",
+  async () => {
+    selectedPayoutCycleIndex =
+      Number(
+        payoutCycleSelect.value || 0
+      );
+
+    updatePayoutCycleControls();
+    await loadPayoutData();
+  }
+);
+
+previousPayoutCycleButton.addEventListener(
+  "click",
+  async () => {
+    if (
+      selectedPayoutCycleIndex <= 0
+    ) {
+      return;
+    }
+
+    selectedPayoutCycleIndex -= 1;
+    updatePayoutCycleControls();
+    await loadPayoutData();
+  }
+);
+
+nextPayoutCycleButton.addEventListener(
+  "click",
+  async () => {
+    if (
+      selectedPayoutCycleIndex >=
+      payoutCycles.length - 1
+    ) {
+      return;
+    }
+
+    selectedPayoutCycleIndex += 1;
+    updatePayoutCycleControls();
+    await loadPayoutData();
+  }
+);
+
+refreshPayoutButton.addEventListener(
+  "click",
+  loadPayoutData
+);
+
+closePayoutDetailButton.addEventListener(
+  "click",
+  () => {
+    payoutDetailPanel.classList.add(
+      "hidden"
+    );
+  }
+);
 
 
 // ========================================

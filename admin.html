@@ -23,7 +23,7 @@
 
   <link
     rel="stylesheet"
-    href="admin.css?v=21"
+    href="admin.css?v=22"
   >
 </head>
 
@@ -132,6 +132,22 @@
 
           <span>
             เมนูบริการ / ราคา
+          </span>
+
+          <b>›</b>
+        </button>
+
+        <button
+          class="admin-nav-button"
+          data-admin-page="payouts"
+          type="button"
+        >
+          <span class="nav-icon">
+            ฿
+          </span>
+
+          <span>
+            จ่ายเงินช่าง
           </span>
 
           <b>›</b>
@@ -407,6 +423,177 @@
 
         </section>
 
+
+        <section
+          id="payoutAdminPage"
+          class="hidden"
+        >
+          <section class="payout-cycle-card">
+            <div>
+              <div class="section-kicker">
+                BARBER PAYOUT
+              </div>
+
+              <h2>
+                รอบจ่ายเงินช่าง
+              </h2>
+
+              <p>
+                วันที่ 1 = งานวันที่ 16–สิ้นเดือนก่อน · วันที่ 16 = งานวันที่ 1–15
+              </p>
+            </div>
+
+            <div class="payout-cycle-controls">
+              <button
+                id="previousPayoutCycleButton"
+                class="secondary-button"
+                type="button"
+                aria-label="รอบก่อนหน้า"
+              >
+                ‹
+              </button>
+
+              <select
+                id="payoutCycleSelect"
+                aria-label="เลือกรอบจ่าย"
+              ></select>
+
+              <button
+                id="nextPayoutCycleButton"
+                class="secondary-button"
+                type="button"
+                aria-label="รอบถัดไป"
+              >
+                ›
+              </button>
+            </div>
+          </section>
+
+          <div
+            id="payoutPeriodText"
+            class="payout-period-text"
+          >
+            -
+          </div>
+
+          <section class="payout-summary-grid">
+            <article class="payout-summary-card">
+              <span>ช่างในรอบนี้</span>
+              <strong id="payoutBarberCount">0</strong>
+              <small>คน</small>
+            </article>
+
+            <article class="payout-summary-card">
+              <span>ค่ามือ + ประกันมือ</span>
+              <strong id="payoutLaborTotal">0</strong>
+              <small>บาท</small>
+            </article>
+
+            <article class="payout-summary-card">
+              <span>ทิปช่าง</span>
+              <strong id="payoutTipTotal">0</strong>
+              <small>บาท</small>
+            </article>
+
+            <article class="payout-summary-card payout-summary-card-dark">
+              <span>ยอดต้องจ่ายรวม</span>
+              <strong id="payoutGrandTotal">0</strong>
+              <small>บาท</small>
+            </article>
+          </section>
+
+          <section class="payout-rule-note">
+            <strong>สูตรที่ใช้</strong>
+            <span>
+              ค่ามือต่อบริการ = ครึ่งหนึ่งของราคาจริง สูงสุด 100 บาท ·
+              ประกันมือทั่วไป 400 บาท/วัน · barber01 500 บาท/วัน ·
+              ทิปแยก 100%
+            </span>
+          </section>
+
+          <section class="payout-table-card">
+            <div class="payout-table-toolbar">
+              <div>
+                <h2>สรุปยอดช่าง</h2>
+                <p>
+                  กดดูรายละเอียดเพื่อดูยอดรายวันก่อนยืนยันจ่าย
+                </p>
+              </div>
+
+              <button
+                id="refreshPayoutButton"
+                class="secondary-text-button"
+                type="button"
+              >
+                <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+                โหลดใหม่
+              </button>
+            </div>
+
+            <div
+              id="payoutStatus"
+              class="payout-status hidden"
+            ></div>
+
+            <div
+              id="payoutList"
+              class="payout-list"
+            >
+              <div class="empty">
+                กำลังโหลดข้อมูล...
+              </div>
+            </div>
+          </section>
+
+          <section
+            id="payoutDetailPanel"
+            class="payout-detail-panel hidden"
+          >
+            <div class="payout-detail-heading">
+              <div>
+                <div class="section-kicker">
+                  DAILY BREAKDOWN
+                </div>
+
+                <h2 id="payoutDetailTitle">
+                  รายละเอียดช่าง
+                </h2>
+
+                <p id="payoutDetailSubtitle">
+                  -
+                </p>
+              </div>
+
+              <button
+                id="closePayoutDetailButton"
+                class="secondary-button payout-detail-close"
+                type="button"
+                aria-label="ปิดรายละเอียด"
+              >
+                ×
+              </button>
+            </div>
+
+            <div
+              id="payoutDetailSummary"
+              class="payout-detail-summary"
+            ></div>
+
+            <div
+              id="payoutDailyList"
+              class="payout-daily-list"
+            ></div>
+          </section>
+
+          <section class="payout-data-note">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            <span>
+              ประกันมือของวันที่ไม่มีรายการขาย ต้องอาศัยประวัติเข้างานจาก POS
+              ระบบจะเริ่มเก็บประวัตินี้หลังวางไฟล์ POS ที่แนบมาด้วย
+            </span>
+          </section>
+        </section>
+
       </div>
     </main>
 
@@ -414,7 +601,7 @@
 
   <script
     type="module"
-    src="admin.js?v=21"
+    src="admin.js?v=22"
   ></script>
 </body>
 </html>

@@ -6,7 +6,7 @@ import {
   getBranch,
   uploadPaymentSlip,
   loadPaymentSlipUrl
-} from "./firebase.js?v=36";
+} from "./firebase.js?v=37";
 
 import {
   getApp
@@ -510,6 +510,117 @@ function startPresenceWatcher(branchId) {
 }
 
 
+
+
+// ========================================
+// BARBER ATTENDANCE HISTORY
+// เก็บประวัติเข้างานรายวันสำหรับคำนวณประกันมือ
+// ========================================
+
+function getAttendanceDocumentId(
+  barberId,
+  dateKey = getLocalDateKey()
+) {
+  return [
+    dateKey,
+    currentBranch?.id || "unknown",
+    barberId
+  ].join("_");
+}
+
+async function saveBarberCheckIn(
+  barber,
+  checkInMethod
+) {
+  const dateKey =
+    getLocalDateKey();
+
+  const batch =
+    writeBatch(db);
+
+  batch.set(
+    doc(
+      db,
+      "barber_presence",
+      barber.id
+    ),
+    {
+      barberId:
+        barber.id,
+
+      barberName:
+        barber.name || "",
+
+      branchId:
+        currentBranch.id,
+
+      branchName:
+        currentBranch.name || "",
+
+      dateKey,
+
+      active:
+        true,
+
+      checkInAt:
+        serverTimestamp(),
+
+      updatedAt:
+        serverTimestamp(),
+
+      checkInMethod
+    },
+    {
+      merge: true
+    }
+  );
+
+  batch.set(
+    doc(
+      db,
+      "barber_attendance",
+      getAttendanceDocumentId(
+        barber.id,
+        dateKey
+      )
+    ),
+    {
+      barberId:
+        barber.id,
+
+      barberName:
+        barber.name || "",
+
+      branchId:
+        currentBranch.id,
+
+      branchName:
+        currentBranch.name || "",
+
+      dateKey,
+
+      attended:
+        true,
+
+      active:
+        true,
+
+      checkInAt:
+        serverTimestamp(),
+
+      updatedAt:
+        serverTimestamp(),
+
+      checkInMethod
+    },
+    {
+      merge: true
+    }
+  );
+
+  await batch.commit();
+}
+
 // ========================================
 // RFID READER SCANS
 // ========================================
@@ -602,43 +713,9 @@ async function checkInBarberByRfid(cardUid) {
     };
   }
 
-  await setDoc(
-    doc(
-      db,
-      "barber_presence",
-      barber.id
-    ),
-    {
-      barberId:
-        barber.id,
-
-      barberName:
-        barber.name || "",
-
-      branchId:
-        currentBranch.id,
-
-      branchName:
-        currentBranch.name || "",
-
-      dateKey:
-        getLocalDateKey(),
-
-      active:
-        true,
-
-      checkInAt:
-        serverTimestamp(),
-
-      updatedAt:
-        serverTimestamp(),
-
-      checkInMethod:
-        "rfid"
-    },
-    {
-      merge: true
-    }
+  await saveBarberCheckIn(
+    barber,
+    "rfid"
   );
 
   return {
@@ -849,40 +926,9 @@ async function checkInBarberByPin(pin) {
     };
   }
 
-  await setDoc(
-    doc(
-      db,
-      "barber_presence",
-      barber.id
-    ),
-    {
-      barberId:
-        barber.id,
-
-      barberName:
-        barber.name || "",
-
-      branchId:
-        currentBranch.id,
-
-      branchName:
-        currentBranch.name || "",
-
-      dateKey:
-        getLocalDateKey(),
-
-      active:
-        true,
-
-      checkInAt:
-        serverTimestamp(),
-
-      updatedAt:
-        serverTimestamp()
-    },
-    {
-      merge: true
-    }
+  await saveBarberCheckIn(
+    barber,
+    "pin"
   );
 
   return {
@@ -944,6 +990,50 @@ async function closeStoreByPin(pin) {
             serverTimestamp(),
           updatedAt:
             serverTimestamp(),
+          checkOutReason:
+            "store_closed"
+        },
+        {
+          merge: true
+        }
+      );
+
+      batch.set(
+        doc(
+          db,
+          "barber_attendance",
+          getAttendanceDocumentId(
+            barber.id,
+            dateKey
+          )
+        ),
+        {
+          barberId:
+            barber.id,
+
+          barberName:
+            barber.name || "",
+
+          branchId:
+            currentBranch.id,
+
+          branchName:
+            currentBranch.name || "",
+
+          dateKey,
+
+          attended:
+            true,
+
+          active:
+            false,
+
+          checkOutAt:
+            serverTimestamp(),
+
+          updatedAt:
+            serverTimestamp(),
+
           checkOutReason:
             "store_closed"
         },
