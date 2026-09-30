@@ -226,9 +226,6 @@ const historyDetailModal =
 const historyDetailBackdrop =
   document.getElementById("historyDetailBackdrop");
 
-const historyDetailCloseButton =
-  document.getElementById("historyDetailCloseButton");
-
 const historyDetailDoneButton =
   document.getElementById("historyDetailDoneButton");
 
@@ -3996,13 +3993,6 @@ if (historyBackdrop) {
   historyBackdrop.addEventListener(
     "click",
     closeTransactionHistory
-  );
-}
-
-if (historyDetailCloseButton) {
-  historyDetailCloseButton.addEventListener(
-    "click",
-    closeHistoryTransactionDetail
   );
 }
 

@@ -1,13 +1,13 @@
-BKK-CUTZ POS HISTORY POPUP V40
+BKK-CUTZ POS HISTORY POPUP V41
 
-แก้จาก V39:
-- รายการเต็มไม่เปลี่ยนหน้าแล้ว เปิดเป็น Popup ซ้อนบน Popup ประวัติ
-- หน้ารายละเอียดใช้ layout เดียวกับหน้าสรุปหลังชำระเงิน
-- ปิดรายละเอียดแล้วกลับรายการประวัติทันที
-- Dropdown ช่างเปลี่ยนเป็น Custom Dropdown สไตล์ BKK-CUTZ ขาว/ดำ
-- ไม่ใช้ native browser dropdown สำหรับตัวกรองช่าง
-- รายการสแกนจ่ายยังมีปุ่มดูสลิป
-- cache bust app.js / pos.css เป็น v40
+แก้จาก V40:
+- Popup รายละเอียดรายการใช้หน้าตาเดียวกับหน้าสรุปหลังชำระเงินแบบเดียวกันจริง ๆ
+  (วงกลมเครื่องหมายถูก / หัวข้อ / card / row / ยอดรวม / ปุ่ม)
+- ยังคงเป็น Popup ไม่เปลี่ยนหน้า
+- ปิดรายละเอียดด้วยปุ่ม "กลับประวัติ" หรือแตะพื้นหลัง
+- Dropdown ช่างยังใช้ Custom Dropdown สไตล์ BKK-CUTZ ขาว/ดำ
+- ซ่อน native select ของ browser
+- cache bust เป็น v41
 
 วางทับ:
 - index.html -> index.html

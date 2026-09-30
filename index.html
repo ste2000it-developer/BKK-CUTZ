@@ -28,7 +28,7 @@
 
   <link
     rel="stylesheet"
-    href="pos.css?v=40"
+    href="pos.css?v=41"
   >
 </head>
 
@@ -710,88 +710,84 @@
       ></div>
 
       <div class="history-detail-card">
-        <div class="history-detail-head">
-          <div>
-            <div class="success-kicker">
-              ประวัติรายการ
+        <div class="success-wrap">
+          <div class="success-check">
+            ✓
+          </div>
+
+          <div class="success-kicker">
+            เสร็จเรียบร้อย
+          </div>
+
+          <h1>
+            บันทึกรายการแล้ว
+          </h1>
+
+          <p>
+            รายการได้รับการยืนยันเรียบร้อย
+          </p>
+
+          <div class="success-card">
+            <div class="success-row">
+              <span>ช่าง</span>
+              <strong id="historyDetailBarberName">-</strong>
             </div>
 
-            <h2>รายละเอียดรายการ</h2>
+            <div
+              id="historyDetailServiceList"
+              class="success-service-list"
+            ></div>
 
-            <p>
-              ข้อมูลเดียวกับหน้าสรุปหลังชำระเงิน
-            </p>
+            <div class="success-row">
+              <span>ค่าบริการ</span>
+              <strong id="historyDetailTotal">0 บาท</strong>
+            </div>
+
+            <div
+              id="historyDetailTipRow"
+              class="success-row hidden"
+            >
+              <span>ทิปช่าง</span>
+              <strong id="historyDetailTipAmount">0 บาท</strong>
+            </div>
+
+            <div class="success-row success-total">
+              <span>รับทั้งหมด</span>
+              <strong id="historyDetailGrandTotal">0 บาท</strong>
+            </div>
+
+            <div class="success-row">
+              <span>ชำระด้วย</span>
+              <strong id="historyDetailPaymentMethod">-</strong>
+            </div>
+
+            <div class="success-row">
+              <span>วันที่ / เวลา</span>
+              <strong id="historyDetailDateTime">-</strong>
+            </div>
           </div>
 
           <button
-            id="historyDetailCloseButton"
-            class="modal-close"
+            id="historyDetailSlipButton"
+            class="success-slip-button hidden"
             type="button"
-            aria-label="ปิด"
           >
-            ×
+            <span class="material-symbols-outlined">
+              image
+            </span>
+
+            ดูสลิป
+          </button>
+
+          <button
+            id="historyDetailDoneButton"
+            class="primary-button"
+            type="button"
+          >
+            กลับประวัติ
+            <span>→</span>
           </button>
         </div>
-
-        <div class="success-card history-detail-summary">
-          <div class="success-row">
-            <span>ช่าง</span>
-            <strong id="historyDetailBarberName">-</strong>
-          </div>
-
-          <div
-            id="historyDetailServiceList"
-            class="success-service-list"
-          ></div>
-
-          <div class="success-row">
-            <span>ค่าบริการ</span>
-            <strong id="historyDetailTotal">0 บาท</strong>
-          </div>
-
-          <div
-            id="historyDetailTipRow"
-            class="success-row hidden"
-          >
-            <span>ทิปช่าง</span>
-            <strong id="historyDetailTipAmount">0 บาท</strong>
-          </div>
-
-          <div class="success-row success-total">
-            <span>รับทั้งหมด</span>
-            <strong id="historyDetailGrandTotal">0 บาท</strong>
-          </div>
-
-          <div class="success-row">
-            <span>ชำระด้วย</span>
-            <strong id="historyDetailPaymentMethod">-</strong>
-          </div>
-
-          <div class="success-row">
-            <span>วันที่ / เวลา</span>
-            <strong id="historyDetailDateTime">-</strong>
-          </div>
-        </div>
-
-        <button
-          id="historyDetailSlipButton"
-          class="success-slip-button hidden"
-          type="button"
-        >
-          <span class="material-symbols-outlined">
-            image
-          </span>
-
-          ดูสลิป
-        </button>
-
-        <button
-          id="historyDetailDoneButton"
-          class="primary-button"
-          type="button"
-        >
-          กลับประวัติ
-        </button>
       </div>
     </section>
 
@@ -1285,7 +1281,7 @@
 
   <script
     type="module"
-    src="app.js?v=40"
+    src="app.js?v=41"
   ></script>
 </body>
 </html>
