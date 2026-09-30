@@ -197,6 +197,18 @@ const historyRefreshButton =
   document.getElementById("historyRefreshButton");
 const historyBarberFilter =
   document.getElementById("historyBarberFilter");
+
+const historyBarberCustomSelect =
+  document.getElementById("historyBarberCustomSelect");
+
+const historyBarberSelectButton =
+  document.getElementById("historyBarberSelectButton");
+
+const historyBarberSelectText =
+  document.getElementById("historyBarberSelectText");
+
+const historyBarberSelectMenu =
+  document.getElementById("historyBarberSelectMenu");
 const historyList =
   document.getElementById("historyList");
 const historyCount =
@@ -207,6 +219,45 @@ const historyTipTotal =
   document.getElementById("historyTipTotal");
 const historyGrandTotal =
   document.getElementById("historyGrandTotal");
+
+const historyDetailModal =
+  document.getElementById("historyDetailModal");
+
+const historyDetailBackdrop =
+  document.getElementById("historyDetailBackdrop");
+
+const historyDetailCloseButton =
+  document.getElementById("historyDetailCloseButton");
+
+const historyDetailDoneButton =
+  document.getElementById("historyDetailDoneButton");
+
+const historyDetailBarberName =
+  document.getElementById("historyDetailBarberName");
+
+const historyDetailServiceList =
+  document.getElementById("historyDetailServiceList");
+
+const historyDetailTotal =
+  document.getElementById("historyDetailTotal");
+
+const historyDetailTipRow =
+  document.getElementById("historyDetailTipRow");
+
+const historyDetailTipAmount =
+  document.getElementById("historyDetailTipAmount");
+
+const historyDetailGrandTotal =
+  document.getElementById("historyDetailGrandTotal");
+
+const historyDetailPaymentMethod =
+  document.getElementById("historyDetailPaymentMethod");
+
+const historyDetailDateTime =
+  document.getElementById("historyDetailDateTime");
+
+const historyDetailSlipButton =
+  document.getElementById("historyDetailSlipButton");
 
 const historySlipModal =
   document.getElementById("historySlipModal");
@@ -317,6 +368,8 @@ let historyReturnPage = null;
 
 let successViewMode = "new";
 let successSlipPath = null;
+
+let historyDetailSlipPath = null;
 
 
 
@@ -3206,6 +3259,125 @@ function setHistoryLoading(isLoading) {
   }
 }
 
+function closeHistoryBarberDropdown() {
+  if (
+    !historyBarberCustomSelect ||
+    !historyBarberSelectButton ||
+    !historyBarberSelectMenu
+  ) {
+    return;
+  }
+
+  historyBarberCustomSelect.classList.remove(
+    "open"
+  );
+
+  historyBarberSelectMenu.classList.add(
+    "hidden"
+  );
+
+  historyBarberSelectButton.setAttribute(
+    "aria-expanded",
+    "false"
+  );
+}
+
+function renderHistoryBarberCustomSelect() {
+  if (
+    !historyBarberFilter ||
+    !historyBarberSelectText ||
+    !historyBarberSelectMenu
+  ) {
+    return;
+  }
+
+  const options =
+    Array.from(
+      historyBarberFilter.options
+    );
+
+  const selected =
+    options.find(
+      (option) =>
+        option.value ===
+        historyBarberFilter.value
+    ) || options[0];
+
+  historyBarberSelectText.textContent =
+    selected?.textContent?.trim() ||
+    "ช่างทุกคน";
+
+  historyBarberSelectMenu.innerHTML =
+    "";
+
+  options.forEach(
+    (option) => {
+      const button =
+        document.createElement("button");
+
+      button.type = "button";
+
+      button.className =
+        "history-custom-select-option";
+
+      button.dataset.value =
+        option.value;
+
+      const isSelected =
+        option.value ===
+        historyBarberFilter.value;
+
+      button.classList.toggle(
+        "selected",
+        isSelected
+      );
+
+      button.setAttribute(
+        "role",
+        "option"
+      );
+
+      button.setAttribute(
+        "aria-selected",
+        String(isSelected)
+      );
+
+      button.innerHTML = `
+        <span>
+          ${escapeHtml(
+            option.textContent.trim()
+          )}
+        </span>
+
+        <span
+          class="material-symbols-outlined"
+          aria-hidden="true"
+        >
+          check
+        </span>
+      `;
+
+      button.addEventListener(
+        "click",
+        (event) => {
+          event.stopPropagation();
+
+          historyBarberFilter.value =
+            option.value;
+
+          renderHistoryBarberCustomSelect();
+          renderTransactionHistory();
+          closeHistoryBarberDropdown();
+        }
+      );
+
+      historyBarberSelectMenu.appendChild(
+        button
+      );
+    }
+  );
+}
+
 function populateHistoryBarberFilter() {
   if (!historyBarberFilter) {
     return;
@@ -3265,6 +3437,8 @@ function populateHistoryBarberFilter() {
     stillExists
       ? previousValue
       : "all";
+
+  renderHistoryBarberCustomSelect();
 }
 
 function getFilteredHistoryTransactions() {
@@ -3466,14 +3640,138 @@ function renderTransactionHistory() {
   );
 }
 
+function closeHistoryTransactionDetail() {
+  if (!historyDetailModal) {
+    return;
+  }
+
+  historyDetailModal.classList.add(
+    "hidden"
+  );
+
+  historyDetailSlipPath = null;
+
+  if (historyPage.classList.contains("hidden")) {
+    document.body.classList.remove(
+      "modal-open"
+    );
+  }
+}
+
 function openHistoryTransactionDetail(
   transaction
 ) {
-  showSuccessPage(
-    transaction,
-    {
-      fromHistory: true
+  if (!historyDetailModal) {
+    return;
+  }
+
+  const serviceTotal =
+    Number(
+      transaction.serviceTotal ??
+      transaction.total ??
+      0
+    );
+
+  const tipAmount =
+    Number(
+      transaction.tipAmount || 0
+    );
+
+  const grandTotal =
+    Number(
+      transaction.grandTotal ??
+      serviceTotal +
+      tipAmount
+    );
+
+  historyDetailSlipPath =
+    transaction.slipStoragePath ||
+    null;
+
+  historyDetailBarberName.textContent =
+    transaction.barberName || "-";
+
+  historyDetailTotal.textContent =
+    `${formatMoney(serviceTotal)} บาท`;
+
+  historyDetailTipAmount.textContent =
+    `${formatMoney(tipAmount)} บาท`;
+
+  historyDetailTipRow.classList.toggle(
+    "hidden",
+    tipAmount <= 0
+  );
+
+  historyDetailGrandTotal.textContent =
+    `${formatMoney(grandTotal)} บาท`;
+
+  historyDetailPaymentMethod.textContent =
+    transaction.paymentMethod === "cash"
+      ? "เงินสด"
+      : "สแกนจ่าย";
+
+  historyDetailDateTime.textContent =
+    formatThaiDateTime(
+      transaction.createdAt,
+      true
+    );
+
+  historyDetailServiceList.innerHTML =
+    "";
+
+  const services =
+    Array.isArray(transaction.services)
+      ? transaction.services
+      : [];
+
+  services.forEach(
+    (service) => {
+      const row =
+        document.createElement("div");
+
+      row.className =
+        "success-service-row";
+
+      const detail =
+        service.detail
+          ? ` (${service.detail})`
+          : "";
+
+      row.innerHTML = `
+        <span>
+          ${escapeHtml(
+            (service.name || "รายการ") +
+            detail
+          )}
+        </span>
+
+        <strong>
+          ${formatSignedMoney(
+            service.price
+          )}
+        </strong>
+      `;
+
+      historyDetailServiceList.appendChild(
+        row
+      );
     }
+  );
+
+  historyDetailSlipButton.classList.toggle(
+    "hidden",
+    !historyDetailSlipPath
+  );
+
+  historyDetailSlipButton.disabled =
+    false;
+
+  historyDetailModal.classList.remove(
+    "hidden"
+  );
+
+  document.body.classList.add(
+    "modal-open"
   );
 }
 
@@ -3596,6 +3894,15 @@ function closeTransactionHistory() {
     "hidden"
   );
 
+  if (historyDetailModal) {
+    historyDetailModal.classList.add(
+      "hidden"
+    );
+  }
+
+  historyDetailSlipPath = null;
+  closeHistoryBarberDropdown();
+
   document.body.classList.remove(
     "modal-open"
   );
@@ -3692,6 +3999,43 @@ if (historyBackdrop) {
   );
 }
 
+if (historyDetailCloseButton) {
+  historyDetailCloseButton.addEventListener(
+    "click",
+    closeHistoryTransactionDetail
+  );
+}
+
+if (historyDetailDoneButton) {
+  historyDetailDoneButton.addEventListener(
+    "click",
+    closeHistoryTransactionDetail
+  );
+}
+
+if (historyDetailBackdrop) {
+  historyDetailBackdrop.addEventListener(
+    "click",
+    closeHistoryTransactionDetail
+  );
+}
+
+if (historyDetailSlipButton) {
+  historyDetailSlipButton.addEventListener(
+    "click",
+    async () => {
+      if (!historyDetailSlipPath) {
+        return;
+      }
+
+      await openHistorySlip(
+        historyDetailSlipPath,
+        historyDetailSlipButton
+      );
+    }
+  );
+}
+
 if (historyDateInput) {
   historyDateInput.addEventListener(
     "change",
@@ -3705,6 +4049,52 @@ if (historyRefreshButton) {
     loadTransactionHistory
   );
 }
+
+if (historyBarberSelectButton) {
+  historyBarberSelectButton.addEventListener(
+    "click",
+    (event) => {
+      event.stopPropagation();
+
+      const isOpen =
+        historyBarberCustomSelect
+          .classList
+          .contains("open");
+
+      if (isOpen) {
+        closeHistoryBarberDropdown();
+        return;
+      }
+
+      historyBarberCustomSelect.classList.add(
+        "open"
+      );
+
+      historyBarberSelectMenu.classList.remove(
+        "hidden"
+      );
+
+      historyBarberSelectButton.setAttribute(
+        "aria-expanded",
+        "true"
+      );
+    }
+  );
+}
+
+document.addEventListener(
+  "click",
+  (event) => {
+    if (
+      historyBarberCustomSelect &&
+      !historyBarberCustomSelect.contains(
+        event.target
+      )
+    ) {
+      closeHistoryBarberDropdown();
+    }
+  }
+);
 
 if (historyBarberFilter) {
   historyBarberFilter.addEventListener(
@@ -3775,40 +4165,7 @@ function resetTransaction() {
 
 homeButton.addEventListener(
   "click",
-  () => {
-    if (
-      successViewMode ===
-      "history"
-    ) {
-      hideAllPages();
-
-      const target =
-        historyReturnPage ||
-        barberPage;
-
-      target.classList.remove(
-        "hidden"
-      );
-
-      successViewMode =
-        "new";
-
-      successSlipPath =
-        null;
-
-      historyPage.classList.remove(
-        "hidden"
-      );
-
-      document.body.classList.add(
-        "modal-open"
-      );
-
-      return;
-    }
-
-    resetTransaction();
-  }
+  resetTransaction
 );
 
 backButton.addEventListener(
