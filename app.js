@@ -794,6 +794,55 @@ async function checkInBarberByRfid(cardUid) {
   };
 }
 
+async function writeReaderResult(
+  scan,
+  {
+    status,
+    barber = null,
+    message = ""
+  }
+) {
+  const scanId =
+    String(
+      scan?.scanId || ""
+    ).trim();
+
+  if (!scanId) {
+    throw new Error(
+      "RFID scan ไม่มี scanId"
+    );
+  }
+
+  await setDoc(
+    doc(
+      db,
+      "reader_results",
+      scanId
+    ),
+    {
+      scanId,
+
+      branchId:
+        currentBranch.id,
+
+      resultStatus:
+        status,
+
+      barberId:
+        barber?.id || "",
+
+      barberName:
+        barber?.name || "",
+
+      message,
+
+      createdAt:
+        serverTimestamp()
+    }
+  );
+}
+
+
 function startReaderScanWatcher(branchId) {
   stopReaderScanWatcher();
 
@@ -898,11 +947,22 @@ function startReaderScanWatcher(branchId) {
                 scan.cardUid
               );
 
-            showNotice(
-              result.alreadyActive
-                ? `${result.barber.name} เข้างานอยู่แล้ว`
-                : `${result.barber.name} เข้างานเรียบร้อย`,
-              "RFID"
+            await writeReaderResult(
+              scan,
+              {
+                status:
+                  result.alreadyActive
+                    ? "already_active"
+                    : "success",
+
+                barber:
+                  result.barber,
+
+                message:
+                  result.alreadyActive
+                    ? `${result.barber.name} เข้างานอยู่แล้ว`
+                    : `${result.barber.name} เข้างานแล้ว`
+              }
             );
 
           } catch (error) {
@@ -911,11 +971,23 @@ function startReaderScanWatcher(branchId) {
               error
             );
 
-            showNotice(
-              error.message ||
-                "ไม่สามารถเข้างานด้วยบัตร RFID ได้",
-              "RFID"
-            );
+            try {
+              await writeReaderResult(
+                scan,
+                {
+                  status: "error",
+                  barber: null,
+                  message:
+                    error.message ||
+                    "ไม่สามารถเข้างานด้วยบัตร RFID ได้"
+                }
+              );
+            } catch (resultError) {
+              console.error(
+                "Write RFID reader result error:",
+                resultError
+              );
+            }
           }
         }
       },

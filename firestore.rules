@@ -148,6 +148,22 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // ESP32 อ่านผลของ scanId ตัวเองด้วย REST
+    // อนุญาตเฉพาะ get เอกสารตรง ๆ และห้าม list collection
+    match /reader_results/{scanId} {
+      allow get: if true;
+      allow list: if false;
+
+      allow create: if isBranch()
+        && request.resource.data.branchId == myBranchId();
+
+      allow update: if isBranch()
+        && resource.data.branchId == myBranchId()
+        && request.resource.data.branchId == myBranchId();
+
+      allow delete: if isAdmin();
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
