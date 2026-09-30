@@ -23,7 +23,7 @@
 
   <link
     rel="stylesheet"
-    href="admin.css?v=25"
+    href="admin.css?v=26"
   >
 </head>
 
@@ -148,6 +148,22 @@
 
           <span>
             จ่ายเงินช่าง
+          </span>
+
+          <b>›</b>
+        </button>
+
+        <button
+          class="admin-nav-button"
+          data-admin-page="payout-history"
+          type="button"
+        >
+          <span class="nav-icon">
+            ◷
+          </span>
+
+          <span>
+            ประวัติจ่ายเงินช่าง
           </span>
 
           <b>›</b>
@@ -622,6 +638,194 @@
 
 
         <section
+          id="payoutHistoryAdminPage"
+          class="hidden"
+        >
+          <section class="payout-history-filter-card">
+            <div class="payout-history-filter-head">
+              <div>
+                <div class="section-kicker">
+                  PAYOUT HISTORY
+                </div>
+
+                <h2>
+                  ประวัติการจ่ายเงินช่าง
+                </h2>
+
+                <p>
+                  แสดงเฉพาะรายการที่ยืนยันจ่ายแล้ว
+                </p>
+              </div>
+
+              <button
+                id="refreshPayoutHistoryButton"
+                class="secondary-text-button"
+                type="button"
+              >
+                <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+                โหลดใหม่
+              </button>
+            </div>
+
+            <div class="payout-history-filters">
+              <label class="payout-history-select-field">
+                <span>รอบจ่าย</span>
+
+                <select
+                  id="payoutHistoryCycleFilter"
+                  class="native-app-select"
+                >
+                  <option value="all">
+                    ทุกรอบจ่าย
+                  </option>
+                </select>
+              </label>
+
+              <label class="payout-history-select-field">
+                <span>ช่าง</span>
+
+                <select
+                  id="payoutHistoryBarberFilter"
+                  class="native-app-select"
+                >
+                  <option value="all">
+                    ช่างทุกคน
+                  </option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section
+            id="payoutHistoryEmptyState"
+            class="payout-history-empty-state hidden"
+          >
+            <div class="payout-history-empty-icon">
+              ฿
+            </div>
+
+            <strong>
+              ยังไม่มีประวัติการจ่ายเงินช่าง
+            </strong>
+
+            <p>
+              เมื่อกดยืนยันจ่ายในหน้าจ่ายเงินช่าง รายการจะมาแสดงที่นี่
+            </p>
+          </section>
+
+          <section
+            id="payoutHistoryContent"
+            class="hidden"
+          >
+            <div class="payout-history-summary-grid">
+              <article class="payout-history-summary-card">
+                <span>รายการจ่าย</span>
+                <strong id="payoutHistoryCount">0</strong>
+                <small>รายการ</small>
+              </article>
+
+              <article class="payout-history-summary-card">
+                <span>ช่างที่จ่าย</span>
+                <strong id="payoutHistoryBarberCount">0</strong>
+                <small>คน</small>
+              </article>
+
+              <article class="payout-history-summary-card">
+                <span>ทิป</span>
+                <strong id="payoutHistoryTipTotal">0</strong>
+                <small>บาท</small>
+              </article>
+
+              <article class="payout-history-summary-card payout-history-summary-card-dark">
+                <span>จ่ายรวม</span>
+                <strong id="payoutHistoryGrandTotal">0</strong>
+                <small>บาท</small>
+              </article>
+            </div>
+
+            <section class="payout-history-table-card">
+              <div class="payout-history-table-head">
+                <div>รอบจ่าย</div>
+                <div>ช่าง</div>
+                <div>วันทำงาน</div>
+                <div>ค่ามือ + ประกัน</div>
+                <div>ทิป</div>
+                <div>รวมจ่าย</div>
+                <div>จ่ายเมื่อ</div>
+                <div>ผู้ยืนยัน</div>
+                <div></div>
+              </div>
+
+              <div
+                id="payoutHistoryList"
+                class="payout-history-list"
+              ></div>
+            </section>
+          </section>
+        </section>
+
+
+        <div
+          id="payoutHistoryDetailModal"
+          class="payout-history-detail-modal hidden"
+        >
+          <div
+            id="payoutHistoryDetailBackdrop"
+            class="payout-history-detail-backdrop"
+          ></div>
+
+          <section class="payout-history-detail-card">
+            <div class="payout-history-detail-heading">
+              <div>
+                <div class="section-kicker">
+                  PAID DETAIL
+                </div>
+
+                <h2 id="payoutHistoryDetailTitle">
+                  รายละเอียดการจ่าย
+                </h2>
+
+                <p id="payoutHistoryDetailSubtitle">
+                  -
+                </p>
+              </div>
+
+              <button
+                id="payoutHistoryDetailCloseButton"
+                class="secondary-button payout-history-detail-close"
+                type="button"
+                aria-label="ปิด"
+              >
+                ×
+              </button>
+            </div>
+
+            <div
+              id="payoutHistoryDetailSummary"
+              class="payout-detail-summary"
+            ></div>
+
+            <div class="payout-history-paid-info">
+              <div>
+                <span>จ่ายเมื่อ</span>
+                <strong id="payoutHistoryDetailPaidAt">-</strong>
+              </div>
+
+              <div>
+                <span>ผู้ยืนยัน</span>
+                <strong id="payoutHistoryDetailPaidBy">-</strong>
+              </div>
+            </div>
+
+            <div
+              id="payoutHistoryDetailDailyList"
+              class="payout-daily-list"
+            ></div>
+          </section>
+        </div>
+
+
+        <section
           id="dailyHistoryAdminPage"
           class="hidden"
         >
@@ -855,7 +1059,7 @@
 
   <script
     type="module"
-    src="admin.js?v=25"
+    src="admin.js?v=26"
   ></script>
 </body>
 </html>

@@ -1,11 +1,17 @@
-BKK-CUTZ ADMIN DAILY HISTORY V25 — NO EXPORT
+BKK-CUTZ ADMIN PAYOUT HISTORY V26
 
-แก้จาก V24:
-- เอาปุ่ม Export Excel ออกจากหน้า Admin ก่อน
-- เอา ExcelJS ออกจาก admin.html
-- เอาโค้ดสร้างไฟล์ Excel ออกจาก admin.js
-- เอา CSS ของปุ่ม Export ออก
-- ฟังก์ชันประวัติรายวัน / ตัวกรอง / รายละเอียดรายการ ยังอยู่ครบ
+เพิ่มจาก V25:
+- เมนู Admin: ประวัติจ่ายเงินช่าง
+- อ่านข้อมูลจริงจาก barber_payouts
+- แสดงเฉพาะรายการที่ยืนยันจ่ายแล้ว
+- กรองตามรอบจ่ายและช่าง
+- Dropdown ใช้ Custom Dropdown สไตล์ BKK-CUTZ เดิม
+- สรุปจำนวนรายการ / จำนวนช่าง / ทิป / ยอดจ่ายรวม
+- ตารางแสดง รอบจ่าย / ช่าง / วันทำงาน / ค่ามือ+ประกัน / ทิป / รวม / เวลาจ่าย / ผู้ยืนยัน
+- กดรายการเพื่อดูรายละเอียดรายวันแบบ Popup
+- ไม่เพิ่ม Export Excel
+- ไม่แก้ POS
+- ไม่ต้องแก้ Firestore Rules
 
 วางทับ:
 - admin.html -> admin.html

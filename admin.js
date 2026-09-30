@@ -78,6 +78,66 @@ const servicesAdminPage =
 const payoutAdminPage =
   document.getElementById("payoutAdminPage");
 
+const payoutHistoryAdminPage =
+  document.getElementById("payoutHistoryAdminPage");
+
+const payoutHistoryCycleFilter =
+  document.getElementById("payoutHistoryCycleFilter");
+
+const payoutHistoryBarberFilter =
+  document.getElementById("payoutHistoryBarberFilter");
+
+const refreshPayoutHistoryButton =
+  document.getElementById("refreshPayoutHistoryButton");
+
+const payoutHistoryEmptyState =
+  document.getElementById("payoutHistoryEmptyState");
+
+const payoutHistoryContent =
+  document.getElementById("payoutHistoryContent");
+
+const payoutHistoryCount =
+  document.getElementById("payoutHistoryCount");
+
+const payoutHistoryBarberCount =
+  document.getElementById("payoutHistoryBarberCount");
+
+const payoutHistoryTipTotal =
+  document.getElementById("payoutHistoryTipTotal");
+
+const payoutHistoryGrandTotal =
+  document.getElementById("payoutHistoryGrandTotal");
+
+const payoutHistoryList =
+  document.getElementById("payoutHistoryList");
+
+const payoutHistoryDetailModal =
+  document.getElementById("payoutHistoryDetailModal");
+
+const payoutHistoryDetailBackdrop =
+  document.getElementById("payoutHistoryDetailBackdrop");
+
+const payoutHistoryDetailCloseButton =
+  document.getElementById("payoutHistoryDetailCloseButton");
+
+const payoutHistoryDetailTitle =
+  document.getElementById("payoutHistoryDetailTitle");
+
+const payoutHistoryDetailSubtitle =
+  document.getElementById("payoutHistoryDetailSubtitle");
+
+const payoutHistoryDetailSummary =
+  document.getElementById("payoutHistoryDetailSummary");
+
+const payoutHistoryDetailPaidAt =
+  document.getElementById("payoutHistoryDetailPaidAt");
+
+const payoutHistoryDetailPaidBy =
+  document.getElementById("payoutHistoryDetailPaidBy");
+
+const payoutHistoryDetailDailyList =
+  document.getElementById("payoutHistoryDetailDailyList");
+
 const payoutCycleSelect =
   document.getElementById("payoutCycleSelect");
 
@@ -243,6 +303,9 @@ let payoutPaidMap = new Map();
 let payoutLoading = false;
 let payoutCyclesLoaded = false;
 
+let payoutHistoryRecords = [];
+let payoutHistoryLoading = false;
+
 let dailyHistoryTransactions = [];
 let dailyHistoryLoading = false;
 
@@ -296,6 +359,11 @@ adminNavButtons.forEach((button) => {
       page !== "payouts"
     );
 
+    payoutHistoryAdminPage.classList.toggle(
+      "hidden",
+      page !== "payout-history"
+    );
+
     dailyHistoryAdminPage.classList.toggle(
       "hidden",
       page !== "daily-history"
@@ -318,6 +386,16 @@ adminNavButtons.forEach((button) => {
         if (hasCycles) {
           await loadPayoutData();
         }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    if (page === "payout-history") {
+      pageTitle.textContent = "ประวัติจ่ายเงินช่าง";
+
+      try {
+        await loadPayoutHistory();
       } catch (error) {
         console.error(error);
       }
@@ -2892,6 +2970,796 @@ closePayoutDetailButton.addEventListener(
 );
 
 
+
+
+
+// ========================================
+// PAYOUT HISTORY
+// ========================================
+
+function getPayoutPaidDate(record) {
+  const value =
+    record?.paidAt || null;
+
+  if (!value) {
+    return null;
+  }
+
+  if (
+    typeof value.toDate ===
+    "function"
+  ) {
+    const date = value.toDate();
+
+    return Number.isFinite(
+      date.getTime()
+    )
+      ? date
+      : null;
+  }
+
+  if (value instanceof Date) {
+    return Number.isFinite(
+      value.getTime()
+    )
+      ? value
+      : null;
+  }
+
+  const date = new Date(value);
+
+  return Number.isFinite(
+    date.getTime()
+  )
+    ? date
+    : null;
+}
+
+function formatPayoutPaidAt(record) {
+  const date =
+    getPayoutPaidDate(record);
+
+  if (!date) {
+    return "-";
+  }
+
+  return new Intl.DateTimeFormat(
+    "th-TH-u-ca-buddhist",
+    {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    }
+  ).format(date);
+}
+
+function getPayoutHistoryLabor(record) {
+  return (
+    Number(
+      record.commissionAmount || 0
+    ) +
+    Number(
+      record.guaranteeAmount || 0
+    )
+  );
+}
+
+function populatePayoutHistoryFilters() {
+  const previousCycle =
+    payoutHistoryCycleFilter.value ||
+    "all";
+
+  const previousBarber =
+    payoutHistoryBarberFilter.value ||
+    "all";
+
+  const cycleMap = new Map();
+  const barberMap = new Map();
+
+  payoutHistoryRecords.forEach(
+    (record) => {
+      const cycleId =
+        String(
+          record.payoutCycleId ||
+          record.payoutDate ||
+          ""
+        ).trim();
+
+      if (cycleId) {
+        cycleMap.set(
+          cycleId,
+          cycleId
+        );
+      }
+
+      const barberId =
+        String(
+          record.barberId || ""
+        ).trim();
+
+      if (barberId) {
+        barberMap.set(
+          barberId,
+          record.barberName ||
+          barberId
+        );
+      }
+    }
+  );
+
+  payoutHistoryCycleFilter.innerHTML =
+    '<option value="all">ทุกรอบจ่าย</option>';
+
+  Array.from(
+    cycleMap.keys()
+  )
+    .sort(
+      (a, b) =>
+        b.localeCompare(a)
+    )
+    .forEach(
+      (cycleId) => {
+        const option =
+          document.createElement(
+            "option"
+          );
+
+        option.value =
+          cycleId;
+
+        option.textContent =
+          `รอบจ่าย ${formatThaiDateLong(
+            cycleId
+          )}`;
+
+        payoutHistoryCycleFilter
+          .appendChild(option);
+      }
+    );
+
+  payoutHistoryBarberFilter.innerHTML =
+    '<option value="all">ช่างทุกคน</option>';
+
+  Array.from(
+    barberMap.entries()
+  )
+    .sort(
+      (a, b) =>
+        String(a[1])
+          .localeCompare(
+            String(b[1]),
+            "th"
+          )
+    )
+    .forEach(
+      ([barberId, barberName]) => {
+        const option =
+          document.createElement(
+            "option"
+          );
+
+        option.value =
+          barberId;
+
+        option.textContent =
+          barberName;
+
+        payoutHistoryBarberFilter
+          .appendChild(option);
+      }
+    );
+
+  payoutHistoryCycleFilter.value =
+    previousCycle === "all" ||
+    cycleMap.has(previousCycle)
+      ? previousCycle
+      : "all";
+
+  payoutHistoryBarberFilter.value =
+    previousBarber === "all" ||
+    barberMap.has(previousBarber)
+      ? previousBarber
+      : "all";
+
+  refreshCustomSelect(
+    payoutHistoryCycleFilter
+  );
+
+  refreshCustomSelect(
+    payoutHistoryBarberFilter
+  );
+}
+
+function getFilteredPayoutHistory() {
+  const cycleId =
+    payoutHistoryCycleFilter.value ||
+    "all";
+
+  const barberId =
+    payoutHistoryBarberFilter.value ||
+    "all";
+
+  return payoutHistoryRecords.filter(
+    (record) => {
+      const recordCycleId =
+        String(
+          record.payoutCycleId ||
+          record.payoutDate ||
+          ""
+        );
+
+      if (
+        cycleId !== "all" &&
+        recordCycleId !== cycleId
+      ) {
+        return false;
+      }
+
+      if (
+        barberId !== "all" &&
+        String(
+          record.barberId || ""
+        ) !== barberId
+      ) {
+        return false;
+      }
+
+      return true;
+    }
+  );
+}
+
+function renderPayoutHistory() {
+  const records =
+    getFilteredPayoutHistory();
+
+  const hasData =
+    records.length > 0;
+
+  payoutHistoryEmptyState
+    .classList
+    .toggle(
+      "hidden",
+      hasData
+    );
+
+  payoutHistoryContent
+    .classList
+    .toggle(
+      "hidden",
+      !hasData
+    );
+
+  if (!hasData) {
+    payoutHistoryList.innerHTML =
+      "";
+    return;
+  }
+
+  const uniqueBarbers =
+    new Set(
+      records.map(
+        (record) =>
+          record.barberId ||
+          record.barberName ||
+          record.id
+      )
+    );
+
+  const totalTip =
+    records.reduce(
+      (sum, record) =>
+        sum +
+        Number(
+          record.tipAmount || 0
+        ),
+      0
+    );
+
+  const totalPaid =
+    records.reduce(
+      (sum, record) =>
+        sum +
+        Number(
+          record.totalAmount || 0
+        ),
+      0
+    );
+
+  payoutHistoryCount.textContent =
+    formatMoney(
+      records.length
+    );
+
+  payoutHistoryBarberCount.textContent =
+    formatMoney(
+      uniqueBarbers.size
+    );
+
+  payoutHistoryTipTotal.textContent =
+    formatMoney(totalTip);
+
+  payoutHistoryGrandTotal.textContent =
+    formatMoney(totalPaid);
+
+  payoutHistoryList.innerHTML =
+    "";
+
+  records.forEach(
+    (record) => {
+      const row =
+        document.createElement(
+          "button"
+        );
+
+      row.type =
+        "button";
+
+      row.className =
+        "payout-history-table-row";
+
+      const cycleId =
+        record.payoutCycleId ||
+        record.payoutDate ||
+        "";
+
+      row.innerHTML = `
+        <div>
+          <strong>
+            ${escapeHtml(
+              cycleId
+                ? formatThaiDateShort(
+                    cycleId
+                  )
+                : "-"
+            )}
+          </strong>
+
+          <small>
+            ${escapeHtml(
+              record.periodStart &&
+              record.periodEnd
+                ? `${formatThaiDateShort(
+                    record.periodStart
+                  )} – ${formatThaiDateShort(
+                    record.periodEnd
+                  )}`
+                : "-"
+            )}
+          </small>
+        </div>
+
+        <div class="payout-history-barber-cell">
+          <strong>
+            ${escapeHtml(
+              record.barberName ||
+              record.barberId ||
+              "-"
+            )}
+          </strong>
+
+          <small>
+            ${escapeHtml(
+              record.barberId || ""
+            )}
+          </small>
+        </div>
+
+        <div>
+          <strong>
+            ${formatMoney(
+              record.workDays || 0
+            )}
+          </strong>
+          <small>วัน</small>
+        </div>
+
+        <div>
+          ${formatMoney(
+            getPayoutHistoryLabor(
+              record
+            )
+          )}
+        </div>
+
+        <div>
+          ${formatMoney(
+            record.tipAmount || 0
+          )}
+        </div>
+
+        <div class="payout-history-total-cell">
+          ${formatMoney(
+            record.totalAmount || 0
+          )}
+        </div>
+
+        <div class="payout-history-paid-at">
+          ${escapeHtml(
+            formatPayoutPaidAt(
+              record
+            )
+          )}
+        </div>
+
+        <div class="payout-history-paid-by">
+          ${escapeHtml(
+            record.paidByEmail ||
+            record.paidByUid ||
+            "-"
+          )}
+        </div>
+
+        <div class="payout-history-chevron">
+          ›
+        </div>
+      `;
+
+      row.addEventListener(
+        "click",
+        () => {
+          openPayoutHistoryDetail(
+            record
+          );
+        }
+      );
+
+      payoutHistoryList
+        .appendChild(row);
+    }
+  );
+}
+
+async function loadPayoutHistory() {
+  if (payoutHistoryLoading) {
+    return;
+  }
+
+  payoutHistoryLoading = true;
+
+  refreshPayoutHistoryButton.disabled =
+    true;
+
+  payoutHistoryContent
+    .classList
+    .add("hidden");
+
+  payoutHistoryEmptyState
+    .classList
+    .add("hidden");
+
+  try {
+    const snapshot =
+      await getDocs(
+        collection(
+          db,
+          "barber_payouts"
+        )
+      );
+
+    payoutHistoryRecords =
+      snapshot.docs
+        .map(
+          (snapshot) => ({
+            id: snapshot.id,
+            ...snapshot.data()
+          })
+        )
+        .filter(
+          (record) =>
+            !record.status ||
+            record.status === "paid"
+        )
+        .sort(
+          (a, b) => {
+            const dateA =
+              getPayoutPaidDate(a);
+
+            const dateB =
+              getPayoutPaidDate(b);
+
+            if (
+              dateA ||
+              dateB
+            ) {
+              return (
+                (dateB?.getTime() || 0) -
+                (dateA?.getTime() || 0)
+              );
+            }
+
+            return String(
+              b.payoutCycleId ||
+              b.payoutDate ||
+              ""
+            ).localeCompare(
+              String(
+                a.payoutCycleId ||
+                a.payoutDate ||
+                ""
+              )
+            );
+          }
+        );
+
+    populatePayoutHistoryFilters();
+    renderPayoutHistory();
+
+  } catch (error) {
+    console.error(
+      "Load payout history error:",
+      error
+    );
+
+    payoutHistoryRecords = [];
+
+    populatePayoutHistoryFilters();
+    renderPayoutHistory();
+
+    payoutHistoryEmptyState
+      .classList
+      .remove("hidden");
+
+    payoutHistoryEmptyState
+      .querySelector("strong")
+      .textContent =
+        "โหลดประวัติการจ่ายไม่สำเร็จ";
+
+    payoutHistoryEmptyState
+      .querySelector("p")
+      .textContent =
+        error.message ||
+        "กรุณาลองใหม่อีกครั้ง";
+
+  } finally {
+    payoutHistoryLoading = false;
+
+    refreshPayoutHistoryButton.disabled =
+      false;
+  }
+}
+
+function openPayoutHistoryDetail(
+  record
+) {
+  const cycleId =
+    record.payoutCycleId ||
+    record.payoutDate ||
+    "";
+
+  payoutHistoryDetailTitle.textContent =
+    record.barberName ||
+    record.barberId ||
+    "รายละเอียดการจ่าย";
+
+  payoutHistoryDetailSubtitle.textContent =
+    cycleId
+      ? `รอบจ่าย ${formatThaiDateLong(
+          cycleId
+        )}`
+      : "รอบจ่าย -";
+
+  payoutHistoryDetailSummary.innerHTML = `
+    <div>
+      <span>ค่ามือ</span>
+      <strong>
+        ${formatMoney(
+          record.commissionAmount || 0
+        )} บาท
+      </strong>
+    </div>
+
+    <div>
+      <span>ประกันมือ</span>
+      <strong>
+        ${formatMoney(
+          record.guaranteeAmount || 0
+        )} บาท
+      </strong>
+    </div>
+
+    <div>
+      <span>ทิป</span>
+      <strong>
+        ${formatMoney(
+          record.tipAmount || 0
+        )} บาท
+      </strong>
+    </div>
+
+    <div class="grand">
+      <span>รวมจ่าย</span>
+      <strong>
+        ${formatMoney(
+          record.totalAmount || 0
+        )} บาท
+      </strong>
+    </div>
+  `;
+
+  payoutHistoryDetailPaidAt.textContent =
+    formatPayoutPaidAt(record);
+
+  payoutHistoryDetailPaidBy.textContent =
+    record.paidByEmail ||
+    record.paidByUid ||
+    "-";
+
+  payoutHistoryDetailDailyList.innerHTML =
+    "";
+
+  const header =
+    document.createElement("div");
+
+  header.className =
+    "payout-daily-head";
+
+  header.innerHTML = `
+    <div>วันที่</div>
+    <div>สาขา</div>
+    <div>รายการ</div>
+    <div>ค่ามือ</div>
+    <div>ประกัน</div>
+    <div>ทิป</div>
+    <div>รวม</div>
+  `;
+
+  payoutHistoryDetailDailyList
+    .appendChild(header);
+
+  const dailyBreakdown =
+    Array.isArray(
+      record.dailyBreakdown
+    )
+      ? record.dailyBreakdown
+      : [];
+
+  dailyBreakdown.forEach(
+    (day) => {
+      const item =
+        document.createElement(
+          "div"
+        );
+
+      item.className =
+        "payout-daily-row";
+
+      const branches =
+        Array.isArray(day.branches)
+          ? day.branches.join(" · ")
+          : (
+              day.branchName ||
+              day.branchId ||
+              "-"
+            );
+
+      item.innerHTML = `
+        <div>
+          ${escapeHtml(
+            day.dateKey
+              ? formatThaiDateShort(
+                  day.dateKey
+                )
+              : "-"
+          )}
+        </div>
+
+        <div class="payout-daily-branch">
+          ${escapeHtml(
+            branches || "-"
+          )}
+        </div>
+
+        <div>
+          ${formatMoney(
+            day.transactionCount || 0
+          )}
+        </div>
+
+        <div>
+          ${formatMoney(
+            day.commissionAmount || 0
+          )}
+        </div>
+
+        <div>
+          ${formatMoney(
+            day.guaranteeAmount || 0
+          )}
+        </div>
+
+        <div>
+          ${formatMoney(
+            day.tipAmount || 0
+          )}
+        </div>
+
+        <div class="payout-daily-total">
+          ${formatMoney(
+            day.totalAmount || 0
+          )}
+        </div>
+      `;
+
+      payoutHistoryDetailDailyList
+        .appendChild(item);
+    }
+  );
+
+  if (dailyBreakdown.length === 0) {
+    payoutHistoryDetailDailyList
+      .innerHTML = `
+        <div class="payout-history-detail-empty">
+          ไม่มีรายละเอียดรายวันในรายการนี้
+        </div>
+      `;
+  }
+
+  payoutHistoryDetailModal
+    .classList
+    .remove("hidden");
+
+  document.body
+    .classList
+    .add(
+      "payout-history-modal-open"
+    );
+}
+
+function closePayoutHistoryDetail() {
+  payoutHistoryDetailModal
+    .classList
+    .add("hidden");
+
+  document.body
+    .classList
+    .remove(
+      "payout-history-modal-open"
+    );
+}
+
+if (refreshPayoutHistoryButton) {
+  refreshPayoutHistoryButton
+    .addEventListener(
+      "click",
+      loadPayoutHistory
+    );
+}
+
+[
+  payoutHistoryCycleFilter,
+  payoutHistoryBarberFilter
+].forEach(
+  (select) => {
+    if (!select) {
+      return;
+    }
+
+    select.addEventListener(
+      "change",
+      renderPayoutHistory
+    );
+  }
+);
+
+if (payoutHistoryDetailCloseButton) {
+  payoutHistoryDetailCloseButton
+    .addEventListener(
+      "click",
+      closePayoutHistoryDetail
+    );
+}
+
+if (payoutHistoryDetailBackdrop) {
+  payoutHistoryDetailBackdrop
+    .addEventListener(
+      "click",
+      closePayoutHistoryDetail
+    );
+}
 
 
 // ========================================
