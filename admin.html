@@ -23,7 +23,7 @@
 
   <link
     rel="stylesheet"
-    href="admin.css?v=23"
+    href="admin.css?v=24"
   >
 </head>
 
@@ -148,6 +148,22 @@
 
           <span>
             จ่ายเงินช่าง
+          </span>
+
+          <b>›</b>
+        </button>
+
+        <button
+          class="admin-nav-button"
+          data-admin-page="daily-history"
+          type="button"
+        >
+          <span class="nav-icon">
+            ≡
+          </span>
+
+          <span>
+            ประวัติรายการรายวัน
           </span>
 
           <b>›</b>
@@ -604,14 +620,254 @@
           </section>
         </section>
 
+
+        <section
+          id="dailyHistoryAdminPage"
+          class="hidden"
+        >
+          <section class="daily-history-filter-card">
+            <div class="daily-history-filter-head">
+              <div>
+                <div class="section-kicker">
+                  DAILY TRANSACTIONS
+                </div>
+
+                <h2>
+                  ประวัติรายการเข้าใช้บริการรายวัน
+                </h2>
+
+                <p>
+                  ดูรายการขายของทุกสาขา แยกตามวัน สาขา ช่าง และวิธีชำระเงิน
+                </p>
+              </div>
+
+              <button
+                id="dailyHistoryExportButton"
+                class="daily-history-export-button"
+                type="button"
+                disabled
+              >
+                <i class="fa-solid fa-file-excel" aria-hidden="true"></i>
+                Export Excel
+              </button>
+            </div>
+
+            <div class="daily-history-filters">
+              <label class="daily-history-date-field">
+                <span>วันที่</span>
+
+                <input
+                  id="dailyHistoryDateInput"
+                  type="date"
+                >
+              </label>
+
+              <label class="daily-history-select-field">
+                <span>สาขา</span>
+
+                <select
+                  id="dailyHistoryBranchFilter"
+                  class="native-app-select"
+                >
+                  <option value="all">ทุกสาขา</option>
+                </select>
+              </label>
+
+              <label class="daily-history-select-field">
+                <span>ช่าง</span>
+
+                <select
+                  id="dailyHistoryBarberFilter"
+                  class="native-app-select"
+                >
+                  <option value="all">ช่างทุกคน</option>
+                </select>
+              </label>
+
+              <label class="daily-history-select-field">
+                <span>ชำระเงิน</span>
+
+                <select
+                  id="dailyHistoryPaymentFilter"
+                  class="native-app-select"
+                >
+                  <option value="all">ทุกช่องทาง</option>
+                  <option value="cash">เงินสด</option>
+                  <option value="scan">สแกนจ่าย</option>
+                </select>
+              </label>
+
+              <button
+                id="dailyHistoryRefreshButton"
+                class="secondary-text-button daily-history-refresh-button"
+                type="button"
+              >
+                <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+                โหลดใหม่
+              </button>
+            </div>
+          </section>
+
+          <section
+            id="dailyHistoryEmptyState"
+            class="daily-history-empty-state hidden"
+          >
+            <div class="daily-history-empty-icon">
+              <i class="fa-solid fa-receipt" aria-hidden="true"></i>
+            </div>
+
+            <strong>
+              ยังไม่มีรายการในวันที่เลือก
+            </strong>
+
+            <p>
+              เมื่อ POS บันทึกรายการสำเร็จ ข้อมูลจะมาแสดงที่หน้านี้อัตโนมัติ
+            </p>
+          </section>
+
+          <section
+            id="dailyHistoryContent"
+            class="hidden"
+          >
+            <div class="daily-history-summary-grid">
+              <article class="daily-history-summary-card">
+                <span>จำนวนรายการ</span>
+                <strong id="dailyHistoryCount">0</strong>
+                <small>รายการ</small>
+              </article>
+
+              <article class="daily-history-summary-card">
+                <span>ค่าบริการ</span>
+                <strong id="dailyHistoryServiceTotal">0</strong>
+                <small>บาท</small>
+              </article>
+
+              <article class="daily-history-summary-card">
+                <span>ทิปช่าง</span>
+                <strong id="dailyHistoryTipTotal">0</strong>
+                <small>บาท</small>
+              </article>
+
+              <article class="daily-history-summary-card daily-history-summary-card-dark">
+                <span>รับทั้งหมด</span>
+                <strong id="dailyHistoryGrandTotal">0</strong>
+                <small>บาท</small>
+              </article>
+            </div>
+
+            <section class="daily-history-table-card">
+              <div class="daily-history-table-head">
+                <div>เวลา</div>
+                <div>สาขา</div>
+                <div>ช่าง</div>
+                <div>บริการ</div>
+                <div>ค่าบริการ</div>
+                <div>ทิป</div>
+                <div>รวม</div>
+                <div>ชำระ</div>
+                <div></div>
+              </div>
+
+              <div
+                id="dailyHistoryList"
+                class="daily-history-list"
+              ></div>
+            </section>
+          </section>
+        </section>
+
+
+        <div
+          id="dailyHistoryDetailModal"
+          class="daily-history-detail-modal hidden"
+        >
+          <div
+            id="dailyHistoryDetailBackdrop"
+            class="daily-history-detail-backdrop"
+          ></div>
+
+          <section class="daily-history-detail-card">
+            <div class="daily-history-detail-header">
+              <div>
+                <div class="section-kicker">
+                  TRANSACTION DETAIL
+                </div>
+
+                <h2>รายละเอียดรายการ</h2>
+              </div>
+
+              <button
+                id="dailyHistoryDetailCloseButton"
+                class="secondary-button daily-history-detail-close"
+                type="button"
+                aria-label="ปิด"
+              >
+                ×
+              </button>
+            </div>
+
+            <div class="daily-history-receipt">
+              <div class="daily-history-receipt-row">
+                <span>สาขา</span>
+                <strong id="dailyHistoryDetailBranch">-</strong>
+              </div>
+
+              <div class="daily-history-receipt-row">
+                <span>ช่าง</span>
+                <strong id="dailyHistoryDetailBarber">-</strong>
+              </div>
+
+              <div
+                id="dailyHistoryDetailServices"
+                class="daily-history-detail-services"
+              ></div>
+
+              <div class="daily-history-receipt-row">
+                <span>ค่าบริการ</span>
+                <strong id="dailyHistoryDetailServiceTotal">0 บาท</strong>
+              </div>
+
+              <div
+                id="dailyHistoryDetailTipRow"
+                class="daily-history-receipt-row hidden"
+              >
+                <span>ทิปช่าง</span>
+                <strong id="dailyHistoryDetailTip">0 บาท</strong>
+              </div>
+
+              <div class="daily-history-receipt-row daily-history-receipt-total">
+                <span>รับทั้งหมด</span>
+                <strong id="dailyHistoryDetailGrandTotal">0 บาท</strong>
+              </div>
+
+              <div class="daily-history-receipt-row">
+                <span>ชำระด้วย</span>
+                <strong id="dailyHistoryDetailPayment">-</strong>
+              </div>
+
+              <div class="daily-history-receipt-row">
+                <span>วันที่ / เวลา</span>
+                <strong id="dailyHistoryDetailDateTime">-</strong>
+              </div>
+
+              <div class="daily-history-receipt-row">
+                <span>เลขรายการ</span>
+                <strong id="dailyHistoryDetailId">-</strong>
+              </div>
+            </div>
+          </section>
+        </div>
+
       </div>
     </main>
 
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+
   <script
     type="module"
-    src="admin.js?v=23"
+    src="admin.js?v=24"
   ></script>
 </body>
 </html>

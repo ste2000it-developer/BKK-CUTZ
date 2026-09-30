@@ -144,6 +144,87 @@ const payoutDailyList =
 const closePayoutDetailButton =
   document.getElementById("closePayoutDetailButton");
 
+const dailyHistoryAdminPage =
+  document.getElementById("dailyHistoryAdminPage");
+
+const dailyHistoryDateInput =
+  document.getElementById("dailyHistoryDateInput");
+
+const dailyHistoryBranchFilter =
+  document.getElementById("dailyHistoryBranchFilter");
+
+const dailyHistoryBarberFilter =
+  document.getElementById("dailyHistoryBarberFilter");
+
+const dailyHistoryPaymentFilter =
+  document.getElementById("dailyHistoryPaymentFilter");
+
+const dailyHistoryRefreshButton =
+  document.getElementById("dailyHistoryRefreshButton");
+
+const dailyHistoryExportButton =
+  document.getElementById("dailyHistoryExportButton");
+
+const dailyHistoryEmptyState =
+  document.getElementById("dailyHistoryEmptyState");
+
+const dailyHistoryContent =
+  document.getElementById("dailyHistoryContent");
+
+const dailyHistoryCount =
+  document.getElementById("dailyHistoryCount");
+
+const dailyHistoryServiceTotal =
+  document.getElementById("dailyHistoryServiceTotal");
+
+const dailyHistoryTipTotal =
+  document.getElementById("dailyHistoryTipTotal");
+
+const dailyHistoryGrandTotal =
+  document.getElementById("dailyHistoryGrandTotal");
+
+const dailyHistoryList =
+  document.getElementById("dailyHistoryList");
+
+const dailyHistoryDetailModal =
+  document.getElementById("dailyHistoryDetailModal");
+
+const dailyHistoryDetailBackdrop =
+  document.getElementById("dailyHistoryDetailBackdrop");
+
+const dailyHistoryDetailCloseButton =
+  document.getElementById("dailyHistoryDetailCloseButton");
+
+const dailyHistoryDetailBranch =
+  document.getElementById("dailyHistoryDetailBranch");
+
+const dailyHistoryDetailBarber =
+  document.getElementById("dailyHistoryDetailBarber");
+
+const dailyHistoryDetailServices =
+  document.getElementById("dailyHistoryDetailServices");
+
+const dailyHistoryDetailServiceTotal =
+  document.getElementById("dailyHistoryDetailServiceTotal");
+
+const dailyHistoryDetailTipRow =
+  document.getElementById("dailyHistoryDetailTipRow");
+
+const dailyHistoryDetailTip =
+  document.getElementById("dailyHistoryDetailTip");
+
+const dailyHistoryDetailGrandTotal =
+  document.getElementById("dailyHistoryDetailGrandTotal");
+
+const dailyHistoryDetailPayment =
+  document.getElementById("dailyHistoryDetailPayment");
+
+const dailyHistoryDetailDateTime =
+  document.getElementById("dailyHistoryDetailDateTime");
+
+const dailyHistoryDetailId =
+  document.getElementById("dailyHistoryDetailId");
+
 
 
 // ========================================
@@ -163,6 +244,9 @@ let payoutRows = [];
 let payoutPaidMap = new Map();
 let payoutLoading = false;
 let payoutCyclesLoaded = false;
+
+let dailyHistoryTransactions = [];
+let dailyHistoryLoading = false;
 
 
 
@@ -214,6 +298,11 @@ adminNavButtons.forEach((button) => {
       page !== "payouts"
     );
 
+    dailyHistoryAdminPage.classList.toggle(
+      "hidden",
+      page !== "daily-history"
+    );
+
     payoutDetailPanel.classList.add("hidden");
 
     if (page === "services") {
@@ -231,6 +320,21 @@ adminNavButtons.forEach((button) => {
         if (hasCycles) {
           await loadPayoutData();
         }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    if (page === "daily-history") {
+      pageTitle.textContent = "ประวัติรายการรายวัน";
+
+      if (!dailyHistoryDateInput.value) {
+        dailyHistoryDateInput.value =
+          toDateKey(new Date());
+      }
+
+      try {
+        await loadDailyHistory();
       } catch (error) {
         console.error(error);
       }
@@ -2789,6 +2893,1151 @@ closePayoutDetailButton.addEventListener(
   }
 );
 
+
+
+
+// ========================================
+// DAILY TRANSACTION HISTORY
+// ========================================
+
+function getTransactionCreatedAtDate(transaction) {
+  const raw =
+    transaction?.createdAt ||
+    null;
+
+  if (!raw) {
+    return null;
+  }
+
+  const date = new Date(raw);
+
+  return Number.isNaN(date.getTime())
+    ? null
+    : date;
+}
+
+function formatDailyHistoryTime(transaction) {
+  const date =
+    getTransactionCreatedAtDate(
+      transaction
+    );
+
+  if (!date) {
+    return "-";
+  }
+
+  return date.toLocaleTimeString(
+    "th-TH",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
+    }
+  );
+}
+
+function formatDailyHistoryDateTime(transaction) {
+  const date =
+    getTransactionCreatedAtDate(
+      transaction
+    );
+
+  if (!date) {
+    return "-";
+  }
+
+  return date.toLocaleString(
+    "th-TH-u-ca-buddhist",
+    {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
+    }
+  );
+}
+
+function getTransactionServiceTotal(transaction) {
+  return Number(
+    transaction.serviceTotal ??
+    transaction.total ??
+    0
+  );
+}
+
+function getTransactionTip(transaction) {
+  return Number(
+    transaction.tipAmount || 0
+  );
+}
+
+function getTransactionGrandTotal(transaction) {
+  return Number(
+    transaction.grandTotal ??
+    (
+      getTransactionServiceTotal(transaction) +
+      getTransactionTip(transaction)
+    )
+  );
+}
+
+function getTransactionPaymentText(transaction) {
+  return transaction.paymentMethod === "cash"
+    ? "เงินสด"
+    : "สแกนจ่าย";
+}
+
+function getTransactionServiceText(transaction) {
+  const services =
+    Array.isArray(transaction.services)
+      ? transaction.services
+      : [];
+
+  if (services.length === 0) {
+    return "-";
+  }
+
+  return services
+    .map((service) => {
+      const detail =
+        service.detail
+          ? ` (${service.detail})`
+          : "";
+
+      return `${service.name || "รายการ"}${detail}`;
+    })
+    .join(" · ");
+}
+
+function getBranchDisplayName(transaction) {
+  if (transaction.branchName) {
+    return transaction.branchName;
+  }
+
+  const branch =
+    branches.find(
+      (item) =>
+        item.id === transaction.branchId
+    );
+
+  return branch?.name ||
+    transaction.branchId ||
+    "-";
+}
+
+function populateDailyHistoryFilters() {
+  const previousBranch =
+    dailyHistoryBranchFilter.value ||
+    "all";
+
+  const previousBarber =
+    dailyHistoryBarberFilter.value ||
+    "all";
+
+  const branchMap = new Map();
+  const barberMap = new Map();
+
+  dailyHistoryTransactions.forEach(
+    (transaction) => {
+      if (transaction.branchId) {
+        branchMap.set(
+          transaction.branchId,
+          getBranchDisplayName(transaction)
+        );
+      }
+
+      if (transaction.barberId) {
+        barberMap.set(
+          transaction.barberId,
+          transaction.barberName ||
+            transaction.barberId
+        );
+      }
+    }
+  );
+
+  dailyHistoryBranchFilter.innerHTML =
+    '<option value="all">ทุกสาขา</option>';
+
+  Array.from(branchMap.entries())
+    .sort(
+      (a, b) =>
+        String(a[1]).localeCompare(
+          String(b[1]),
+          "th"
+        )
+    )
+    .forEach(([id, name]) => {
+      const option =
+        document.createElement("option");
+
+      option.value = id;
+      option.textContent = name;
+
+      dailyHistoryBranchFilter.appendChild(
+        option
+      );
+    });
+
+  dailyHistoryBarberFilter.innerHTML =
+    '<option value="all">ช่างทุกคน</option>';
+
+  Array.from(barberMap.entries())
+    .sort(
+      (a, b) =>
+        String(a[1]).localeCompare(
+          String(b[1]),
+          "th"
+        )
+    )
+    .forEach(([id, name]) => {
+      const option =
+        document.createElement("option");
+
+      option.value = id;
+      option.textContent = name;
+
+      dailyHistoryBarberFilter.appendChild(
+        option
+      );
+    });
+
+  dailyHistoryBranchFilter.value =
+    previousBranch === "all" ||
+    branchMap.has(previousBranch)
+      ? previousBranch
+      : "all";
+
+  dailyHistoryBarberFilter.value =
+    previousBarber === "all" ||
+    barberMap.has(previousBarber)
+      ? previousBarber
+      : "all";
+
+  refreshCustomSelect(
+    dailyHistoryBranchFilter
+  );
+
+  refreshCustomSelect(
+    dailyHistoryBarberFilter
+  );
+
+  refreshCustomSelect(
+    dailyHistoryPaymentFilter
+  );
+}
+
+function getFilteredDailyHistoryTransactions() {
+  const branchId =
+    dailyHistoryBranchFilter.value ||
+    "all";
+
+  const barberId =
+    dailyHistoryBarberFilter.value ||
+    "all";
+
+  const payment =
+    dailyHistoryPaymentFilter.value ||
+    "all";
+
+  return dailyHistoryTransactions.filter(
+    (transaction) => {
+      if (
+        branchId !== "all" &&
+        transaction.branchId !== branchId
+      ) {
+        return false;
+      }
+
+      if (
+        barberId !== "all" &&
+        transaction.barberId !== barberId
+      ) {
+        return false;
+      }
+
+      if (
+        payment !== "all" &&
+        transaction.paymentMethod !== payment
+      ) {
+        return false;
+      }
+
+      return true;
+    }
+  );
+}
+
+function renderDailyHistory() {
+  const transactions =
+    getFilteredDailyHistoryTransactions();
+
+  const hasData =
+    transactions.length > 0;
+
+  dailyHistoryEmptyState.classList.toggle(
+    "hidden",
+    hasData
+  );
+
+  dailyHistoryContent.classList.toggle(
+    "hidden",
+    !hasData
+  );
+
+  dailyHistoryExportButton.disabled =
+    !hasData;
+
+  if (!hasData) {
+    dailyHistoryList.innerHTML = "";
+    return;
+  }
+
+  const totals =
+    transactions.reduce(
+      (result, transaction) => {
+        result.service +=
+          getTransactionServiceTotal(
+            transaction
+          );
+
+        result.tip +=
+          getTransactionTip(
+            transaction
+          );
+
+        result.grand +=
+          getTransactionGrandTotal(
+            transaction
+          );
+
+        return result;
+      },
+      {
+        service: 0,
+        tip: 0,
+        grand: 0
+      }
+    );
+
+  dailyHistoryCount.textContent =
+    formatMoney(transactions.length);
+
+  dailyHistoryServiceTotal.textContent =
+    formatMoney(totals.service);
+
+  dailyHistoryTipTotal.textContent =
+    formatMoney(totals.tip);
+
+  dailyHistoryGrandTotal.textContent =
+    formatMoney(totals.grand);
+
+  dailyHistoryList.innerHTML = "";
+
+  transactions.forEach(
+    (transaction) => {
+      const row =
+        document.createElement("button");
+
+      row.type = "button";
+      row.className =
+        "daily-history-table-row";
+
+      row.innerHTML = `
+        <div class="daily-history-time-cell">
+          ${escapeHtml(
+            formatDailyHistoryTime(
+              transaction
+            )
+          )}
+        </div>
+
+        <div>
+          ${escapeHtml(
+            getBranchDisplayName(
+              transaction
+            )
+          )}
+        </div>
+
+        <div class="daily-history-barber-cell">
+          ${escapeHtml(
+            transaction.barberName ||
+            transaction.barberId ||
+            "-"
+          )}
+        </div>
+
+        <div class="daily-history-services-cell">
+          ${escapeHtml(
+            getTransactionServiceText(
+              transaction
+            )
+          )}
+        </div>
+
+        <div>
+          ${formatMoney(
+            getTransactionServiceTotal(
+              transaction
+            )
+          )}
+        </div>
+
+        <div>
+          ${formatMoney(
+            getTransactionTip(
+              transaction
+            )
+          )}
+        </div>
+
+        <div class="daily-history-grand-cell">
+          ${formatMoney(
+            getTransactionGrandTotal(
+              transaction
+            )
+          )}
+        </div>
+
+        <div>
+          <span class="daily-history-payment-badge">
+            ${getTransactionPaymentText(
+              transaction
+            )}
+          </span>
+        </div>
+
+        <div class="daily-history-chevron">
+          ›
+        </div>
+      `;
+
+      row.addEventListener(
+        "click",
+        () => {
+          openDailyHistoryDetail(
+            transaction
+          );
+        }
+      );
+
+      dailyHistoryList.appendChild(row);
+    }
+  );
+}
+
+async function loadDailyHistory() {
+  if (dailyHistoryLoading) {
+    return;
+  }
+
+  const dateKey =
+    dailyHistoryDateInput.value ||
+    toDateKey(new Date());
+
+  dailyHistoryLoading = true;
+  dailyHistoryRefreshButton.disabled = true;
+  dailyHistoryExportButton.disabled = true;
+  dailyHistoryEmptyState.classList.add(
+    "hidden"
+  );
+  dailyHistoryContent.classList.add(
+    "hidden"
+  );
+
+  try {
+    const historyQuery = query(
+      collection(db, "transactions"),
+      where(
+        "dateKey",
+        "==",
+        dateKey
+      )
+    );
+
+    const snapshot =
+      await getDocs(historyQuery);
+
+    dailyHistoryTransactions =
+      snapshot.docs
+        .map((snapshot) => ({
+          id: snapshot.id,
+          ...snapshot.data()
+        }))
+        .sort(
+          (a, b) => {
+            const aDate =
+              getTransactionCreatedAtDate(a);
+            const bDate =
+              getTransactionCreatedAtDate(b);
+
+            return (
+              (bDate?.getTime() || 0) -
+              (aDate?.getTime() || 0)
+            );
+          }
+        );
+
+    populateDailyHistoryFilters();
+    renderDailyHistory();
+
+  } catch (error) {
+    console.error(
+      "Load daily history error:",
+      error
+    );
+
+    dailyHistoryTransactions = [];
+    populateDailyHistoryFilters();
+    renderDailyHistory();
+
+    dailyHistoryEmptyState.classList.remove(
+      "hidden"
+    );
+
+    dailyHistoryEmptyState.querySelector(
+      "strong"
+    ).textContent =
+      "โหลดประวัติไม่สำเร็จ";
+
+    dailyHistoryEmptyState.querySelector(
+      "p"
+    ).textContent =
+      error.message ||
+      "กรุณาลองใหม่อีกครั้ง";
+
+  } finally {
+    dailyHistoryLoading = false;
+    dailyHistoryRefreshButton.disabled = false;
+  }
+}
+
+function openDailyHistoryDetail(transaction) {
+  dailyHistoryDetailBranch.textContent =
+    getBranchDisplayName(transaction);
+
+  dailyHistoryDetailBarber.textContent =
+    transaction.barberName ||
+    transaction.barberId ||
+    "-";
+
+  dailyHistoryDetailServiceTotal.textContent =
+    `${formatMoney(
+      getTransactionServiceTotal(
+        transaction
+      )
+    )} บาท`;
+
+  const tip =
+    getTransactionTip(transaction);
+
+  dailyHistoryDetailTip.textContent =
+    `${formatMoney(tip)} บาท`;
+
+  dailyHistoryDetailTipRow.classList.toggle(
+    "hidden",
+    tip <= 0
+  );
+
+  dailyHistoryDetailGrandTotal.textContent =
+    `${formatMoney(
+      getTransactionGrandTotal(
+        transaction
+      )
+    )} บาท`;
+
+  dailyHistoryDetailPayment.textContent =
+    getTransactionPaymentText(transaction);
+
+  dailyHistoryDetailDateTime.textContent =
+    formatDailyHistoryDateTime(
+      transaction
+    );
+
+  dailyHistoryDetailId.textContent =
+    transaction.id || "-";
+
+  dailyHistoryDetailServices.innerHTML =
+    "";
+
+  const services =
+    Array.isArray(transaction.services)
+      ? transaction.services
+      : [];
+
+  services.forEach(
+    (service) => {
+      const row =
+        document.createElement("div");
+
+      row.className =
+        "daily-history-detail-service-row";
+
+      const detail =
+        service.detail
+          ? ` (${service.detail})`
+          : "";
+
+      row.innerHTML = `
+        <span>
+          ${escapeHtml(
+            (service.name || "รายการ") +
+            detail
+          )}
+        </span>
+
+        <strong>
+          ${formatMoney(
+            Number(service.price || 0)
+          )} บาท
+        </strong>
+      `;
+
+      dailyHistoryDetailServices.appendChild(
+        row
+      );
+    }
+  );
+
+  dailyHistoryDetailModal.classList.remove(
+    "hidden"
+  );
+
+  document.body.classList.add(
+    "daily-history-modal-open"
+  );
+}
+
+function closeDailyHistoryDetail() {
+  dailyHistoryDetailModal.classList.add(
+    "hidden"
+  );
+
+  document.body.classList.remove(
+    "daily-history-modal-open"
+  );
+}
+
+function getThaiDateForExcel(dateKey) {
+  const date =
+    fromDateKey(dateKey);
+
+  return new Intl.DateTimeFormat(
+    "th-TH-u-ca-buddhist",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    }
+  ).format(date);
+}
+
+async function exportDailyHistoryExcel() {
+  const transactions =
+    getFilteredDailyHistoryTransactions();
+
+  if (transactions.length === 0) {
+    return;
+  }
+
+  if (!window.ExcelJS) {
+    window.alert(
+      "โหลดระบบ Export Excel ไม่สำเร็จ กรุณารีเฟรชหน้าแล้วลองใหม่"
+    );
+    return;
+  }
+
+  dailyHistoryExportButton.disabled = true;
+
+  const oldHtml =
+    dailyHistoryExportButton.innerHTML;
+
+  dailyHistoryExportButton.innerHTML =
+    '<i class="fa-solid fa-spinner fa-spin"></i> กำลังสร้างไฟล์';
+
+  try {
+    const workbook =
+      new window.ExcelJS.Workbook();
+
+    workbook.creator = "BKK-CUTZ Admin";
+    workbook.created = new Date();
+
+    const worksheet =
+      workbook.addWorksheet(
+        "ประวัติรายวัน",
+        {
+          views: [
+            {
+              state: "frozen",
+              ySplit: 5
+            }
+          ],
+          pageSetup: {
+            orientation: "landscape",
+            fitToPage: true,
+            fitToWidth: 1,
+            fitToHeight: 0,
+            paperSize: 9
+          }
+        }
+      );
+
+    worksheet.mergeCells("A1:J1");
+    worksheet.getCell("A1").value =
+      "BKK-CUTZ — ประวัติรายการเข้าใช้บริการรายวัน";
+
+    worksheet.getCell("A1").font = {
+      bold: true,
+      size: 16,
+      color: {
+        argb: "FFFFFFFF"
+      }
+    };
+
+    worksheet.getCell("A1").fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: {
+        argb: "FF121212"
+      }
+    };
+
+    worksheet.getCell("A1").alignment = {
+      horizontal: "center",
+      vertical: "middle"
+    };
+
+    worksheet.getRow(1).height = 28;
+
+    worksheet.mergeCells("A2:J2");
+    worksheet.getCell("A2").value =
+      `วันที่ ${getThaiDateForExcel(
+        dailyHistoryDateInput.value
+      )}`;
+
+    worksheet.getCell("A2").font = {
+      bold: true,
+      size: 12
+    };
+
+    worksheet.getCell("A2").alignment = {
+      horizontal: "center"
+    };
+
+    const branchLabel =
+      dailyHistoryBranchFilter
+        .selectedOptions[0]
+        ?.textContent
+        ?.trim() ||
+      "ทุกสาขา";
+
+    const barberLabel =
+      dailyHistoryBarberFilter
+        .selectedOptions[0]
+        ?.textContent
+        ?.trim() ||
+      "ช่างทุกคน";
+
+    const paymentLabel =
+      dailyHistoryPaymentFilter
+        .selectedOptions[0]
+        ?.textContent
+        ?.trim() ||
+      "ทุกช่องทาง";
+
+    worksheet.mergeCells("A3:J3");
+    worksheet.getCell("A3").value =
+      `สาขา: ${branchLabel}   |   ช่าง: ${barberLabel}   |   ชำระ: ${paymentLabel}`;
+
+    worksheet.getCell("A3").alignment = {
+      horizontal: "center"
+    };
+
+    worksheet.getCell("A3").font = {
+      color: {
+        argb: "FF666666"
+      }
+    };
+
+    const headerRow =
+      worksheet.getRow(5);
+
+    headerRow.values = [
+      "ลำดับ",
+      "เวลา",
+      "สาขา",
+      "ช่าง",
+      "บริการ",
+      "ค่าบริการ",
+      "ทิป",
+      "รวม",
+      "ชำระด้วย",
+      "เลขรายการ"
+    ];
+
+    headerRow.eachCell((cell) => {
+      cell.font = {
+        bold: true,
+        color: {
+          argb: "FFFFFFFF"
+        }
+      };
+
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: {
+          argb: "FF1D1D1D"
+        }
+      };
+
+      cell.alignment = {
+        horizontal: "center",
+        vertical: "middle"
+      };
+
+      cell.border = {
+        top: {
+          style: "thin",
+          color: { argb: "FFCCCCCC" }
+        },
+        left: {
+          style: "thin",
+          color: { argb: "FFCCCCCC" }
+        },
+        bottom: {
+          style: "thin",
+          color: { argb: "FFCCCCCC" }
+        },
+        right: {
+          style: "thin",
+          color: { argb: "FFCCCCCC" }
+        }
+      };
+    });
+
+    headerRow.height = 24;
+
+    transactions.forEach(
+      (transaction, index) => {
+        const row =
+          worksheet.addRow([
+            index + 1,
+            formatDailyHistoryTime(
+              transaction
+            ),
+            getBranchDisplayName(
+              transaction
+            ),
+            transaction.barberName ||
+              transaction.barberId ||
+              "-",
+            getTransactionServiceText(
+              transaction
+            ),
+            getTransactionServiceTotal(
+              transaction
+            ),
+            getTransactionTip(
+              transaction
+            ),
+            getTransactionGrandTotal(
+              transaction
+            ),
+            getTransactionPaymentText(
+              transaction
+            ),
+            transaction.id || "-"
+          ]);
+
+        row.alignment = {
+          vertical: "top",
+          wrapText: true
+        };
+
+        row.getCell(1).alignment = {
+          horizontal: "center",
+          vertical: "top"
+        };
+
+        row.getCell(2).alignment = {
+          horizontal: "center",
+          vertical: "top"
+        };
+
+        [6, 7, 8].forEach(
+          (columnIndex) => {
+            row.getCell(columnIndex).numFmt =
+              '#,##0.00';
+
+            row.getCell(columnIndex).alignment = {
+              horizontal: "right",
+              vertical: "top"
+            };
+          }
+        );
+
+        row.eachCell((cell) => {
+          cell.border = {
+            top: {
+              style: "thin",
+              color: { argb: "FFE4E4E4" }
+            },
+            left: {
+              style: "thin",
+              color: { argb: "FFE4E4E4" }
+            },
+            bottom: {
+              style: "thin",
+              color: { argb: "FFE4E4E4" }
+            },
+            right: {
+              style: "thin",
+              color: { argb: "FFE4E4E4" }
+            }
+          };
+        });
+      }
+    );
+
+    const totalRowIndex =
+      worksheet.rowCount + 2;
+
+    worksheet.mergeCells(
+      totalRowIndex,
+      1,
+      totalRowIndex,
+      5
+    );
+
+    worksheet.getCell(
+      totalRowIndex,
+      1
+    ).value =
+      `รวม ${transactions.length} รายการ`;
+
+    worksheet.getCell(
+      totalRowIndex,
+      1
+    ).font = {
+      bold: true
+    };
+
+    const totalService =
+      transactions.reduce(
+        (sum, transaction) =>
+          sum +
+          getTransactionServiceTotal(
+            transaction
+          ),
+        0
+      );
+
+    const totalTip =
+      transactions.reduce(
+        (sum, transaction) =>
+          sum +
+          getTransactionTip(transaction),
+        0
+      );
+
+    const totalGrand =
+      transactions.reduce(
+        (sum, transaction) =>
+          sum +
+          getTransactionGrandTotal(
+            transaction
+          ),
+        0
+      );
+
+    worksheet.getCell(
+      totalRowIndex,
+      6
+    ).value = totalService;
+
+    worksheet.getCell(
+      totalRowIndex,
+      7
+    ).value = totalTip;
+
+    worksheet.getCell(
+      totalRowIndex,
+      8
+    ).value = totalGrand;
+
+    for (
+      let column = 1;
+      column <= 10;
+      column += 1
+    ) {
+      const cell =
+        worksheet.getCell(
+          totalRowIndex,
+          column
+        );
+
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: {
+          argb: "FFF1F1F0"
+        }
+      };
+
+      cell.border = {
+        top: {
+          style: "thin",
+          color: { argb: "FFCCCCCC" }
+        },
+        bottom: {
+          style: "thin",
+          color: { argb: "FFCCCCCC" }
+        }
+      };
+    }
+
+    [6, 7, 8].forEach(
+      (column) => {
+        const cell =
+          worksheet.getCell(
+            totalRowIndex,
+            column
+          );
+
+        cell.numFmt = '#,##0.00';
+        cell.font = {
+          bold: true
+        };
+        cell.alignment = {
+          horizontal: "right"
+        };
+      }
+    );
+
+    worksheet.columns = [
+      { width: 8 },
+      { width: 12 },
+      { width: 22 },
+      { width: 20 },
+      { width: 42 },
+      { width: 14 },
+      { width: 12 },
+      { width: 14 },
+      { width: 15 },
+      { width: 27 }
+    ];
+
+    worksheet.autoFilter = {
+      from: "A5",
+      to: `J${5 + transactions.length}`
+    };
+
+    const buffer =
+      await workbook.xlsx.writeBuffer();
+
+    const blob =
+      new Blob(
+        [buffer],
+        {
+          type:
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        }
+      );
+
+    const url =
+      URL.createObjectURL(blob);
+
+    const anchor =
+      document.createElement("a");
+
+    anchor.href = url;
+    anchor.download =
+      `BKK-CUTZ_ประวัติรายวัน_${dailyHistoryDateInput.value}.xlsx`;
+
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+
+    URL.revokeObjectURL(url);
+
+  } catch (error) {
+    console.error(
+      "Export daily history error:",
+      error
+    );
+
+    window.alert(
+      `Export Excel ไม่สำเร็จ: ${error.message}`
+    );
+
+  } finally {
+    dailyHistoryExportButton.innerHTML =
+      oldHtml;
+
+    dailyHistoryExportButton.disabled =
+      getFilteredDailyHistoryTransactions()
+        .length === 0;
+  }
+}
+
+if (dailyHistoryDateInput) {
+  dailyHistoryDateInput.value =
+    toDateKey(new Date());
+
+  dailyHistoryDateInput.addEventListener(
+    "change",
+    loadDailyHistory
+  );
+}
+
+[
+  dailyHistoryBranchFilter,
+  dailyHistoryBarberFilter,
+  dailyHistoryPaymentFilter
+].forEach((select) => {
+  if (!select) {
+    return;
+  }
+
+  select.addEventListener(
+    "change",
+    renderDailyHistory
+  );
+});
+
+if (dailyHistoryRefreshButton) {
+  dailyHistoryRefreshButton.addEventListener(
+    "click",
+    loadDailyHistory
+  );
+}
+
+if (dailyHistoryExportButton) {
+  dailyHistoryExportButton.addEventListener(
+    "click",
+    exportDailyHistoryExcel
+  );
+}
+
+if (dailyHistoryDetailCloseButton) {
+  dailyHistoryDetailCloseButton.addEventListener(
+    "click",
+    closeDailyHistoryDetail
+  );
+}
+
+if (dailyHistoryDetailBackdrop) {
+  dailyHistoryDetailBackdrop.addEventListener(
+    "click",
+    closeDailyHistoryDetail
+  );
+}
 
 // ========================================
 // HTML ESCAPE
