@@ -1396,27 +1396,6 @@ select {
   font-size: 12px;
 }
 
-.daily-history-export-button {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 0 16px;
-  border: 1px solid #111111;
-  border-radius: 10px;
-  background: #111111;
-  color: #ffffff;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.daily-history-export-button:disabled {
-  border-color: #d7d7d7;
-  background: #eeeeee;
-  color: #999999;
-  cursor: default;
-}
 
 .daily-history-filters {
   display: grid;
@@ -1741,10 +1720,6 @@ body.daily-history-modal-open {
   .daily-history-filter-head {
     align-items: stretch;
     flex-direction: column;
-  }
-
-  .daily-history-export-button {
-    width: 100%;
   }
 
   .daily-history-filters,

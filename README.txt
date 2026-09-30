@@ -1,14 +1,11 @@
-BKK-CUTZ ADMIN DAILY HISTORY V24
+BKK-CUTZ ADMIN DAILY HISTORY V25 — NO EXPORT
 
-เพิ่ม:
-- เมนู Admin: ประวัติรายการรายวัน
-- เลือกวันที่
-- Custom dropdown สาขา / ช่าง / วิธีชำระเงิน ใช้สไตล์ BKK-CUTZ เดิม
-- สรุป จำนวนรายการ / ค่าบริการ / ทิป / รับทั้งหมด
-- รายการรายวันแบบตาราง กดดูรายละเอียดได้
-- Export Excel .xlsx จากข้อมูลที่กรองอยู่
-- Excel มีหัวรายงานภาษาไทย, พ.ศ., filter, freeze header, border, summary total
-- ไม่ต้องแก้ Firestore Rules เพิ่ม เพราะ Admin มีสิทธิ์อ่าน transactions อยู่แล้ว
+แก้จาก V24:
+- เอาปุ่ม Export Excel ออกจากหน้า Admin ก่อน
+- เอา ExcelJS ออกจาก admin.html
+- เอาโค้ดสร้างไฟล์ Excel ออกจาก admin.js
+- เอา CSS ของปุ่ม Export ออก
+- ฟังก์ชันประวัติรายวัน / ตัวกรอง / รายละเอียดรายการ ยังอยู่ครบ
 
 วางทับ:
 - admin.html -> admin.html
