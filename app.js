@@ -175,10 +175,22 @@ const successPaymentMethod =
 
 const successDateTime =
   document.getElementById("successDateTime");
+
+const successKicker =
+  document.getElementById("successKicker");
+const successTitle =
+  document.getElementById("successTitle");
+const successSubtitle =
+  document.getElementById("successSubtitle");
+const successSlipButton =
+  document.getElementById("successSlipButton");
+
 const homeButton = document.getElementById("homeButton");
 
 const historyBackButton =
   document.getElementById("historyBackButton");
+const historyBackdrop =
+  document.getElementById("historyBackdrop");
 const historyDateInput =
   document.getElementById("historyDateInput");
 const historyRefreshButton =
@@ -302,6 +314,9 @@ let isCompletingTransaction = false;
 let historyTransactions = [];
 let isLoadingHistory = false;
 let historyReturnPage = null;
+
+let successViewMode = "new";
+let successSlipPath = null;
 
 
 
@@ -2993,18 +3008,72 @@ async function completeTransaction(paymentMethod) {
 // SUCCESS
 // ========================================
 
-function showSuccessPage(transaction) {
+function showSuccessPage(
+  transaction,
+  options = {}
+) {
+  const fromHistory =
+    options.fromHistory === true;
+
+  successViewMode =
+    fromHistory
+      ? "history"
+      : "new";
+
+  successSlipPath =
+    transaction.slipStoragePath ||
+    null;
+
   closePaymentModal();
   closeServiceOptionModal();
+
+  historyPage.classList.add(
+    "hidden"
+  );
+  document.body.classList.remove(
+    "modal-open"
+  );
 
   hideAllPages();
   successPage.classList.remove("hidden");
 
+  if (successKicker) {
+    successKicker.textContent =
+      fromHistory
+        ? "ประวัติรายการ"
+        : "เสร็จเรียบร้อย";
+  }
+
+  if (successTitle) {
+    successTitle.textContent =
+      fromHistory
+        ? "รายละเอียดรายการ"
+        : "บันทึกรายการแล้ว";
+  }
+
+  if (successSubtitle) {
+    successSubtitle.textContent =
+      fromHistory
+        ? "ข้อมูลรายการที่ชำระสำเร็จ"
+        : "รายการได้รับการยืนยันเรียบร้อย";
+  }
+
+  if (homeButton) {
+    homeButton.innerHTML =
+      fromHistory
+        ? `<span>←</span> กลับประวัติ`
+        : `กลับหน้าหลัก <span>→</span>`;
+  }
+
   successBarberName.textContent =
-    transaction.barberName;
+    transaction.barberName || "-";
 
   successTotal.textContent =
-    `${formatMoney(transaction.serviceTotal ?? transaction.total)} บาท`;
+    `${formatMoney(
+      transaction.serviceTotal ??
+      transaction.total ??
+      0
+    )} บาท`;
 
   const tipAmount =
     Number(transaction.tipAmount || 0);
@@ -3021,7 +3090,11 @@ function showSuccessPage(transaction) {
     `${formatMoney(
       transaction.grandTotal ??
       (
-        Number(transaction.total || 0) +
+        Number(
+          transaction.serviceTotal ??
+          transaction.total ??
+          0
+        ) +
         tipAmount
       )
     )} บาท`;
@@ -3039,32 +3112,52 @@ function showSuccessPage(transaction) {
       );
   }
 
+  if (successSlipButton) {
+    successSlipButton.classList.toggle(
+      "hidden",
+      !successSlipPath
+    );
+    successSlipButton.disabled = false;
+  }
+
   successServiceList.innerHTML = "";
 
-  transaction.services.forEach((service) => {
-    const row =
-      document.createElement("div");
+  const transactionServices =
+    Array.isArray(transaction.services)
+      ? transaction.services
+      : [];
 
-    row.className =
-      "success-service-row";
+  transactionServices.forEach(
+    (service) => {
+      const row =
+        document.createElement("div");
 
-    const detail =
-      service.detail
-        ? ` (${service.detail})`
-        : "";
+      row.className =
+        "success-service-row";
 
-    row.innerHTML = `
-      <span>
-        ${escapeHtml(service.name + detail)}
-      </span>
+      const detail =
+        service.detail
+          ? ` (${service.detail})`
+          : "";
 
-      <strong>
-        ${formatSignedMoney(service.price)}
-      </strong>
-    `;
+      row.innerHTML = `
+        <span>
+          ${escapeHtml(
+            (service.name || "รายการ") +
+            detail
+          )}
+        </span>
 
-    successServiceList.appendChild(row);
-  });
+        <strong>
+          ${formatSignedMoney(
+            service.price
+          )}
+        </strong>
+      `;
+
+      successServiceList.appendChild(row);
+    }
+  );
 
   window.scrollTo({
     top: 0,
@@ -3270,10 +3363,7 @@ function renderTransactionHistory() {
   const transactions =
     getFilteredHistoryTransactions();
 
-  renderHistorySummary(
-    transactions
-  );
-
+  renderHistorySummary(transactions);
   historyList.innerHTML = "";
 
   if (transactions.length === 0) {
@@ -3282,22 +3372,19 @@ function renderTransactionHistory() {
         <span class="material-symbols-outlined">
           receipt_long
         </span>
-        <strong>ยังไม่มีประวัติในวันที่เลือก</strong>
-        <p>รายการที่ชำระสำเร็จจะมาแสดงตรงนี้</p>
+        <strong>
+          ยังไม่มีประวัติในวันที่เลือก
+        </strong>
+        <p>
+          รายการที่ชำระสำเร็จจะมาแสดงตรงนี้
+        </p>
       </div>
     `;
-
     return;
   }
 
   transactions.forEach(
     (transaction) => {
-      const card =
-        document.createElement("article");
-
-      card.className =
-        "history-item";
-
       const serviceTotal =
         Number(
           transaction.serviceTotal ??
@@ -3313,7 +3400,8 @@ function renderTransactionHistory() {
       const grandTotal =
         Number(
           transaction.grandTotal ??
-          serviceTotal + tipAmount
+          serviceTotal +
+          tipAmount
         );
 
       const paymentText =
@@ -3321,89 +3409,72 @@ function renderTransactionHistory() {
           ? "เงินสด"
           : "สแกนจ่าย";
 
-      const slipButtonHtml =
-        transaction.slipStoragePath
-          ? `
-            <button
-              class="history-slip-button"
-              type="button"
-              data-slip-path="${escapeHtml(transaction.slipStoragePath)}"
+      const item =
+        document.createElement("button");
+
+      item.type = "button";
+      item.className =
+        "history-item history-item-compact";
+
+      item.innerHTML = `
+        <div class="history-compact-main">
+          <div class="history-compact-time">
+            ${escapeHtml(
+              formatThaiDateTime(
+                transaction.createdAt,
+                true
+              )
+            )}
+          </div>
+
+          <div class="history-compact-barber">
+            ${escapeHtml(
+              transaction.barberName ||
+              "-"
+            )}
+          </div>
+        </div>
+
+        <div class="history-compact-right">
+          <div class="history-compact-total">
+            ${formatMoney(grandTotal)} บาท
+          </div>
+
+          <div class="history-compact-meta">
+            <span>${paymentText}</span>
+            <span
+              class="material-symbols-outlined"
+              aria-hidden="true"
             >
-              <span class="material-symbols-outlined">image</span>
-              ดูสลิป
-            </button>
-          `
-          : "";
-
-      const tipHtml =
-        tipAmount > 0
-          ? `
-            <div>
-              <span>ทิปช่าง</span>
-              <strong>${formatMoney(tipAmount)} บาท</strong>
-            </div>
-          `
-          : "";
-
-      card.innerHTML = `
-        <div class="history-item-head">
-          <div>
-            <div class="history-time">
-              ${escapeHtml(formatThaiDateTime(transaction.createdAt, true))}
-            </div>
-            <h3>${escapeHtml(transaction.barberName || "-")}</h3>
+              chevron_right
+            </span>
           </div>
-
-          <span class="history-payment-badge">
-            ${paymentText}
-          </span>
-        </div>
-
-        <div class="history-services-text">
-          ${escapeHtml(getHistoryServiceText(transaction))}
-        </div>
-
-        <div class="history-money-grid">
-          <div>
-            <span>ค่าบริการ</span>
-            <strong>${formatMoney(serviceTotal)} บาท</strong>
-          </div>
-
-          ${tipHtml}
-
-          <div class="grand">
-            <span>รับทั้งหมด</span>
-            <strong>${formatMoney(grandTotal)} บาท</strong>
-          </div>
-        </div>
-
-        <div class="history-item-foot">
-          <small>
-            #${escapeHtml(transaction.id || "-")}
-          </small>
-          ${slipButtonHtml}
         </div>
       `;
 
-      historyList.appendChild(card);
-    }
-  );
-
-  historyList
-    .querySelectorAll(
-      "[data-slip-path]"
-    )
-    .forEach((button) => {
-      button.addEventListener(
+      item.addEventListener(
         "click",
-        async () => {
-          await openHistorySlip(
-            button.dataset.slipPath,
-            button
+        () => {
+          openHistoryTransactionDetail(
+            transaction
           );
         }
       );
-    });
+
+      historyList.appendChild(item);
+    }
+  );
+}
+
+function openHistoryTransactionDetail(
+  transaction
+) {
+  showSuccessPage(
+    transaction,
+    {
+      fromHistory: true
+    }
+  );
 }
 
 async function loadTransactionHistory() {
@@ -3491,42 +3562,43 @@ async function openTransactionHistory() {
   const visiblePage =
     getVisiblePosPage();
 
-  if (visiblePage !== historyPage) {
-    historyReturnPage = visiblePage;
+  if (
+    visiblePage &&
+    visiblePage !== successPage
+  ) {
+    historyReturnPage =
+      visiblePage;
+  }
+
+  if (!historyReturnPage) {
+    historyReturnPage =
+      barberPage;
   }
 
   if (historyDateInput) {
     historyDateInput.value =
-      historyDateInput.value ||
       getLocalDateKey();
   }
 
-  hideAllPages();
-  historyPage.classList.remove("hidden");
+  historyPage.classList.remove(
+    "hidden"
+  );
 
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
+  document.body.classList.add(
+    "modal-open"
+  );
 
   await loadTransactionHistory();
 }
 
 function closeTransactionHistory() {
-  historyPage.classList.add("hidden");
+  historyPage.classList.add(
+    "hidden"
+  );
 
-  const target =
-    historyReturnPage &&
-    historyReturnPage !== historyPage
-      ? historyReturnPage
-      : barberPage;
-
-  target.classList.remove("hidden");
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
+  document.body.classList.remove(
+    "modal-open"
+  );
 }
 
 function closeHistorySlip() {
@@ -3613,6 +3685,13 @@ if (historyBackButton) {
   );
 }
 
+if (historyBackdrop) {
+  historyBackdrop.addEventListener(
+    "click",
+    closeTransactionHistory
+  );
+}
+
 if (historyDateInput) {
   historyDateInput.addEventListener(
     "change",
@@ -3648,6 +3727,22 @@ if (historySlipBackdrop) {
   );
 }
 
+if (successSlipButton) {
+  successSlipButton.addEventListener(
+    "click",
+    async () => {
+      if (!successSlipPath) {
+        return;
+      }
+
+      await openHistorySlip(
+        successSlipPath,
+        successSlipButton
+      );
+    }
+  );
+}
+
 
 // ========================================
 // RESET
@@ -3680,7 +3775,40 @@ function resetTransaction() {
 
 homeButton.addEventListener(
   "click",
-  resetTransaction
+  () => {
+    if (
+      successViewMode ===
+      "history"
+    ) {
+      hideAllPages();
+
+      const target =
+        historyReturnPage ||
+        barberPage;
+
+      target.classList.remove(
+        "hidden"
+      );
+
+      successViewMode =
+        "new";
+
+      successSlipPath =
+        null;
+
+      historyPage.classList.remove(
+        "hidden"
+      );
+
+      document.body.classList.add(
+        "modal-open"
+      );
+
+      return;
+    }
+
+    resetTransaction();
+  }
 );
 
 backButton.addEventListener(

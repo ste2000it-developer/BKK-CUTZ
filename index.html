@@ -28,7 +28,7 @@
 
   <link
     rel="stylesheet"
-    href="pos.css?v=35"
+    href="pos.css?v=39"
   >
 </head>
 
@@ -564,24 +564,40 @@
     </section>
 
 
-    <!-- TRANSACTION HISTORY -->
-    <section id="historyPage" class="page hidden">
-      <div class="history-page-head">
-        <div class="history-title-row">
+    <!-- TRANSACTION HISTORY POPUP -->
+    <section
+      id="historyPage"
+      class="history-modal hidden"
+      aria-modal="true"
+      role="dialog"
+    >
+      <div
+        id="historyBackdrop"
+        class="history-modal-backdrop"
+      ></div>
+
+      <div class="history-modal-card">
+        <div class="history-popup-head">
+          <div>
+            <div class="page-kicker">
+              ประวัติของสาขานี้
+            </div>
+
+            <h2>ประวัติรายการ</h2>
+
+            <p>
+              แตะรายการเพื่อดูรายละเอียดแบบหน้าสรุป
+            </p>
+          </div>
+
           <button
             id="historyBackButton"
-            class="square-back"
+            class="modal-close"
             type="button"
-            aria-label="กลับ"
+            aria-label="ปิด"
           >
-            ←
+            ×
           </button>
-
-          <div>
-            <div class="page-kicker">ประวัติของสาขานี้</div>
-            <h1>ประวัติรายการ</h1>
-            <p>ดูรายการขายย้อนหลังของช่างในสาขาปัจจุบัน</p>
-          </div>
         </div>
 
         <div class="history-controls">
@@ -596,7 +612,9 @@
           <label class="history-control">
             <span>ช่าง</span>
             <select id="historyBarberFilter">
-              <option value="all">ช่างทุกคน</option>
+              <option value="all">
+                ช่างทุกคน
+              </option>
             </select>
           </label>
 
@@ -608,36 +626,36 @@
             รีเฟรช
           </button>
         </div>
-      </div>
 
-      <div class="history-summary-grid">
-        <div class="history-summary-card">
-          <span>จำนวนรายการ</span>
-          <strong id="historyCount">0</strong>
+        <div class="history-summary-grid hidden" aria-hidden="true">
+          <div class="history-summary-card">
+            <span>จำนวนรายการ</span>
+            <strong id="historyCount">0</strong>
+          </div>
+
+          <div class="history-summary-card">
+            <span>ค่าบริการ</span>
+            <strong id="historyServiceTotal">0 บาท</strong>
+          </div>
+
+          <div class="history-summary-card">
+            <span>ทิปช่าง</span>
+            <strong id="historyTipTotal">0 บาท</strong>
+          </div>
+
+          <div class="history-summary-card emphasized">
+            <span>รับทั้งหมด</span>
+            <strong id="historyGrandTotal">0 บาท</strong>
+          </div>
         </div>
 
-        <div class="history-summary-card">
-          <span>ค่าบริการ</span>
-          <strong id="historyServiceTotal">0 บาท</strong>
-        </div>
-
-        <div class="history-summary-card">
-          <span>ทิปช่าง</span>
-          <strong id="historyTipTotal">0 บาท</strong>
-        </div>
-
-        <div class="history-summary-card emphasized">
-          <span>รับทั้งหมด</span>
-          <strong id="historyGrandTotal">0 บาท</strong>
-        </div>
-      </div>
-
-      <div
-        id="historyList"
-        class="history-list"
-      >
-        <div class="history-loading">
-          กำลังโหลดประวัติ...
+        <div
+          id="historyList"
+          class="history-list"
+        >
+          <div class="history-loading">
+            กำลังโหลดประวัติ...
+          </div>
         </div>
       </div>
     </section>
@@ -650,13 +668,18 @@
           ✓
         </div>
 
-        <div class="success-kicker">
+        <div
+          id="successKicker"
+          class="success-kicker"
+        >
           เสร็จเรียบร้อย
         </div>
 
-        <h1>บันทึกรายการแล้ว</h1>
+        <h1 id="successTitle">
+          บันทึกรายการแล้ว
+        </h1>
 
-        <p>
+        <p id="successSubtitle">
           รายการได้รับการยืนยันเรียบร้อย
         </p>
 
@@ -699,6 +722,17 @@
             <strong id="successDateTime">-</strong>
           </div>
         </div>
+
+        <button
+          id="successSlipButton"
+          class="success-slip-button hidden"
+          type="button"
+        >
+          <span class="material-symbols-outlined">
+            image
+          </span>
+          ดูสลิป
+        </button>
 
         <button
           id="homeButton"
@@ -1116,7 +1150,7 @@
 
   <script
     type="module"
-    src="app.js?v=38"
+    src="app.js?v=39"
   ></script>
 </body>
 </html>

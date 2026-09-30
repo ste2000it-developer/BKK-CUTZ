@@ -1,14 +1,14 @@
-BKK-CUTZ ADMIN PAYOUT V23
+BKK-CUTZ POS HISTORY POPUP V39
 
 วางทับ:
-admin.html -> admin.html
-admin.js   -> admin.js
-admin.css  -> admin.css
+- index.html -> index.html
+- app.js -> app.js
+- pos.css -> pos.css
 
 แก้:
-- Dropdown ทั้งหมดใน Admin เป็น custom BKK-CUTZ
-- ไม่สร้างรอบจ่ายย้อนหลังเปล่าๆ
-- แสดงเฉพาะรอบที่มีข้อมูลจริง
-- ไม่มีข้อมูล = ซ่อนยอด 0 และตาราง
-
-ไม่ต้องเปลี่ยน app.js / firebase.js / Firestore Rules จาก V22
+- ประวัติ POS เป็น Popup
+- รายการสั้น: เวลา / ช่าง / ยอดรวม / วิธีจ่าย
+- กดรายการ -> เปิดหน้าสรุปเดิมแบบเต็ม
+- กดกลับ -> กลับ Popup ประวัติ
+- สแกนจ่าย -> มีปุ่มดูสลิป
+- cache bust เป็น v39
