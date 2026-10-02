@@ -54,7 +54,6 @@ svg {
   display: none !important;
 }
 
-
 /* LOADING */
 
 .loading-page {
@@ -365,6 +364,32 @@ svg {
   display: flex;
   align-items: center;
   gap: 18px;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 110px;
+  height: 64px;
+  flex: 0 0 auto;
+  padding: 0 14px;
+  border: 1px solid #cecece;
+  border-radius: 14px;
+  background: #ffffff;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.back-button-arrow {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.back-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .square-back {
@@ -944,6 +969,7 @@ svg {
 }
 
 .payment-page-card {
+  position: relative;
   width: min(620px, 100%);
   margin: 0 auto;
   padding: 32px;
@@ -951,6 +977,12 @@ svg {
   border-radius: 18px;
   background: #ffffff;
   text-align: center;
+}
+
+.payment-page-card > .back-button {
+  position: absolute;
+  top: 32px;
+  left: 32px;
 }
 
 .payment-page-card h1 {
@@ -1317,6 +1349,11 @@ svg {
     padding: 24px 18px;
   }
 
+  .payment-page-card > .back-button {
+    top: 24px;
+    left: 18px;
+  }
+
   .payment-extra-head {
     align-items: flex-start;
     flex-direction: column;
@@ -1433,6 +1470,33 @@ svg {
     font-size: 21px;
   }
 
+  .app-header {
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .app-header .system-brand {
+    font-size: 20px;
+    letter-spacing: 1.2px;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .header-actions .pos-datetime {
+    display: none;
+  }
+
+  .header-actions .shift-header-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .header-actions .shift-header-button .material-symbols-outlined {
+    font-size: 23px;
+  }
+
   .page-topline h1 {
     font-size: 35px;
   }
@@ -1462,6 +1526,16 @@ svg {
 
   .service-name {
     font-size: 16px;
+  }
+
+  .barber-button {
+    min-height: 88px;
+    padding: 20px 58px 20px 22px;
+    font-size: 27px;
+  }
+
+  .barber-button::after {
+    right: 20px;
   }
 
   .service-price {

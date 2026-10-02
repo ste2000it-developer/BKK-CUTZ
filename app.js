@@ -1,16 +1,12 @@
 import {
-  login,
   logout,
-  watchAuth,
-  getUserProfile,
-  getBranch,
   uploadPaymentSlip,
   loadPaymentSlipUrl
-} from "./firebase.js?v=37";
+} from "./firebase.js";
 
 import {
-  getApp
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+  findBarberByRfid as findBarberByRfidDomain
+} from "./src/shared/domain/rfid.ts";
 
 import {
   getFirestore,
@@ -23,10 +19,12 @@ import {
   onSnapshot,
   serverTimestamp,
   writeBatch
-} from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+} from "firebase/firestore";
 
+import {
+  db
+} from "./src/shared/firebase/client.ts";
 
-const db = getFirestore(getApp());
 
 
 // ========================================
@@ -53,16 +51,7 @@ const processedReaderScanIds = new Set();
 // DOM
 // ========================================
 
-const loadingPage = document.getElementById("loadingPage");
-
-const loginPage = document.getElementById("loginPage");
 const mainApp = document.getElementById("mainApp");
-
-const loginForm = document.getElementById("loginForm");
-const emailInput = document.getElementById("emailInput");
-const passwordInput = document.getElementById("passwordInput");
-const loginButton = document.getElementById("loginButton");
-const loginError = document.getElementById("loginError");
 
 const logoutButton = document.getElementById("logoutButton");
 const currentBranchName = document.getElementById("currentBranchName");
@@ -339,8 +328,6 @@ if (historyButton) {
     }
   );
 }
-
-
 // ========================================
 // STATE
 // ========================================
@@ -704,51 +691,11 @@ function stopReaderScanWatcher() {
   processedReaderScanIds.clear();
 }
 
-function normalizeRfidUid(value) {
-  return String(value || "")
-    .trim()
-    .toUpperCase()
-    .replace(/[^0-9A-F]/g, "");
-}
-
 function findBarberByRfid(cardUid) {
-  const normalizedCardUid =
-    normalizeRfidUid(cardUid);
-
-  if (!normalizedCardUid) {
-    return {
-      barber: null,
-      error: "ไม่พบ UID ของบัตร"
-    };
-  }
-
-  const matches =
-    barbers.filter(
-      (barber) =>
-        normalizeRfidUid(
-          barber.rfidUid
-        ) === normalizedCardUid
-    );
-
-  if (matches.length === 0) {
-    return {
-      barber: null,
-      error: "ไม่พบบัตรนี้ในระบบ"
-    };
-  }
-
-  if (matches.length > 1) {
-    return {
-      barber: null,
-      error:
-        "บัตร RFID นี้ถูกผูกกับช่างมากกว่า 1 คน กรุณาแก้ข้อมูลในระบบ"
-    };
-  }
-
-  return {
-    barber: matches[0],
-    error: null
-  };
+  return findBarberByRfidDomain(
+    barbers,
+    cardUid
+  );
 }
 
 async function checkInBarberByRfid(cardUid) {
@@ -1259,43 +1206,13 @@ async function loadServices(groupId) {
       Number(a.sortOrder || 999) -
       Number(b.sortOrder || 999)
   );
+
+  window.dispatchEvent(
+    new CustomEvent("bkk:pos:services-loaded", {
+      detail: { services }
+    })
+  );
 }
-
-
-// ========================================
-// LOGIN
-// ========================================
-
-loginForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
-
-  loginError.classList.add("hidden");
-  loginError.textContent = "";
-
-  loginButton.disabled = true;
-  loginButton.textContent = "กำลังเข้าสู่ระบบ...";
-
-  try {
-    await login(
-      emailInput.value.trim(),
-      passwordInput.value
-    );
-
-  } catch (error) {
-    console.error(
-      "Login error:",
-      error
-    );
-
-    loginError.textContent =
-      "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
-
-    loginError.classList.remove("hidden");
-
-    loginButton.disabled = false;
-    loginButton.textContent = "เข้าสู่ระบบ";
-  }
-});
 
 
 // ========================================
@@ -1314,103 +1231,38 @@ if (logoutButton) {
 }
 
 
-// ========================================
-// AUTH
-// ========================================
+window.addEventListener("bkk:pos:session-ended", () => {
+  stopPresenceWatcher();
+  stopReaderScanWatcher();
+  currentUserProfile = null;
+  currentBranch = null;
+  barbers = [];
+  activeBarbers = [];
+  services = [];
+  mainApp.classList.add("hidden");
+  closePaymentModal();
+  closeServiceOptionModal();
+});
 
-watchAuth(async (user) => {
-  if (!user) {
+window.addEventListener("bkk:pos:session-ready", async (event) => {
+  const { profile, branch } = event.detail;
+  try {
     stopPresenceWatcher();
     stopReaderScanWatcher();
-
-    currentUserProfile = null;
-    currentBranch = null;
-    barbers = [];
-    activeBarbers = [];
-    services = [];
-
-    showLoginPage();
-    return;
-  }
-
-  try {
-    const profile =
-      await getUserProfile(
-        user.uid
-      );
-
-    if (profile.active !== true) {
-      throw new Error(
-        "บัญชีถูกปิดใช้งาน"
-      );
-    }
-
-    if (profile.role !== "branch") {
-      throw new Error(
-        "บัญชีนี้ไม่ใช่บัญชีสาขา"
-      );
-    }
-
-    const branch =
-      await getBranch(
-        profile.branchId
-      );
-
-    if (branch.active !== true) {
-      throw new Error(
-        "สาขานี้ถูกปิดใช้งาน"
-      );
-    }
-
-    if (!branch.serviceGroup) {
-      throw new Error(
-        "สาขานี้ยังไม่ได้กำหนดกลุ่มราคา"
-      );
-    }
-
     currentUserProfile = profile;
     currentBranch = branch;
-
     await loadBarbers();
-    await loadServices(
-      branch.serviceGroup
-    );
-
-    await startPresenceWatcher(
-      branch.id
-    );
-
-    startReaderScanWatcher(
-      branch.id
-    );
-
-    currentBranchName.textContent =
-      branch.name || branch.id;
-
-    loginButton.disabled = false;
-    loginButton.textContent = "เข้าสู่ระบบ";
-
-    loginError.classList.add("hidden");
-
+    await loadServices(branch.serviceGroup);
+    await startPresenceWatcher(branch.id);
+    startReaderScanWatcher(branch.id);
+    currentBranchName.textContent = branch.name || branch.id;
     showMainApp();
-
   } catch (error) {
-    console.error(
-      "Account setup error:",
-      error
-    );
-
+    console.error("POS session initialization error:", error);
+    window.dispatchEvent(new CustomEvent("bkk:pos:session-error", {
+      detail: { message: error.message || "เริ่มต้นระบบสาขาไม่สำเร็จ" },
+    }));
     await logout();
-
-    showLoginPage();
-
-    loginError.textContent =
-      error.message;
-
-    loginError.classList.remove("hidden");
-
-    loginButton.disabled = false;
-    loginButton.textContent = "เข้าสู่ระบบ";
   }
 });
 
@@ -1419,30 +1271,11 @@ watchAuth(async (user) => {
 // MAIN PAGE VISIBILITY
 // ========================================
 
-function showLoadingPage() {
-  loginPage.classList.add("hidden");
-  mainApp.classList.add("hidden");
-  loadingPage.classList.remove("hidden");
-
-  closePaymentModal();
-  closeServiceOptionModal();
-}
-
-function showLoginPage() {
-  loadingPage.classList.add("hidden");
-  mainApp.classList.add("hidden");
-  loginPage.classList.remove("hidden");
-
-  closePaymentModal();
-  closeServiceOptionModal();
-}
-
 function showMainApp() {
-  loadingPage.classList.add("hidden");
-  loginPage.classList.add("hidden");
   mainApp.classList.remove("hidden");
 
   resetTransaction();
+  window.dispatchEvent(new CustomEvent("bkk:pos:ready"));
 }
 
 function hideAllPages() {
@@ -1459,39 +1292,53 @@ function hideAllPages() {
 // ========================================
 
 function renderBarbers() {
-  barberList.innerHTML = "";
+  window.dispatchEvent(new CustomEvent("bkk:pos:active-barbers", {
+    detail: { barbers: activeBarbers },
+  }));
+}
 
-  if (activeBarbers.length === 0) {
-    barberList.classList.add("hidden");
-    noShiftState.classList.remove("hidden");
+window.addEventListener("bkk:pos:select-barber", (event) => {
+  const { barberId } = event.detail;
+  const barber = activeBarbers.find((item) => item.id === barberId);
+  if (barber) selectBarber(barber);
+});
+
+window.addEventListener("bkk:pos:open-shift", () => {
+  openShiftFromEmptyButton?.click();
+});
+
+window.addEventListener("bkk:pos:back-to-barbers", () => {
+  resetTransaction();
+});
+
+window.addEventListener("bkk:pos:checkout", (event) => {
+  const selectedItems = event.detail?.selectedServices;
+
+  if (
+    !selectedBarber ||
+    !Array.isArray(selectedItems) ||
+    selectedItems.length === 0
+  ) {
     return;
   }
 
-  noShiftState.classList.add("hidden");
-  barberList.classList.remove("hidden");
-
-  activeBarbers.forEach((barber) => {
-    const button =
-      document.createElement("button");
-
-    button.type = "button";
-    button.className = "barber-button";
-    button.textContent = barber.name;
-
-    button.addEventListener(
-      "click",
-      () => {
-        selectBarber(barber);
-      }
-    );
-
-    barberList.appendChild(button);
+  selectedServices.clear();
+  selectedItems.forEach((service) => {
+    selectedServices.set(service.id, service);
   });
-}
+
+  openPaymentModal();
+});
 
 function selectBarber(barber) {
   selectedBarber = barber;
   selectedServices.clear();
+
+  window.dispatchEvent(
+    new CustomEvent("bkk:pos:barber-selected", {
+      detail: { barber }
+    })
+  );
 
   selectedBarberName.textContent =
     barber.name;
@@ -4204,6 +4051,10 @@ function resetTransaction() {
   selectedBarber = null;
   selectedServices.clear();
 
+  window.dispatchEvent(
+    new CustomEvent("bkk:pos:transaction-reset")
+  );
+
   closePaymentModal();
   closeServiceOptionModal();
   resetPaymentExtras();
@@ -4269,56 +4120,6 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
-
-
-
-// ========================================
-// PASSWORD VISIBILITY
-// ========================================
-
-const passwordToggleButton =
-  document.getElementById("passwordToggleButton");
-
-const passwordToggleIcon =
-  document.getElementById("passwordToggleIcon");
-
-if (
-  passwordToggleButton &&
-  passwordToggleIcon
-) {
-  passwordToggleButton.addEventListener(
-    "click",
-    () => {
-      const isHidden =
-        passwordInput.type === "password";
-
-      passwordInput.type =
-        isHidden
-          ? "text"
-          : "password";
-
-      passwordToggleIcon.classList.toggle(
-        "fa-eye",
-        !isHidden
-      );
-
-      passwordToggleIcon.classList.toggle(
-        "fa-eye-slash",
-        isHidden
-      );
-
-      passwordToggleButton.setAttribute(
-        "aria-label",
-        isHidden
-          ? "ซ่อนรหัสผ่าน"
-          : "แสดงรหัสผ่าน"
-      );
-
-      passwordInput.focus();
-    }
-  );
-}
-
 
 
 
@@ -4682,8 +4483,3 @@ if (
 }
 
 
-// ========================================
-// START
-// ========================================
-
-showLoadingPage();
