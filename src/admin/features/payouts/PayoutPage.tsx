@@ -227,14 +227,14 @@ export function PayoutPage() {
         </div>
         <div className="payout-cycle-controls">
           <button
-            className="secondary-button"
+            className="secondary-button payout-cycle-nav"
             type="button"
             aria-label="รอบก่อนหน้า"
             disabled={loading || selectedCycleIndex <= 0}
             onClick={() => void selectCycle(selectedCycleIndex - 1)}
           >‹</button>
           <select
-            className="native-app-select"
+            className="payout-cycle-select"
             aria-label="เลือกรอบจ่าย"
             value={selectedCycle ? String(selectedCycleIndex) : ""}
             disabled={loading || cycles.length === 0}
@@ -247,7 +247,7 @@ export function PayoutPage() {
             ))}
           </select>
           <button
-            className="secondary-button"
+            className="secondary-button payout-cycle-nav"
             type="button"
             aria-label="รอบถัดไป"
             disabled={loading || selectedCycleIndex >= cycles.length - 1}

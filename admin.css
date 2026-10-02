@@ -501,11 +501,13 @@ select {
 .service-type {
   color: #666666;
   font-size: 12px;
+  white-space: nowrap;
 }
 
 .service-price {
   font-size: 13px;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .service-status {
@@ -685,10 +687,20 @@ select {
 
   .service-section {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
   }
 
   .service-list {
-    min-width: 760px;
+    min-width: 620px;
+  }
+
+  .service-table-head,
+  .service-table-row {
+    grid-template-columns: 32px minmax(140px, 1.5fr) 80px 85px 92px 76px;
+    gap: 8px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .admin-topbar h1 {
@@ -778,13 +790,19 @@ select {
 
 .payout-cycle-controls {
   display: grid;
-  grid-template-columns: 44px minmax(230px, 1fr) 44px;
+  grid-template-columns: 44px minmax(0, 230px) 44px;
   gap: 8px;
   align-items: center;
+  width: min(342px, 100%);
 }
 
-.secondary-button {
+.payout-cycle-nav {
+  width: 44px;
+  min-width: 44px;
   height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid #d7d7d7;
   border-radius: 10px;
   background: #ffffff;
@@ -792,9 +810,23 @@ select {
   cursor: pointer;
 }
 
-.secondary-button:disabled {
+.payout-cycle-nav:disabled {
   opacity: .35;
   cursor: default;
+}
+
+.payout-cycle-select {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #d7d7d7;
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: center;
 }
 
 .payout-period-text {
@@ -1159,7 +1191,8 @@ select {
   }
 
   .payout-cycle-controls {
-    grid-template-columns: 42px minmax(0, 1fr) 42px;
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    width: 100%;
   }
 
   .payout-table-toolbar {
