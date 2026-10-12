@@ -36,7 +36,7 @@ export function PosApp() {
   }
 
   if (initializing) {
-    return <section className="loading-page"><LoadingScreen message="กำลังโหลดระบบ..." messageElement="p" spinnerClassName="loading-spinner" /></section>;
+    return <section className="loading-page"><LoadingScreen message="กำลังโหลดระบบ..." spinnerClassName="loading-spinner" /></section>;
   }
 
   if (branch) return <PosWorkspace key={branch.id} branch={branch} />;
@@ -46,9 +46,6 @@ export function PosApp() {
       <header className="login-topbar"><div><div className="system-brand">BKK-CUTZ</div><div className="system-subbrand">BARBER POS SYSTEM</div></div></header>
       <section className="login-stage">
         <form className="login-card" onSubmit={(event) => void submitLogin(event)}>
-          <div className="login-card-brand">BKK-CUTZ</div>
-          <div className="login-card-subbrand">BARBER POS SYSTEM</div>
-          <div className="login-rule" />
           <h1>เข้าสู่ระบบสาขา</h1>
           <p className="login-subtitle">เข้าสู่ระบบด้วยบัญชีประจำสาขา</p>
           <label className="field-label" htmlFor="posReactEmail">อีเมล</label>

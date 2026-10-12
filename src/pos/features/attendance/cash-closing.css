@@ -1,0 +1,18 @@
+.cash-closing-form { text-align: left; }
+.cash-closing-context { color: #737373; line-height: 1.6; text-align: center; }
+.cash-closing-totals { margin: 22px 0; }
+.cash-closing-totals > div { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; }
+.cash-closing-totals dd { margin: 0; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.cash-closing-expected { border-top: 1px solid #dedede; margin-top: 8px; font-weight: 800; }
+.cash-closing-form label { display: block; margin-bottom: 10px; font-weight: 700; }
+.cash-closing-actual { box-sizing: border-box; width: 100%; min-height: 68px; border: 2px solid #dedede; border-radius: 12px; background: #fafafa; color: #111; padding: 12px; text-align: center; font: inherit; font-size: 28px; font-weight: 700; appearance: textfield; -moz-appearance: textfield; }
+.cash-closing-actual::-webkit-inner-spin-button, .cash-closing-actual::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.cash-closing-actual:focus { outline: 3px solid #ffcf3340; border-color: #e9b700; }
+.cash-closing-actual::placeholder { font-size: 18px; font-weight: 400; color: #888; }
+.cash-closing-difference { padding: 16px; margin: 16px 0; border-radius: 10px; background: #f5f5f5; text-align: center; font-size: 20px; font-weight: 700; }
+.cash-closing-difference.is-short { color: #b91c1c; background: #fef2f2; }
+.cash-closing-difference.is-over { color: #92400e; background: #fffbeb; }
+.cash-closing-difference.is-balanced { color: #047857; background: #ecfdf5; }
+.cash-closing-actions { display: flex; align-items: stretch; gap: 12px; }
+.cash-closing-actions > button { flex: 1; width: auto; margin: 0; min-height: 56px; }
+.close-store-modal-card:has(.cash-closing-form) { max-height: calc(100dvh - 32px); overflow-y: auto; }

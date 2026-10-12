@@ -1,3 +1,4 @@
+import { AppSelect } from "../../components/AppSelect";
 import { useEffect, useMemo, useState } from "react";
 import { fromDateKey } from "../../../shared/domain/payout";
 import {
@@ -149,18 +150,18 @@ export function PayoutHistoryPage() {
           </button>
         </div>
         <div className="payout-history-filters">
-          <label className="payout-history-select-field"><span>รอบจ่าย</span>
-            <select className="native-app-select" value={cycleFilter} onChange={(event) => setCycleFilter(event.target.value)}>
+          <div className="payout-history-select-field"><span>รอบจ่าย</span>
+            <AppSelect aria-label="รอบจ่าย"  value={cycleFilter} onChange={(value) => setCycleFilter(value)}>
               <option value="all">ทุกรอบจ่าย</option>
               {cycles.map((cycle) => <option key={cycle} value={cycle}>รอบจ่าย {formatThaiDate(cycle, "long")}</option>)}
-            </select>
-          </label>
-          <label className="payout-history-select-field"><span>ช่าง</span>
-            <select className="native-app-select" value={barberFilter} onChange={(event) => setBarberFilter(event.target.value)}>
+            </AppSelect>
+          </div>
+          <div className="payout-history-select-field"><span>ช่าง</span>
+            <AppSelect aria-label="ช่าง"  value={barberFilter} onChange={(value) => setBarberFilter(value)}>
               <option value="all">ช่างทุกคน</option>
               {barbers.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
-            </select>
-          </label>
+            </AppSelect>
+          </div>
         </div>
       </section>
 
@@ -212,6 +213,10 @@ export function PayoutHistoryPage() {
               <div><span>ค่ามือ</span><strong>{formatMoney(selectedRecord.commissionAmount)} บาท</strong></div>
               <div><span>ประกันมือ</span><strong>{formatMoney(selectedRecord.guaranteeAmount)} บาท</strong></div>
               <div><span>ทิป</span><strong>{formatMoney(selectedRecord.tipAmount)} บาท</strong></div>
+              <div><span>ยอดค้างจากรอบก่อน</span><strong>{formatMoney(selectedRecord.previousAdvanceCarryoverAmount)} บาท</strong></div>
+              <div><span>เบิกล่วงหน้าเพิ่มรอบนี้</span><strong>{formatMoney(selectedRecord.currentAdvanceAmount)} บาท</strong></div>
+              <div><span>หักเบิกล่วงหน้ารอบนี้</span><strong>{formatMoney(selectedRecord.advanceAmount)} บาท</strong></div>
+              <div><span>ค้างยกไปรอบหน้า</span><strong>{formatMoney(selectedRecord.advanceCarryoverAmount)} บาท</strong></div>
               <div className="grand"><span>รวมจ่าย</span><strong>{formatMoney(selectedRecord.totalAmount)} บาท</strong></div>
             </div>
             <div className="payout-history-paid-info"><div><span>จ่ายเมื่อ</span><strong>{formatPaidAt(selectedRecord)}</strong></div><div><span>ผู้ยืนยัน</span><strong>{String(selectedRecord.paidByEmail || selectedRecord.paidByUid || "-")}</strong></div></div>

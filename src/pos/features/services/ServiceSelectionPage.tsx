@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import type { ServiceRecord } from "../../../shared/firebase/repositories/services";
 import {
+  getPosRangeBounds,
   calculatePosServiceTotal,
   getHaircutDiscountAmount,
   getPosServiceDisplayName,
@@ -10,6 +11,8 @@ import {
 
 import type { Barber } from "../../../shared/domain/pos-attendance";
 import { BackButton } from "../../../shared/components/BackButton";
+
+
 type OptionMode = "choice" | "range" | "custom" | null;
 
 const iconByCode: Record<string, string> = {
@@ -45,7 +48,7 @@ export function ServiceSelectionPage({ services, barber, onBack, onCheckout }: {
     if (service.type === "choice") {
       if (chosen) return `${formatMoney(chosen.price)} บาท`;
       const choices = Array.isArray(service.choices) ? service.choices : [];
-      if (service.serviceCode === "shave" && choices.length >= 2) {
+      if ((service.serviceCode === "shave" || service.serviceCode === "trim") && choices.length >= 2) {
         return `${formatMoney(Math.min(...choices.map(Number)))} - ${formatMoney(Math.max(...choices.map(Number)))} บาท`;
       }
       return choices.length ? `เลือก ${choices.map((price) => formatMoney(Number(price))).join(" / ")}` : "เลือกราคา";
@@ -104,7 +107,7 @@ export function ServiceSelectionPage({ services, barber, onBack, onCheckout }: {
     if (service.type === "choice") {
       setPendingService(service);
       setRangePrice("");
-      setOptionMode(service.serviceCode === "shave" ? "range" : "choice");
+      setOptionMode(service.serviceCode === "shave" || service.serviceCode === "trim" ? "range" : "choice");
       return;
     }
     if (service.type === "custom") {
@@ -131,15 +134,7 @@ export function ServiceSelectionPage({ services, barber, onBack, onCheckout }: {
     closeOptions();
   }
 
-  const rangeBounds = useMemo(() => {
-    const values = Array.isArray(pendingService?.choices)
-      ? pendingService.choices.map(Number).filter(Number.isFinite)
-      : [];
-    return {
-      min: values.length ? Math.min(...values) : 150,
-      max: values.length ? Math.max(...values) : 200,
-    };
-  }, [pendingService]);
+  const rangeBounds = useMemo(() => getPosRangeBounds(pendingService), [pendingService]);
 
   function checkout() {
     if (!barber || selected.size === 0) return;
@@ -147,7 +142,7 @@ export function ServiceSelectionPage({ services, barber, onBack, onCheckout }: {
   }
 
   return (
-    <div className="service-selection-react">
+    <div className={`service-selection-react${selectedRows.length ? " has-selected-services" : ""}`}>
       <div className="page-topline compact">
         <div className="service-title-row"><BackButton onClick={onBack} /><div><div className="page-kicker">เลือกบริการให้ลูกค้า</div><h1>{barber?.name || "-"}</h1></div></div>
         <div className="steps"><div className="step done"><span>01</span><b>เลือกช่าง</b></div><div className="step-line" /><div className="step active"><span>02</span><b>เลือกบริการ</b></div><div className="step-line" /><div className="step"><span>03</span><b>ชำระเงิน</b></div><div className="step-line" /><div className="step"><span>04</span><b>เสร็จสิ้น</b></div></div>
@@ -160,7 +155,7 @@ export function ServiceSelectionPage({ services, barber, onBack, onCheckout }: {
             return <button className={`service-button${isSelected ? " selected" : ""}`} type="button" key={service.id} onClick={() => clickService(service)}><span className="service-left"><span className="service-icon"><span className="material-symbols-outlined" aria-hidden="true">{iconByCode[iconCode] || iconByCode.custom}</span></span><span className="service-copy"><span className="service-name">{getPosServiceDisplayName(service)}</span></span><span className="service-check">{isSelected ? "✓" : ""}</span></span><span className="service-price">{buttonPrice(service)}</span></button>;
           })}</div>
         </section>
-        <aside className="summary-panel"><div className="summary-head"><div><h2>สรุปรายการ</h2><p>ตรวจสอบรายการที่เลือก</p></div></div>
+        <aside className={`summary-panel${selectedRows.length ? " has-selected-services" : ""}`}><div className="summary-head"><div><h2>สรุปรายการ</h2><p>ตรวจสอบรายการที่เลือก</p></div></div>
           <div className="summary-list">{selectedRows.length === 0 ? <p className="empty-summary">ยังไม่ได้เลือกบริการ</p> : selectedRows.map((item) => <div className={`summary-row${item.price < 0 ? " discount-row" : ""}`} key={item.id}><span>{item.name}{item.detail && <span className="summary-detail">{item.detail}</span>}</span><strong>{item.price < 0 ? `-${formatMoney(Math.abs(item.price))}` : formatMoney(item.price)} บาท</strong></div>)}</div>
           <div className="summary-bottom"><div className="summary-total"><div><span>รวมทั้งสิ้น</span></div><strong>{formatMoney(total)} บาท</strong></div><button className="primary-button" type="button" disabled={!selected.size} onClick={checkout}>ยืนยันรายการ <span>→</span></button><div className="summary-note">รายการจะถูกบันทึกเมื่อยืนยันขั้นตอนถัดไป</div></div>
         </aside>
@@ -168,7 +163,7 @@ export function ServiceSelectionPage({ services, barber, onBack, onCheckout }: {
       {optionMode && pendingService && <div className="modal"><button className="modal-backdrop" type="button" aria-label="ปิดตัวเลือก" onClick={closeOptions} /><section className="option-modal-card" role="dialog" aria-modal="true" aria-labelledby="posOptionTitle"><button className="modal-close" type="button" aria-label="ปิด" onClick={closeOptions}>×</button><h2 id="posOptionTitle">{getPosServiceDisplayName(pendingService)}</h2>
         {optionMode === "choice" && <div className="choice-options-area">{(Array.isArray(pendingService.choices) ? pendingService.choices : []).map((price, index) => <button className="choice-price-button" type="button" key={`${price}-${index}`} onClick={() => commitOption(Number(price))}>{formatMoney(Number(price))} บาท</button>)}</div>}
         {optionMode === "range" && <div className="range-service-area"><p>ใส่ราคา {formatMoney(rangeBounds.min)} - {formatMoney(rangeBounds.max)} บาท</p><input type="number" min={rangeBounds.min} max={rangeBounds.max} step="1" value={rangePrice} onChange={(event) => setRangePrice(event.target.value)} /><button className="primary-button" type="button" onClick={() => { const value = Number(rangePrice); if (!Number.isInteger(value) || value < rangeBounds.min || value > rangeBounds.max) { setError(`กรุณาใส่จำนวนเต็มตั้งแต่ ${formatMoney(rangeBounds.min)} ถึง ${formatMoney(rangeBounds.max)} บาท`); return; } commitOption(value); }}>ยืนยันราคา</button>{error && <div className="error-box" role="alert">{error}</div>}</div>}
-        {optionMode === "custom" && <div className="custom-service-area"><label htmlFor="posCustomDetail">รายละเอียด</label><input id="posCustomDetail" value={customDetail} onChange={(event) => setCustomDetail(event.target.value)} /><label htmlFor="posCustomPrice">ราคา</label><input id="posCustomPrice" type="number" min="0" value={customPrice} onChange={(event) => setCustomPrice(event.target.value)} /><button className="primary-button" type="button" onClick={() => { const value = Number(customPrice); if (!customDetail.trim()) { setError("กรุณาใส่รายละเอียด"); return; } if (!Number.isFinite(value) || value < 0) { setError("กรุณาใส่ราคาให้ถูกต้อง"); return; } commitOption(value, { detail: customDetail.trim() }); }}>เพิ่มรายการ</button>{error && <div className="error-box" role="alert">{error}</div>}</div>}
+        {optionMode === "custom" && <div className="custom-service-area"><label htmlFor="posCustomDetail">รายละเอียด</label><input id="posCustomDetail" placeholder="เช่น สระไดร์พิเศษ, โกนหนวด" value={customDetail} onChange={(event) => setCustomDetail(event.target.value)} /><label htmlFor="posCustomPrice">ราคา</label><input id="posCustomPrice" type="number" min="0" value={customPrice} onChange={(event) => setCustomPrice(event.target.value)} /><button className="primary-button" type="button" onClick={() => { const value = Number(customPrice); if (!customDetail.trim()) { setError("กรุณาใส่รายละเอียด"); return; } if (!customPrice.trim() || !Number.isFinite(value) || value < 0) { setError("กรุณาใส่ราคาให้ถูกต้อง"); return; } commitOption(value, { detail: customDetail.trim() }); }}>เพิ่มรายการ</button>{error && <div className="error-box" role="alert">{error}</div>}</div>}
       </section></div>}
       {error && !optionMode && <div className="notice-modal"><div className="modal-backdrop" onClick={() => setError("")} /><section className="notice-modal-card" role="alertdialog"><h2>แจ้งเตือน</h2><p>{error}</p><button className="primary-button" type="button" onClick={() => setError("")}>ตกลง</button></section></div>}
     </div>

@@ -1,5 +1,10 @@
 import type { ServiceRecord } from "../firebase/repositories/services";
 
+export function getPosRangeBounds(service: ServiceRecord | null) {
+  const values = Array.isArray(service?.choices) ? service.choices.map(Number).filter(Number.isFinite) : [];
+  return { min: values.length ? Math.min(...values) : 150, max: values.length ? Math.max(...values) : 200 };
+}
+
 export type SelectedService = {
   id: string;
   serviceCode: string | null;

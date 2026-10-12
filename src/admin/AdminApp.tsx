@@ -1,26 +1,39 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ComponentType, type FormEvent } from "react";
 import type { User } from "firebase/auth";
 import { LoadingScreen } from "../shared/components/LoadingScreen";
 import { login, logout, watchAuth } from "../shared/firebase/auth";
 import { getUserProfile } from "../shared/firebase/repositories/identity";
-import { DailyHistoryPage } from "./features/daily-history/DailyHistoryPage";
-import { PayoutHistoryPage } from "./features/payouts/PayoutHistoryPage";
-import { PayoutPage } from "./features/payouts/PayoutPage";
 import { ServicesPage } from "./features/services/ServicesPage";
 
-type AdminPage = "services" | "payouts" | "payout-history" | "daily-history";
+type AdminPage = "services" | "barbers" | "payouts" | "payout-history" | "daily-history" | "advances" | "summary";
+
+const adminPageLoaders = {
+  services: async () => ServicesPage,
+  barbers: () => import("./features/barbers/BarbersPage").then(({ BarbersPage }) => BarbersPage),
+  payouts: () => import("./features/payouts/PayoutPage").then(({ PayoutPage }) => PayoutPage),
+  "payout-history": () => import("./features/payouts/PayoutHistoryPage").then(({ PayoutHistoryPage }) => PayoutHistoryPage),
+  "daily-history": () => import("./features/daily-history/DailyHistoryPage").then(({ DailyHistoryPage }) => DailyHistoryPage),
+  advances: () => import("./features/advances/AdvancePage").then(({ AdvancePage }) => AdvancePage),
+  summary: () => import("./features/summary/FinancialSummaryPage").then(({ FinancialSummaryPage }) => FinancialSummaryPage),
+};
 
 const navigation: Array<{ id: AdminPage; icon: string; label: string; title: string }> = [
   { id: "services", icon: "✂", label: "เมนูบริการ / ราคา", title: "เมนูบริการ / ราคา" },
+  { id: "barbers", icon: "♙", label: "จัดการช่าง", title: "จัดการช่าง" },
   { id: "payouts", icon: "฿", label: "จ่ายเงินช่าง", title: "จ่ายเงินช่าง" },
   { id: "payout-history", icon: "◷", label: "ประวัติจ่ายเงินช่าง", title: "ประวัติจ่ายเงินช่าง" },
-  { id: "daily-history", icon: "≡", label: "ประวัติรายการรายวัน", title: "ประวัติรายการรายวัน" },
+  { id: "daily-history", icon: "≡", label: "ประวัติรายวัน", title: "ประวัติรายวัน" },
+  { id: "advances", icon: "⇄", label: "เบิกล่วงหน้า", title: "เบิกล่วงหน้า" },
+  { id: "summary", icon: "∑", label: "สรุปยอด", title: "สรุปยอด" },
 ];
 
 export function AdminApp() {
   const [user, setUser] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
   const [page, setPage] = useState<AdminPage>("services");
+  const [loadedPages, setLoadedPages] = useState(() => new Map<AdminPage, ComponentType>([["services", ServicesPage]]));
+  const [pageLoadError, setPageLoadError] = useState("");
+  const navigationRequest = useRef(0);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -62,6 +75,22 @@ export function AdminApp() {
     if (page === "daily-history") window.dispatchEvent(new CustomEvent("bkk:daily-history:activate", { detail }));
   }, [page, user]);
 
+  async function navigateToPage(nextPage: AdminPage) {
+    const request = ++navigationRequest.current;
+    setPageLoadError("");
+    try {
+      const Page = await adminPageLoaders[nextPage]();
+      if (request !== navigationRequest.current) return;
+
+      setLoadedPages((loaded) => new Map(loaded).set(nextPage, Page));
+      setPage(nextPage);
+    } catch (error) {
+      if (request !== navigationRequest.current) return;
+      console.error("Admin page load failed:", error);
+      setPageLoadError("โหลดหน้าไม่สำเร็จ กรุณาลองใหม่");
+    }
+  }
+
   async function submitLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoginPending(true);
@@ -78,16 +107,13 @@ export function AdminApp() {
   }
 
   if (initializing) {
-    return <section className="loading-page"><LoadingScreen message="กำลังตรวจสอบบัญชี..." messageElement="div" spinnerClassName="spinner" /></section>;
+    return <section className="loading-page"><LoadingScreen message="กำลังตรวจสอบบัญชี..." spinnerClassName="spinner" /></section>;
   }
 
   if (!user) {
     return (
       <section className="login-page">
         <form className="login-card" onSubmit={(event) => void submitLogin(event)}>
-          <div className="login-brand">BKK-CUTZ</div>
-          <div className="login-subbrand">ADMIN PANEL</div>
-          <div className="login-rule" />
           <h1>Admin</h1>
           <p className="subtitle">ระบบจัดการ BKK-CUTZ</p>
           <label htmlFor="reactAdminEmail">อีเมล</label>
@@ -104,23 +130,34 @@ export function AdminApp() {
     );
   }
 
+  const BarbersPage = loadedPages.get("barbers");
+  const PayoutPage = loadedPages.get("payouts");
+  const PayoutHistoryPage = loadedPages.get("payout-history");
+  const DailyHistoryPage = loadedPages.get("daily-history");
+  const AdvancePage = loadedPages.get("advances");
+  const FinancialSummaryPage = loadedPages.get("summary");
+
   return (
     <div className="admin-shell">
       <aside className="admin-sidebar">
         <div><div className="sidebar-brand">BKK-CUTZ</div><div className="sidebar-subbrand">ADMIN PANEL</div></div>
         <div className="sidebar-menu-title">เมนูระบบ</div>
         <nav className="admin-nav" aria-label="เมนู Admin">
-          {navigation.map((item) => <button className={`admin-nav-button${page === item.id ? " active" : ""}`} key={item.id} type="button" aria-current={page === item.id ? "page" : undefined} onClick={() => setPage(item.id)}><span className="nav-icon" aria-hidden="true">{item.icon}</span><span>{item.label}</span><b aria-hidden="true">›</b></button>)}
+          {navigation.map((item) => <button className={`admin-nav-button${page === item.id ? " active" : ""}`} key={item.id} type="button" aria-current={page === item.id ? "page" : undefined} onClick={() => void navigateToPage(item.id)}><span className="nav-icon" aria-hidden="true">{item.icon}</span><span>{item.label}</span><b aria-hidden="true">›</b></button>)}
         </nav>
-        <div className="sidebar-footer"><div>GOOD HAIR</div><div>BETTER PEOPLE</div></div>
+        <div className="sidebar-footer"><div>STAY SHARP</div><div>LOOK FRESH</div></div>
       </aside>
       <main className="admin-main">
         <div className="admin-main-inner">
           <header className="admin-topbar"><div><div className="admin-kicker">BKK-CUTZ CONTROL</div><h1>{navigation.find((item) => item.id === page)?.title}</h1><div className="admin-email">{user.email || "Admin"}</div></div><button className="logout-button" type="button" onClick={() => void logout()}>ออกจากระบบ</button></header>
+          {pageLoadError && <div className="error-box" role="alert">{pageLoadError}</div>}
           <section className={page === "services" ? "" : "hidden"}><ServicesPage /></section>
-          <section className={page === "payouts" ? "" : "hidden"}><PayoutPage /></section>
-          <section className={page === "payout-history" ? "" : "hidden"}><PayoutHistoryPage /></section>
-          <section className={page === "daily-history" ? "" : "hidden"}><DailyHistoryPage /></section>
+          {BarbersPage && <section className={page === "barbers" ? "" : "hidden"}><BarbersPage /></section>}
+          {PayoutPage && <section className={page === "payouts" ? "" : "hidden"}><PayoutPage /></section>}
+          {PayoutHistoryPage && <section className={page === "payout-history" ? "" : "hidden"}><PayoutHistoryPage /></section>}
+          {DailyHistoryPage && <section className={page === "daily-history" ? "" : "hidden"}><DailyHistoryPage /></section>}
+          {AdvancePage && <section className={page === "advances" ? "" : "hidden"}><AdvancePage /></section>}
+          {FinancialSummaryPage && <section className={page === "summary" ? "" : "hidden"}><FinancialSummaryPage /></section>}
         </div>
       </main>
     </div>

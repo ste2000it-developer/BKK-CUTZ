@@ -2,9 +2,11 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("../../../shared/firebase/repositories/attendance", () => ({}));
 import { createAttendanceSession, type AttendanceDependencies } from "./session";
 import { attendanceId, barberByPin, type Presence, type ReaderScan } from "../../../shared/domain/pos-attendance";
+import { bangkokBusinessDate, type CashClosingInput } from "../../../shared/domain/cash-closing";
 
 const branch = { id: "b1", name: "Branch", serviceGroup: "g1" };
 const barber = { id: "a", name: "ช่าง", pin: "1234", rfidUid: "AABB" };
+const cash: CashClosingInput = { summary: { branchId: "b1", businessDate: bangkokBusinessDate(), cashSales: 8500, shopExpenses: 700, cashTipWithdrawals: 300, expectedCash: 7500 }, actualCash: 7500 };
 function fixture() {
   let presence!: (rows: Presence[]) => void;
   let scans!: Parameters<AttendanceDependencies["watchReaderScans"]>[1];
@@ -14,6 +16,7 @@ function fixture() {
     watchPresence: vi.fn((_branch, next) => { presence = next; next([]); return stopPresence; }),
     watchReaderScans: vi.fn((_branch, next) => { scans = next; return stopReader; }),
     saveCheckIn: vi.fn(async () => {}), saveReaderResult: vi.fn(async () => {}), saveStoreClosing: vi.fn(async () => {}),
+    loadCashClosingSummary: vi.fn(async () => cash.summary),
   };
   const update = vi.fn(); const error = vi.fn();
   const session = createAttendanceSession(branch, update, error, repo);
@@ -42,13 +45,13 @@ describe("attendance session contract", () => {
   });
   it("supports PIN and permits closing only an active barber, serializing closing with scans", async () => {
     const f = fixture(); await f.session.ready;
-    await expect(f.session.closeStore("1234")).rejects.toThrow("PIN นี้ไม่ใช่ช่าง");
+    await expect(f.session.closeStore("1234", cash)).rejects.toThrow("PIN นี้ไม่ใช่ช่าง");
     await expect(f.session.checkInPin("9999")).rejects.toThrow("ไม่พบช่าง");
     expect((await f.session.checkInPin("1234")).alreadyActive).toBe(false);
     expect((await f.session.checkInPin("1234")).alreadyActive).toBe(true);
-    await f.session.closeStore("1234");
+    await f.session.closeStore("1234", cash);
     expect(f.repo.saveCheckIn).toHaveBeenCalledWith(branch, barber, "pin", expect.any(String));
-    expect(f.repo.saveStoreClosing).toHaveBeenCalledWith(branch, [barber], barber, expect.any(String));
+    expect(f.repo.saveStoreClosing).toHaveBeenCalledWith(branch, [barber], barber, bangkokBusinessDate(), cash);
     expect(f.update).toHaveBeenLastCalledWith([]);
     f.session.dispose();
   });
@@ -70,5 +73,26 @@ describe("attendance session contract", () => {
   it("keeps attendance IDs and duplicate PIN errors", () => {
     expect(attendanceId("branch", "barber", "2026-10-02")).toBe("2026-10-02_branch_barber");
     expect(() => barberByPin([barber, { ...barber, id: "b" }], "1234")).toThrow("PIN นี้ซ้ำกับช่างมากกว่า 1 คน กรุณาแก้ PIN ในระบบ");
+  });
+  it("requires an active closer PIN before loading cash and preserves presence on save failure", async () => {
+    const f = fixture(); await f.session.ready;
+    await expect(f.session.prepareClosing("1234")).rejects.toThrow("PIN นี้ไม่ใช่ช่าง");
+    expect(f.repo.loadCashClosingSummary).not.toHaveBeenCalled();
+    await f.session.checkInPin("1234");
+    expect(await f.session.prepareClosing("1234")).toEqual({ summary: cash.summary, closer: barber, branchName: branch.name });
+    expect(f.repo.saveStoreClosing).not.toHaveBeenCalled();
+    vi.mocked(f.repo.saveStoreClosing).mockRejectedValueOnce(new Error("save failed"));
+    await expect(f.session.closeStore("1234", cash)).rejects.toThrow("save failed");
+    expect(f.update).toHaveBeenLastCalledWith([barber]);
+    await f.session.closeStore("1234", cash);
+    expect(f.update).toHaveBeenLastCalledWith([]);
+    f.session.dispose();
+  });
+  it("serializes repeated confirm clicks and closes only once", async () => {
+    const f = fixture(); await f.session.ready; await f.session.checkInPin("1234");
+    const results = await Promise.allSettled([f.session.closeStore("1234", cash), f.session.closeStore("1234", cash)]);
+    expect(results.map((result) => result.status)).toEqual(["fulfilled", "rejected"]);
+    expect(f.repo.saveStoreClosing).toHaveBeenCalledOnce();
+    f.session.dispose();
   });
 });

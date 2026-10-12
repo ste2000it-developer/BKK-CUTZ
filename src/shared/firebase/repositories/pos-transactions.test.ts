@@ -1,12 +1,12 @@
 import { expect, it, vi } from "vitest";
-const mock = vi.hoisted(() => ({ getDocs: vi.fn(), setDoc: vi.fn() }));
-vi.mock("../client", () => ({ db: {} }));
+const mock = vi.hoisted(() => ({ getDocs: vi.fn(), setDoc: vi.fn(), updateDoc: vi.fn() }));
+vi.mock("../client", () => ({ db: {}, auth: { currentUser: { uid: "branch-user", email: "branch@example.com" } } }));
 vi.mock("firebase/firestore", () => ({
   collection: (_db: unknown, name: string) => name, doc: (_db: unknown, ...path: string[]) => path.join("/"),
   where: (...args: unknown[]) => args, query: (...args: unknown[]) => args,
-  getDocs: mock.getDocs, setDoc: mock.setDoc, serverTimestamp: () => "SERVER_TIME",
+  getDocs: mock.getDocs, setDoc: mock.setDoc, updateDoc: mock.updateDoc, serverTimestamp: () => "SERVER_TIME",
 }));
-import { listPosTransactions, savePosTransaction } from "./pos-transactions";
+import { listPosTransactions, savePosTransaction, voidPosTransaction } from "./pos-transactions";
 import { makeTransaction } from "../../domain/pos-payment";
 it("queries history by BOTH branchId/dateKey and sorts newest first", async () => {
   mock.getDocs.mockResolvedValue({ docs: [
@@ -20,4 +20,16 @@ it("writes transactions/{id} with server timestamp and unchanged snapshot fields
   const tx = makeTransaction({ id: "b", name: "Branch", serviceGroup: "g" }, { barber: { id: "a", name: "Barber" }, services: [{ id: "s", name: "Cut", serviceCode: "haircut", type: "fixed", price: 200, basePrice: 200 }] }, "cash", 0, "tx");
   await savePosTransaction(tx);
   expect(mock.setDoc).toHaveBeenCalledWith("transactions/tx", { ...tx, createdAtServer: "SERVER_TIME" });
+});
+it("voids a transaction without deleting the original record and stores audit fields", async () => {
+  await voidPosTransaction("tx", { barberId: "barber01", barberName: "ช่างนพ", reason: "กดรายการผิด" });
+  expect(mock.updateDoc).toHaveBeenCalledWith("transactions/tx", {
+    status: "voided",
+    voidReason: "กดรายการผิด",
+    voidedAt: "SERVER_TIME",
+    voidedByUid: "branch-user",
+    voidedByEmail: "branch@example.com",
+    voidedByBarberId: "barber01",
+    voidedByBarberName: "ช่างนพ",
+  });
 });

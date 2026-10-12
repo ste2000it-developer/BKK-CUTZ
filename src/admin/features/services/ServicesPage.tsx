@@ -1,3 +1,4 @@
+import { AppSelect } from "../../components/AppSelect";
 import { useEffect, useState } from "react";
 import {
   listBranches,
@@ -101,6 +102,20 @@ export function ServicesPage() {
     return () => window.removeEventListener("bkk:admin:services:activate", handleActivation);
   }, [groupId]);
 
+  useEffect(() => {
+    if (!editorOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setEditingService(null);
+        setEditorOpen(false);
+        setStatus("");
+        setForm(emptyForm);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [editorOpen]);
+
   function startAdd() {
     setEditingService(null);
     setEditorOpen(true);
@@ -115,7 +130,7 @@ export function ServicesPage() {
     setForm({
       name: service.name || "",
       type: (service.type || "fixed") as ServiceType,
-      price: String(Number(service.price || 0)),
+      price: service.price != null && Number(service.price) > 0 ? String(service.price) : "",
       choices: Array.isArray(service.choices) ? service.choices.join(", ") : "",
       discountPercent: String(Number(service.discountPercent || 50)),
       sortOrder: String(Number(service.sortOrder || 1)),
@@ -241,7 +256,7 @@ export function ServicesPage() {
                   <div className="service-main"><div className="service-name">{service.name || "-"}</div><div className="service-code">{service.serviceCode || service.type}</div></div>
                   <div className="service-type">{typeLabels[service.type as ServiceType] || service.type}</div>
                   <div className="service-price">{getServicePriceText(service)}</div>
-                  <div><span className={`service-status ${service.active === true ? "is-active" : "is-off"}`}>{service.active === true ? "เปิดใช้งาน" : "ปิดใช้งาน"}</span></div>
+                  <div className="service-status-cell"><span className={`service-status ${service.active === true ? "is-active" : "is-off"}`}>{service.active === true ? "เปิดใช้งาน" : "ปิดใช้งาน"}</span></div>
                   <div className="service-actions"><button className="edit-button" type="button" aria-label={`แก้ไข ${service.name}`} onClick={() => startEdit(service)}>แก้ไข</button><button className="delete-button" type="button" aria-label={`ลบ ${service.name}`} onClick={() => void deleteService(service)}>ลบ</button></div>
                 </div>
               ))}
@@ -250,21 +265,151 @@ export function ServicesPage() {
         </section>
 
         {editorOpen ? (
-          <form className="editor" onSubmit={(event) => void submitService(event)}>
-            <div className="editor-heading"><div><h2>{editingService ? `แก้ไขเมนู — กลุ่ม ${groupId}` : `เพิ่มเมนู — กลุ่ม ${groupId}`}</h2><p>ปรับข้อมูลรายการบริการ</p></div></div>
-            <label htmlFor="reactServiceName">ชื่อเมนู</label><input id="reactServiceName" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} />
-            <label htmlFor="reactServiceType">ประเภท</label>
-            <select id="reactServiceType" className="native-app-select" value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value as ServiceType })}>
-              <option value="fixed">ราคาปกติ</option><option value="choice">ช่วง / ตัวเลือกราคา</option><option value="custom">กรอกรายละเอียดและราคาเอง</option><option value="free_cut">ตัดผมฟรี</option><option value="half_cut">ส่วนลดค่าตัดผม</option>
-            </select>
-            {form.type === "fixed" && <><label htmlFor="reactServicePrice">ราคา (บาท)</label><input id="reactServicePrice" type="number" min="0" value={form.price} onChange={(event) => setForm({ ...form, price: event.target.value })} /></>}
-            {form.type === "choice" && <><label htmlFor="reactServiceChoices">ช่วง / ตัวเลือกราคา</label><input id="reactServiceChoices" placeholder="เช่น 150, 200" value={form.choices} onChange={(event) => setForm({ ...form, choices: event.target.value })} /></>}
-            {form.type === "half_cut" && <><label htmlFor="reactDiscountPercent">ส่วนลด %</label><input id="reactDiscountPercent" type="number" min="0" max="100" value={form.discountPercent} onChange={(event) => setForm({ ...form, discountPercent: event.target.value })} /></>}
-            <label htmlFor="reactSortOrder">ลำดับแสดง</label><input id="reactSortOrder" type="number" min="1" value={form.sortOrder} onChange={(event) => setForm({ ...form, sortOrder: event.target.value })} />
-            <label className="checkbox-row"><input type="checkbox" checked={form.active} onChange={(event) => setForm({ ...form, active: event.target.checked })} />เปิดใช้งานเมนูนี้</label>
-            <div className="editor-actions"><button className="cancel-button" type="button" onClick={() => { setEditingService(null); setEditorOpen(false); setStatus(""); setForm(emptyForm); }}>ยกเลิก</button><button className="save-button" type="submit" disabled={saving}>{saving ? "กำลังบันทึก..." : "บันทึก"}</button></div>
-            {error && <div className="status-box" role="alert">{error}</div>}{status && <div className="status-box" role="status">{status}</div>}
-          </form>
+          <div className="admin-modal-overlay">
+            <button
+              className="admin-modal-backdrop"
+              type="button"
+              aria-label="ปิด"
+              onClick={() => {
+                setEditingService(null);
+                setEditorOpen(false);
+                setStatus("");
+                setForm(emptyForm);
+              }}
+            />
+            <form
+              className="admin-modal-card service-editor-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="serviceEditorTitle"
+              onSubmit={(event) => void submitService(event)}
+            >
+              <div className="admin-modal-head">
+                <div>
+                  <div className="section-kicker">SERVICE ITEM</div>
+                  <h2 id="serviceEditorTitle">
+                    {editingService ? `แก้ไขเมนู — กลุ่ม ${groupId}` : `เพิ่มเมนู — กลุ่ม ${groupId}`}
+                  </h2>
+                  <p>ปรับข้อมูลรายการบริการ</p>
+                </div>
+                <button
+                  className="secondary-button admin-modal-close"
+                  type="button"
+                  aria-label="ปิด"
+                  onClick={() => {
+                    setEditingService(null);
+                    setEditorOpen(false);
+                    setStatus("");
+                    setForm(emptyForm);
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="service-editor-body">
+                <label htmlFor="reactServiceName">ชื่อเมนู</label>
+                <input
+                  id="reactServiceName"
+                  placeholder="เช่น ตัดผมชาย, สระผม"
+                  value={form.name}
+                  onChange={(event) => setForm({ ...form, name: event.target.value })}
+                  autoFocus
+                />
+
+                <label htmlFor="reactServiceType">ประเภท</label>
+                <AppSelect
+                  id="reactServiceType"
+                  value={form.type}
+                  onChange={(value) => setForm({ ...form, type: value as ServiceType })}
+                >
+                  <option value="fixed">ราคาปกติ</option>
+                  <option value="choice">ช่วง / ตัวเลือกราคา</option>
+                  <option value="custom">กรอกรายละเอียดและราคาเอง</option>
+                  <option value="free_cut">ตัดผมฟรี</option>
+                  <option value="half_cut">ส่วนลดค่าตัดผม</option>
+                </AppSelect>
+
+                {form.type === "fixed" && (
+                  <>
+                    <label htmlFor="reactServicePrice">ราคา (บาท)</label>
+                    <input
+                      id="reactServicePrice"
+                      type="number"
+                      min="0"
+                      value={form.price}
+                      onChange={(event) => setForm({ ...form, price: event.target.value })}
+                    />
+                  </>
+                )}
+
+                {form.type === "choice" && (
+                  <>
+                    <label htmlFor="reactServiceChoices">ช่วง / ตัวเลือกราคา</label>
+                    <input
+                      id="reactServiceChoices"
+                      placeholder="เช่น 150, 200"
+                      value={form.choices}
+                      onChange={(event) => setForm({ ...form, choices: event.target.value })}
+                    />
+                  </>
+                )}
+
+                {form.type === "half_cut" && (
+                  <>
+                    <label htmlFor="reactDiscountPercent">ส่วนลด %</label>
+                    <input
+                      id="reactDiscountPercent"
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={form.discountPercent}
+                      onChange={(event) => setForm({ ...form, discountPercent: event.target.value })}
+                    />
+                  </>
+                )}
+
+                <label htmlFor="reactSortOrder">ลำดับแสดง</label>
+                <input
+                  id="reactSortOrder"
+                  type="number"
+                  min="1"
+                  value={form.sortOrder}
+                  onChange={(event) => setForm({ ...form, sortOrder: event.target.value })}
+                />
+
+                <label className="checkbox-row">
+                  <input
+                    type="checkbox"
+                    checked={form.active}
+                    onChange={(event) => setForm({ ...form, active: event.target.checked })}
+                  />
+                  เปิดใช้งานเมนูนี้
+                </label>
+
+                {error && <div className="status-box" role="alert">{error}</div>}
+                {status && <div className="status-box" role="status">{status}</div>}
+              </div>
+
+              <div className="editor-actions">
+                <button
+                  className="cancel-button"
+                  type="button"
+                  onClick={() => {
+                    setEditingService(null);
+                    setEditorOpen(false);
+                    setStatus("");
+                    setForm(emptyForm);
+                  }}
+                >
+                  ยกเลิก
+                </button>
+                <button className="primary-button save-button" type="submit" disabled={saving}>
+                  {saving ? "กำลังบันทึก..." : "บันทึก"}
+                </button>
+              </div>
+            </form>
+          </div>
         ) : null}
       </div>
     </div>

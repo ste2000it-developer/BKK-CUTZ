@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   createPayoutIfMissing,
+  getPreviousPayoutCarryovers,
   mapFirestoreRecords,
   PayoutAlreadyExistsError,
 } from "./payouts";
@@ -58,5 +59,50 @@ describe("createPayoutIfMissing", () => {
     ).rejects.toBeInstanceOf(PayoutAlreadyExistsError);
 
     expect(writeCount).toBe(0);
+  });
+});
+
+describe("getPreviousPayoutCarryovers", () => {
+  it("uses the latest prior paid payout for each barber", () => {
+    expect(getPreviousPayoutCarryovers([
+      {
+        id: "old",
+        barberId: "barber01",
+        payoutCycleId: "2026-01-16",
+        status: "paid",
+        advanceCarryoverAmount: 500,
+      },
+      {
+        id: "latest",
+        barberId: "barber01",
+        payoutCycleId: "2026-02-01",
+        status: "paid",
+        advanceCarryoverAmount: 300,
+      },
+      {
+        id: "other",
+        barberId: "barber02",
+        payoutCycleId: "2026-02-01",
+        status: "paid",
+        advanceCarryoverAmount: 100,
+      },
+    ], "2026-02-16")).toEqual([
+      { barberId: "barber01", amount: 300 },
+      { barberId: "barber02", amount: 100 },
+    ]);
+  });
+
+  it("recovers legacy negative payout totals as carryover", () => {
+    expect(getPreviousPayoutCarryovers([
+      {
+        id: "legacy",
+        barberId: "barber01",
+        payoutCycleId: "2026-01-16",
+        status: "paid",
+        totalAmount: -250,
+      },
+    ], "2026-02-01")).toEqual([
+      { barberId: "barber01", amount: 250 },
+    ]);
   });
 });

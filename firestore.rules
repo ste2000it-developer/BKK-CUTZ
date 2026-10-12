@@ -1,0 +1,236 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function hasUserProfile() {
+      return signedIn()
+        && exists(
+          /databases/$(database)/documents/users/$(request.auth.uid)
+        );
+    }
+
+    function isActiveUser() {
+      return hasUserProfile()
+        && get(
+          /databases/$(database)/documents/users/$(request.auth.uid)
+        ).data.active == true;
+    }
+
+    function isAdmin() {
+      return isActiveUser()
+        && get(
+          /databases/$(database)/documents/users/$(request.auth.uid)
+        ).data.role == "admin";
+    }
+
+    function isBranch() {
+      return isActiveUser()
+        && get(
+          /databases/$(database)/documents/users/$(request.auth.uid)
+        ).data.role == "branch";
+    }
+
+    function myBranchId() {
+      return get(
+        /databases/$(database)/documents/users/$(request.auth.uid)
+      ).data.branchId;
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn()
+        && (
+          request.auth.uid == userId
+          || isAdmin()
+        );
+
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /branches/{branchId} {
+      allow read: if isActiveUser();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /barbers/{barberId} {
+      allow read: if isActiveUser();
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /services/{serviceId} {
+      allow read: if isActiveUser();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // สถานะเข้างานประจำวัน ณ ปัจจุบัน (Realtime Presence)
+    match /barber_presence/{barberId} {
+      allow read: if isAdmin()
+        || (
+          isBranch()
+          && resource.data.branchId == myBranchId()
+        );
+
+      allow create: if isBranch()
+        && request.resource.data.branchId == myBranchId();
+
+      allow update: if isBranch()
+        && request.resource.data.branchId == myBranchId();
+
+      allow create, update, delete: if isAdmin();
+    }
+
+    // ประวัติเข้างานรายวัน ใช้คำนวณประกันมือย้อนหลัง
+    match /barber_attendance/{attendanceId} {
+      allow read: if isAdmin()
+        || (
+          isBranch()
+          && resource.data.branchId == myBranchId()
+        );
+
+      allow create: if isBranch()
+        && request.resource.data.branchId == myBranchId();
+
+      allow update: if isBranch()
+        && resource.data.branchId == myBranchId()
+        && request.resource.data.branchId == myBranchId();
+
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /daily_closings/{closingId} {
+      allow read: if isAdmin()
+        || (
+          isBranch()
+          && resource.data.branchId == myBranchId()
+        );
+
+      allow create: if isBranch()
+        && request.resource.data.branchId == myBranchId();
+
+      allow update: if isBranch()
+        && request.resource.data.branchId == myBranchId();
+
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /transactions/{transactionId} {
+      allow create: if isBranch()
+        && request.resource.data.branchId == myBranchId();
+
+      allow read: if isAdmin()
+        || (
+          isBranch()
+          && resource.data.branchId == myBranchId()
+        );
+
+      // POS may only turn its own branch transaction into a voided record.
+      // Original sale fields are immutable and the record is never hard-deleted.
+      allow update: if isBranch()
+        && resource.data.branchId == myBranchId()
+        && request.resource.data.branchId == resource.data.branchId
+        && (!("status" in resource.data) || resource.data.status != "voided")
+        && !("voidedAt" in resource.data)
+        && request.resource.data.status == "voided"
+        && request.resource.data.voidedByUid == request.auth.uid
+        && request.resource.data.voidReason is string
+        && request.resource.data.voidReason.size() > 0
+        && request.resource.data.voidedByBarberId is string
+        && request.resource.data.voidedByBarberName is string
+        && exists(/databases/$(database)/documents/barber_presence/$(request.resource.data.voidedByBarberId))
+        && get(/databases/$(database)/documents/barber_presence/$(request.resource.data.voidedByBarberId)).data.active == true
+        && get(/databases/$(database)/documents/barber_presence/$(request.resource.data.voidedByBarberId)).data.branchId == myBranchId()
+        && request.resource.data.voidedAt == request.time
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          "status",
+          "voidReason",
+          "voidedAt",
+          "voidedByUid",
+          "voidedByEmail",
+          "voidedByBarberId",
+          "voidedByBarberName"
+        ]);
+
+      allow delete: if false;
+    }
+
+    // ประวัติการจ่ายเงินช่าง: Admin สร้างและอ่านได้
+    match /barber_payouts/{payoutId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // ค่าใช้จ่ายร้าน / เบิกเงินสดไปซื้อของ: POS บันทึกได้ / Admin อ่านและจัดการได้
+    match /shop_expenses/{expenseId} {
+      allow read: if isAdmin()
+        || (
+          isBranch()
+          && resource.data.branchId == myBranchId()
+        );
+
+      allow create: if (
+          isBranch()
+          && request.resource.data.branchId == myBranchId()
+        ) || isAdmin();
+
+      allow update, delete: if isAdmin();
+    }
+
+    // Admin จัดการเบิกล่วงหน้า / POS สร้างได้เฉพาะเบิกทิปของสาขาตัวเอง
+    match /barber_advances/{advanceId} {
+      allow read: if isAdmin()
+        || (
+          isBranch()
+          && resource.data.branchId == myBranchId()
+        );
+
+      allow create: if (
+          isBranch()
+          && request.resource.data.branchId == myBranchId()
+          && request.resource.data.type == "tip"
+          && request.resource.data.source == "pos"
+          && request.resource.data.status == "active"
+          && request.resource.data.amount is number
+          && request.resource.data.amount > 0
+          && request.resource.data.barberId is string
+          && request.resource.data.barberId.size() > 0
+        ) || isAdmin();
+
+      allow update, delete: if isAdmin();
+    }
+
+    match /reader_scans/{scanDocumentId} {
+      allow read: if isAdmin()
+        || (
+          isBranch()
+          && resource.data.branchId == myBranchId()
+        );
+
+      allow create, update: if true;
+      allow delete: if isAdmin();
+    }
+
+    // ESP32 อ่านผลของ scanId ตัวเองด้วย REST
+    match /reader_results/{scanId} {
+      allow get: if true;
+      allow list: if false;
+
+      allow create: if isBranch()
+        && request.resource.data.branchId == myBranchId();
+
+      allow update: if isBranch()
+        && resource.data.branchId == myBranchId()
+        && request.resource.data.branchId == myBranchId();
+
+      allow delete: if isAdmin();
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

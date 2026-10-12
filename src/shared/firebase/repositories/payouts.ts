@@ -9,10 +9,13 @@ import {
 } from "firebase/firestore";
 import type {
   PayoutAttendance,
+  PayoutCarryoverSource,
   PayoutTransaction,
   PayoutWriteData,
 } from "../../domain/payout";
 import { db } from "../client";
+
+import { listBarberAdvances, type BarberAdvanceRecord } from "./advances";
 
 export type FirestoreRecord = {
   id: string;
@@ -24,18 +27,23 @@ export type PayoutRecord = FirestoreRecord & {
   payoutCycleId?: string;
   payoutDate?: string;
   status?: string;
+  totalAmount?: number;
+  advanceCarryoverAmount?: number;
 };
 
 export type PayoutCycleSources = {
   transactions: FirestoreRecord[];
   attendance: FirestoreRecord[];
   payouts: PayoutRecord[];
+  advances?: FirestoreRecord[];
 };
 
 export type PayoutCycleData = {
   transactions: PayoutTransaction[];
   attendance: PayoutAttendance[];
   paidPayouts: PayoutRecord[];
+  advances: BarberAdvanceRecord[];
+  previousCarryovers: PayoutCarryoverSource[];
 };
 
 export class PayoutAlreadyExistsError extends Error {
@@ -70,12 +78,41 @@ export function mapFirestoreRecords<T extends object>(
   }));
 }
 
+export function getPreviousPayoutCarryovers(
+  payouts: readonly PayoutRecord[],
+  currentPayoutCycleId: string,
+): PayoutCarryoverSource[] {
+  const latestByBarber = new Map<string, PayoutRecord>();
+
+  payouts.forEach((record) => {
+    if (record.status && record.status !== "paid") return;
+
+    const barberId = String(record.barberId || "").trim();
+    const cycleId = String(record.payoutCycleId || record.payoutDate || "").trim();
+    if (!barberId || !cycleId || cycleId >= currentPayoutCycleId) return;
+
+    const existing = latestByBarber.get(barberId);
+    const existingCycle = String(existing?.payoutCycleId || existing?.payoutDate || "");
+    if (!existing || cycleId > existingCycle) latestByBarber.set(barberId, record);
+  });
+
+  return Array.from(latestByBarber.entries())
+    .map(([barberId, record]) => {
+      const explicit = Number(record.advanceCarryoverAmount);
+      const legacyNegative = Math.max(0, -Number(record.totalAmount || 0));
+      const amount = Number.isFinite(explicit) ? Math.max(0, explicit) : legacyNegative;
+      return { barberId, amount: Math.round(amount * 100) / 100 };
+    })
+    .filter((item) => item.amount > 0);
+}
+
 export async function listPayoutCycleSources(): Promise<PayoutCycleSources> {
-  const [transactionSnapshot, attendanceSnapshot, payoutSnapshot] =
+  const [transactionSnapshot, attendanceSnapshot, payoutSnapshot, advanceSnapshot] =
     await Promise.all([
       getDocs(collection(db, "transactions")),
       getDocs(collection(db, "barber_attendance")),
       getDocs(collection(db, "barber_payouts")),
+      getDocs(collection(db, "barber_advances")).catch(() => ({ docs: [] as any[] })),
     ]);
 
   return {
@@ -86,6 +123,7 @@ export async function listPayoutCycleSources(): Promise<PayoutCycleSources> {
       attendanceSnapshot.docs,
     ),
     payouts: mapFirestoreRecords(payoutSnapshot.docs),
+    advances: mapFirestoreRecords(advanceSnapshot.docs),
   };
 }
 
@@ -104,17 +142,15 @@ export async function loadPayoutCycleData(
     where("dateKey", ">=", startKey),
     where("dateKey", "<=", endKey),
   );
-  const paidQuery = query(
-    collection(db, "barber_payouts"),
-    where("payoutCycleId", "==", payoutCycleId),
-  );
-
-  const [transactionSnapshot, attendanceSnapshot, paidSnapshot] =
+  const [transactionSnapshot, attendanceSnapshot, payoutSnapshot, advances] =
     await Promise.all([
       getDocs(transactionQuery),
       getDocs(attendanceQuery),
-      getDocs(paidQuery),
+      getDocs(collection(db, "barber_payouts")),
+      listBarberAdvances(startKey, endKey),
     ]);
+
+  const payouts = mapFirestoreRecords(payoutSnapshot.docs) as PayoutRecord[];
 
   return {
     transactions: mapFirestoreRecords<PayoutTransaction>(
@@ -123,7 +159,11 @@ export async function loadPayoutCycleData(
     attendance: mapFirestoreRecords<PayoutAttendance>(
       attendanceSnapshot.docs,
     ),
-    paidPayouts: mapFirestoreRecords(paidSnapshot.docs),
+    paidPayouts: payouts.filter(
+      (record) => String(record.payoutCycleId || record.payoutDate || "") === payoutCycleId,
+    ),
+    advances,
+    previousCarryovers: getPreviousPayoutCarryovers(payouts, payoutCycleId),
   };
 }
 

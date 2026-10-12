@@ -15,6 +15,13 @@ export type TransactionHistoryRecord = {
   tipAmount?: number;
   grandTotal?: number;
   paymentMethod?: string;
+  status?: string;
+  voidReason?: string;
+  voidedAt?: unknown;
+  voidedByUid?: string;
+  voidedByEmail?: string;
+  voidedByBarberId?: string;
+  voidedByBarberName?: string;
   [field: string]: unknown;
 };
 
@@ -36,4 +43,29 @@ export async function listTransactionsByDate(
       const secondDate = new Date(String(second.createdAt || "")).getTime() || 0;
       return secondDate - firstDate;
     });
+}
+
+export async function listTransactionsByDateRange(
+  startDateKey: string,
+  endDateKey: string,
+): Promise<TransactionHistoryRecord[]> {
+  const result = await getDocs(
+    query(
+      collection(db, "transactions"),
+      where("dateKey", ">=", startDateKey),
+      where("dateKey", "<=", endDateKey),
+    ),
+  );
+
+  const transactions = result.docs
+    .map((snapshot) => ({
+      id: snapshot.id,
+      ...snapshot.data(),
+    })) as TransactionHistoryRecord[];
+
+  return transactions.sort((first, second) => {
+    const firstDate = new Date(String(first.createdAt || "")).getTime() || 0;
+    const secondDate = new Date(String(second.createdAt || "")).getTime() || 0;
+    return secondDate - firstDate;
+  });
 }

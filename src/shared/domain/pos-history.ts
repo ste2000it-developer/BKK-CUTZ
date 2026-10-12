@@ -19,7 +19,14 @@ export function filterHistory(rows: readonly TransactionHistoryRecord[], barberI
   return barberId === "all" ? [...rows] : rows.filter((row) => row.barberId === barberId);
 }
 export const formatMoney = (value: number) => Number(value || 0).toLocaleString("th-TH", { maximumFractionDigits: 2 });
-export function formatDateTime(value?: string) {
-  const date = new Date(value || "");
+export function formatDateTime(value?: unknown) {
+  let date: Date;
+  if (value instanceof Date) {
+    date = value;
+  } else if (value && typeof value === "object" && "toDate" in value && typeof (value as { toDate?: unknown }).toDate === "function") {
+    date = (value as { toDate: () => Date }).toDate();
+  } else {
+    date = new Date(String(value || ""));
+  }
   return Number.isNaN(date.getTime()) ? "-" : date.toLocaleString("th-TH", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
