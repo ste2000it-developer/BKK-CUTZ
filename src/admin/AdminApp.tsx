@@ -1,3 +1,4 @@
+import { NotificationCenter } from "./components/NotificationCenter";
 import { useEffect, useRef, useState, type ComponentType, type FormEvent } from "react";
 import type { User } from "firebase/auth";
 import { LoadingScreen } from "../shared/components/LoadingScreen";
@@ -5,9 +6,10 @@ import { login, logout, watchAuth } from "../shared/firebase/auth";
 import { getUserProfile } from "../shared/firebase/repositories/identity";
 import { ServicesPage } from "./features/services/ServicesPage";
 
-type AdminPage = "services" | "barbers" | "payouts" | "payout-history" | "daily-history" | "advances" | "summary";
+type AdminPage = "network" | "services" | "barbers" | "payouts" | "payout-history" | "daily-history" | "advances" | "summary";
 
 const adminPageLoaders = {
+  network: () => import("./features/network/BranchNetworkPage").then(({ BranchNetworkPage }) => BranchNetworkPage),
   services: async () => ServicesPage,
   barbers: () => import("./features/barbers/BarbersPage").then(({ BarbersPage }) => BarbersPage),
   payouts: () => import("./features/payouts/PayoutPage").then(({ PayoutPage }) => PayoutPage),
@@ -18,6 +20,7 @@ const adminPageLoaders = {
 };
 
 const navigation: Array<{ id: AdminPage; icon: string; label: string; title: string }> = [
+  { id: "network", icon: "◉", label: "ผังเครือข่ายสาขา", title: "ผังเครือข่ายสาขา" },
   { id: "services", icon: "✂", label: "เมนูบริการ / ราคา", title: "เมนูบริการ / ราคา" },
   { id: "barbers", icon: "♙", label: "จัดการช่าง", title: "จัดการช่าง" },
   { id: "payouts", icon: "฿", label: "จ่ายเงินช่าง", title: "จ่ายเงินช่าง" },
@@ -30,7 +33,7 @@ const navigation: Array<{ id: AdminPage; icon: string; label: string; title: str
 export function AdminApp() {
   const [user, setUser] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
-  const [page, setPage] = useState<AdminPage>("services");
+  const [page, setPage] = useState<AdminPage>("network");
   const [loadedPages, setLoadedPages] = useState(() => new Map<AdminPage, ComponentType>([["services", ServicesPage]]));
   const [pageLoadError, setPageLoadError] = useState("");
   const navigationRequest = useRef(0);
@@ -74,6 +77,15 @@ export function AdminApp() {
     if (page === "payout-history") window.dispatchEvent(new CustomEvent("bkk:payout-history:activate", { detail }));
     if (page === "daily-history") window.dispatchEvent(new CustomEvent("bkk:daily-history:activate", { detail }));
   }, [page, user]);
+
+  useEffect(() => {
+    if (!user || loadedPages.has("network")) return;
+    void adminPageLoaders.network().then((Page) => {
+      setLoadedPages((loaded) => loaded.has("network") ? loaded : new Map(loaded).set("network", Page));
+    }).catch((error) => {
+      console.error("Admin network page preload failed:", error);
+    });
+  }, [user, loadedPages]);
 
   async function navigateToPage(nextPage: AdminPage) {
     const request = ++navigationRequest.current;
@@ -130,6 +142,7 @@ export function AdminApp() {
     );
   }
 
+  const BranchNetworkPage = loadedPages.get("network");
   const BarbersPage = loadedPages.get("barbers");
   const PayoutPage = loadedPages.get("payouts");
   const PayoutHistoryPage = loadedPages.get("payout-history");
@@ -149,8 +162,9 @@ export function AdminApp() {
       </aside>
       <main className="admin-main">
         <div className="admin-main-inner">
-          <header className="admin-topbar"><div><div className="admin-kicker">BKK-CUTZ CONTROL</div><h1>{navigation.find((item) => item.id === page)?.title}</h1><div className="admin-email">{user.email || "Admin"}</div></div><button className="logout-button" type="button" onClick={() => void logout()}>ออกจากระบบ</button></header>
+          <header className="admin-topbar"><div><div className="admin-kicker">BKK-CUTZ CONTROL</div><h1>{navigation.find((item) => item.id === page)?.title}</h1><div className="admin-email">{user.email || "Admin"}</div></div><div className="admin-header-actions"><NotificationCenter key={user.uid} /><button className="logout-button" type="button" onClick={() => void logout()}>ออกจากระบบ</button></div></header>
           {pageLoadError && <div className="error-box" role="alert">{pageLoadError}</div>}
+          {BranchNetworkPage && <section className={page === "network" ? "" : "hidden"}><BranchNetworkPage /></section>}
           <section className={page === "services" ? "" : "hidden"}><ServicesPage /></section>
           {BarbersPage && <section className={page === "barbers" ? "" : "hidden"}><BarbersPage /></section>}
           {PayoutPage && <section className={page === "payouts" ? "" : "hidden"}><PayoutPage /></section>}

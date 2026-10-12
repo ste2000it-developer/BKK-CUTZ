@@ -1,15 +1,16 @@
-BKK-CUTZ — Excel Branch Summary
+BKK-CUTZ Branch Network patch
 
-วางทับ:
-- src/admin/features/payouts/exportPayout.ts
-- src/admin/features/payouts/exportPayout.test.ts
+ไฟล์ที่แก้:
+- src/admin/AdminApp.tsx -> วางทับ
+- src/admin/features/network/branch-network.css -> เพิ่มไฟล์ใหม่
 
 สิ่งที่เพิ่ม:
-- เพิ่มชีต "สรุปยอดสาขา" ใน Excel Export รอบจ่ายช่าง
-- สรุป ค่ามือ / ประกันมือ / ทิป / หักเบิกล่วงหน้า / รวมจ่ายสุทธิ แยกตามสาขา
-- ไม่ Freeze/ล็อกหัวตาราง
-- ถ้าข้อมูลเก่าระบุหลายสาขาในวันเดียวและไม่มีสัดส่วนละเอียด ระบบแบ่งยอดวันนั้นเท่า ๆ กันเพื่อป้องกันการนับซ้ำ
+- เพิ่มเมนู "ผังเครือข่ายสาขา" ใน Admin
+- ตั้งให้หน้าเปิดเริ่มต้นเป็นผังสาขา
+- ต่อ BranchNetworkPage เข้ากับเมนูจริง
+- เพิ่มสไตล์ branch-network.css ให้ได้หน้าตาแบบ dark network dashboard
+- รองรับ desktop และ mobile layout
 
-ตรวจสอบ:
-- npx tsc --noEmit ผ่าน
-- Vitest/Build ใน environment นี้รันไม่ได้เพราะ node_modules ขาด @rollup/rollup-linux-x64-gnu (optional native Rollup package)
+ตรวจแล้ว:
+- npm run typecheck ผ่าน
+- npm run build ใน environment นี้รันไม่ได้ เพราะคำสั่ง vite permission denied

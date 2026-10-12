@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, onSnapshot, query, runTransaction, serverTimestamp, setDoc, where, writeBatch } from "firebase/firestore";
+import { collection, doc, getDocs, onSnapshot, query, runTransaction, serverTimestamp, setDoc, where } from "firebase/firestore";
 import { db } from "../client";
 import { attendanceId, type Barber, type PosBranch, type Presence, type ReaderResult, type ReaderScan } from "../../domain/pos-attendance";
 import { bangkokBusinessDate, cashDifference, type CashClosingInput } from "../../domain/cash-closing";
@@ -27,12 +27,24 @@ export function watchReaderScans(branchId: string, next: (rows: ReaderScan[], ch
 }
 
 export async function saveCheckIn(branch: PosBranch, barber: Barber, checkInMethod: "pin" | "rfid", dateKey: string) {
-  const batch = writeBatch(db);
-  const data = { barberId: barber.id, barberName: barber.name || "", branchId: branch.id, branchName: branch.name || "", dateKey,
-    active: true, checkInAt: serverTimestamp(), updatedAt: serverTimestamp(), checkInMethod };
-  batch.set(doc(db, "barber_presence", barber.id), data, { merge: true });
-  batch.set(doc(db, "barber_attendance", attendanceId(branch.id, barber.id, dateKey)), { ...data, attended: true }, { merge: true });
-  await batch.commit();
+  const id = attendanceId(branch.id, barber.id, dateKey);
+  await runTransaction(db, async (batch) => {
+    const attendanceRef = doc(db, "barber_attendance", id);
+    const previous = await batch.get(attendanceRef);
+    const data = { barberId: barber.id, barberName: barber.name || "", branchId: branch.id, branchName: branch.name || "", dateKey,
+      active: true, checkInAt: serverTimestamp(), updatedAt: serverTimestamp(), checkInMethod };
+    batch.set(doc(db, "barber_presence", barber.id), data, { merge: true });
+    batch.set(attendanceRef, { ...data, attended: true }, { merge: true });
+    // Concurrent transactions retry; only the first attendance creates an event.
+    if (!previous.exists()) {
+      const notificationId = `attendance-checkin_${id}`;
+      batch.set(doc(db, "admin_notifications", notificationId), {
+        id: notificationId, type: "attendance_checkin", attendanceId: id,
+        barberId: data.barberId, barberName: data.barberName, branchId: data.branchId, branchName: data.branchName,
+        eventAt: data.checkInAt, createdAt: serverTimestamp(), read: false, message: `${data.barberName} เข้างานแล้ว`,
+      });
+    }
+  });
 }
 
 export async function saveReaderResult(branchId: string, scan: ReaderScan, result: ReaderResult) {
@@ -67,6 +79,13 @@ export async function saveStoreClosing(branch: PosBranch, barbers: readonly Barb
       id, ...fresh, actualCash, difference, cashClosingVersion: 1,
       branchName: branch.name || "", dateKey, closedByBarberId: closer.id,
       closedByBarberName: closer.name, closedAt: serverTimestamp(), closedBarberCount: barbers.length,
+    });
+    const notificationId = "store-closed_" + id;
+    batch.set(doc(db, "admin_notifications", notificationId), {
+      id: notificationId, type: "store_closed", closingId: id,
+      barberId: closer.id, barberName: closer.name, branchId: branch.id, branchName: branch.name || "",
+      eventAt: serverTimestamp(), createdAt: serverTimestamp(), read: false,
+      message: closer.name + " ปิดร้านแล้ว",
     });
     for (const barber of barbers) {
       const checkout = { active: false, checkOutAt: serverTimestamp(), updatedAt: serverTimestamp(), checkOutReason: "store_closed" };

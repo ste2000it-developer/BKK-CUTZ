@@ -15,13 +15,14 @@ const barber = { id: "a", name: "ช่าง" };
 const date = bangkokBusinessDate();
 const cash: CashClosingInput = { summary: { branchId: "b", businessDate: date, cashSales: 8500, shopExpenses: 700, cashTipWithdrawals: 300, expectedCash: 7500 }, actualCash: 7450 };
 beforeEach(() => { vi.clearAllMocks(); mock.loadCash.mockResolvedValue(cash.summary); });
-it.each(["pin", "rfid"] as const)("batch writes both check-in documents (%s)", async (method) => {
+it.each(["pin", "rfid"] as const)("atomically writes check-in and notification (%s)", async (method) => {
   await saveCheckIn(branch, barber, method, "2026-10-02");
   const fields = { barberId: "a", barberName: "ช่าง", branchId: "b", branchName: "สาขา", dateKey: "2026-10-02", active: true,
     checkInAt: "SERVER_TIME", updatedAt: "SERVER_TIME", checkInMethod: method };
   expect(mock.set.mock.calls).toEqual([
     ["barber_presence/a", fields, { merge: true }],
     ["barber_attendance/2026-10-02_b_a", { ...fields, attended: true }, { merge: true }],
+    ["admin_notifications/attendance-checkin_2026-10-02_b_a", { id: "attendance-checkin_2026-10-02_b_a", type: "attendance_checkin", attendanceId: "2026-10-02_b_a", barberId: "a", barberName: "ช่าง", branchId: "b", branchName: "สาขา", eventAt: "SERVER_TIME", createdAt: "SERVER_TIME", read: false, message: "ช่าง เข้างานแล้ว" }],
   ]); expect(mock.commit).toHaveBeenCalledOnce();
 });
 it("closes presence and attendance without erasing check-in; records daily closing", async () => {
@@ -60,4 +61,50 @@ it("propagates an atomic commit failure so the caller cannot report a successful
 it("keeps ESP32 reader result document and field names", async () => {
   await saveReaderResult("b", { id: "reader", scanId: " scan ", cardUid: "AA" }, { status: "success", barber, message: "ช่าง เข้างานแล้ว" });
   expect(mock.setDoc).toHaveBeenCalledWith("reader_results/scan", { scanId: "scan", branchId: "b", resultStatus: "success", barberId: "a", barberName: "ช่าง", message: "ช่าง เข้างานแล้ว", createdAt: "SERVER_TIME" });
+});
+
+it.each(["pin", "rfid"] as const)("does not recreate or reset read for an existing attendance (%s)", async (method) => {
+  mock.get.mockResolvedValueOnce({ exists: () => true });
+  await saveCheckIn(branch, barber, method, "2026-10-02");
+  expect(mock.set).toHaveBeenCalledTimes(2);
+  expect(mock.set.mock.calls.some(([ref]) => ref.startsWith("admin_notifications/"))).toBe(false);
+});
+it("does not submit any writes if the attendance lookup fails", async () => {
+  mock.get.mockRejectedValueOnce(new Error("permission denied"));
+  await expect(saveCheckIn(branch, barber, "pin", "2026-10-02")).rejects.toThrow("permission denied");
+  expect(mock.set).not.toHaveBeenCalled(); expect(mock.commit).not.toHaveBeenCalled();
+});
+it("propagates failed check-in commits rather than reporting attendance success", async () => {
+  mock.commit.mockRejectedValueOnce(new Error("commit failed"));
+  await expect(saveCheckIn(branch, barber, "rfid", "2026-10-02")).rejects.toThrow("commit failed");
+});
+it("uses the actual branch and barber in notification identity and content", async () => {
+  await saveCheckIn({ ...branch, id: "other", name: "สาขาอื่น" }, { id: "second", name: "ช่างคนที่สอง" }, "pin", "2026-10-03");
+  expect(mock.set).toHaveBeenCalledWith("admin_notifications/attendance-checkin_2026-10-03_other_second", expect.objectContaining({ branchId: "other", branchName: "สาขาอื่น", barberId: "second", message: "ช่างคนที่สอง เข้างานแล้ว" }));
+});
+
+it("creates exactly one closing notification in the same commit as closing and checkout", async () => {
+  await saveStoreClosing(branch, [barber], barber, date, cash);
+  const notifications = mock.set.mock.calls.filter(([ref]) => ref.startsWith("admin_notifications/"));
+  expect(notifications).toEqual([["admin_notifications/store-closed_b_" + date, {
+    id: "store-closed_b_" + date, type: "store_closed", closingId: "b_" + date,
+    barberId: "a", barberName: "ช่าง", branchId: "b", branchName: "สาขา",
+    eventAt: "SERVER_TIME", createdAt: "SERVER_TIME", read: false, message: "ช่าง ปิดร้านแล้ว",
+  }]]);
+  expect(mock.commit).toHaveBeenCalledOnce();
+});
+it("uses the actual branch and closer for store closing notifications", async () => {
+  const otherBranch = { ...branch, id: "other", name: "สาขาอื่น" };
+  const closer = { id: "second", name: "ผู้ปิดร้านอีกคน" };
+  const otherCash = { ...cash, summary: { ...cash.summary, branchId: "other" } };
+  mock.loadCash.mockResolvedValueOnce(otherCash.summary);
+  await saveStoreClosing(otherBranch, [closer, barber], closer, date, otherCash);
+  expect(mock.set).toHaveBeenCalledWith("admin_notifications/store-closed_other_" + date,
+    expect.objectContaining({ type: "store_closed", branchId: "other", branchName: "สาขาอื่น",
+      barberId: "second", barberName: "ผู้ปิดร้านอีกคน", message: "ผู้ปิดร้านอีกคน ปิดร้านแล้ว" }));
+});
+it("does not write a notification if the closing existence check fails", async () => {
+  mock.get.mockRejectedValueOnce(new Error("permission denied"));
+  await expect(saveStoreClosing(branch, [barber], barber, date, cash)).rejects.toThrow("permission denied");
+  expect(mock.set).not.toHaveBeenCalled(); expect(mock.commit).not.toHaveBeenCalled();
 });

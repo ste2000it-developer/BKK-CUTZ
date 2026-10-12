@@ -85,6 +85,10 @@ service cloud.firestore {
 
     // ประวัติเข้างานรายวัน ใช้คำนวณประกันมือย้อนหลัง
     match /barber_attendance/{attendanceId} {
+      // Transactions must be able to check whether a new attendance ID exists.
+      // This grants no access to another branch's existing attendance.
+      allow get: if isBranch()
+        && !exists(/databases/$(database)/documents/barber_attendance/$(attendanceId));
       allow read: if isAdmin()
         || (
           isBranch()
@@ -101,7 +105,65 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
+    // Events must be created with their first successful source transaction.
+    match /admin_notifications/{notificationId} {
+      function validCheckIn() {
+        let n = request.resource.data;
+        let attendancePath = /databases/$(database)/documents/barber_attendance/$(n.attendanceId);
+        let a = getAfter(attendancePath).data;
+        return n.keys().hasAll(["id", "type", "barberId", "barberName", "branchId", "branchName", "attendanceId", "eventAt", "createdAt", "read", "message"])
+          && n.keys().hasOnly(["id", "type", "barberId", "barberName", "branchId", "branchName", "attendanceId", "eventAt", "createdAt", "read", "message"])
+          && n.type == "attendance_checkin"
+          && n.id == notificationId
+          && notificationId == "attendance-checkin_" + n.attendanceId
+          && n.attendanceId == a.dateKey + "_" + n.branchId + "_" + n.barberId
+          && !exists(attendancePath)
+          && a.attended == true && a.active == true
+          && a.checkInMethod in ["pin", "rfid"]
+          && a.barberId == n.barberId && a.barberName == n.barberName
+          && a.branchId == n.branchId && a.branchName == n.branchName
+          && n.barberId is string && n.barberName is string
+          && n.branchId is string && n.branchName is string
+          && n.eventAt == a.checkInAt && n.eventAt == request.time
+          && n.createdAt == request.time && n.read == false
+          && n.message == n.barberName + " เข้างานแล้ว";
+      }
+      function validStoreClosing() {
+        let n = request.resource.data;
+        let closingPath = /databases/$(database)/documents/daily_closings/$(n.closingId);
+        let c = getAfter(closingPath).data;
+        return n.keys().hasAll(["id", "type", "barberId", "barberName", "branchId", "branchName", "closingId", "eventAt", "createdAt", "read", "message"])
+          && n.keys().hasOnly(["id", "type", "barberId", "barberName", "branchId", "branchName", "closingId", "eventAt", "createdAt", "read", "message"])
+          && n.type == "store_closed"
+          && n.id == notificationId
+          && notificationId == "store-closed_" + n.closingId
+          && n.closingId == n.branchId + "_" + c.dateKey
+          && !exists(closingPath)
+          && c.id == n.closingId && c.cashClosingVersion == 1
+          && c.closedByBarberId == n.barberId && c.closedByBarberName == n.barberName
+          && c.branchId == n.branchId && c.branchName == n.branchName
+          && n.barberId is string && n.barberName is string
+          && n.branchId is string && n.branchName is string
+          && n.eventAt == c.closedAt && n.eventAt == request.time
+          && n.createdAt == request.time && n.read == false
+          && n.message == n.barberName + " ปิดร้านแล้ว";
+      }
+      allow read: if isAdmin();
+      allow create: if (isAdmin() || (isBranch() && request.resource.data.branchId == myBranchId()))
+        && ((request.resource.data.type == "attendance_checkin" && validCheckIn())
+          || (request.resource.data.type == "store_closed" && validStoreClosing()));
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["read"])
+        && request.resource.data.read == true;
+      allow delete: if false;
+    }
+
     match /daily_closings/{closingId} {
+      // The closing transaction checks for an existing record before creating it.
+      // A missing document has no branchId; permit only this absence check.
+      allow get: if isBranch()
+        && !exists(/databases/$(database)/documents/daily_closings/$(closingId));
+
       allow read: if isAdmin()
         || (
           isBranch()
