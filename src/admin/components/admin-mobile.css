@@ -971,6 +971,74 @@
   .barber-summary-card { padding:9px 6px !important; }
   .barber-summary-card span { font-size:9px !important; }
 }
+
+/* Phone typography tokens. Visual-only: no grid, spacing, sizing or tablet changes. */
+@media (max-width: 600px) {
+  .admin-main-inner {
+    --admin-type-title: 22px;
+    --admin-type-section: 18px;
+    --admin-type-value: 24px;
+    --admin-type-body: 14px;
+    --admin-type-label: 12px;
+    --admin-type-caption: 11px;
+  }
+  .admin-main-inner :is(h1,h2,h3,strong,button,label,span,p,small,input,select) {
+    -webkit-font-smoothing: antialiased;
+  }
+  .admin-main-inner :is(.bn-top h2,.bn-board-head h3,.barber-toolbar h2,.payout-cycle-card h2,.payout-table-toolbar h2,.payout-history-filter-head h2,.advances-header-top h2,.financial-summary-head h2,.daily-history-table-card h2,.advances-table-header h3) {
+    font-size:var(--admin-type-section) !important;
+    font-weight:750 !important;
+    line-height:1.35 !important;
+  }
+  .admin-main-inner :is(.barber-summary-card span,.payout-summary-card span,.payout-history-summary-card span,.advances-kpi-card span,.daily-history-summary-card span,.bn-summary-card > span,.financial-kpi-card span) {
+    font-size:var(--admin-type-label) !important;
+    font-weight:500 !important;
+    line-height:1.4 !important;
+  }
+  .admin-main-inner :is(.barber-summary-card strong,.payout-summary-card strong,.payout-history-summary-card strong,.advances-kpi-card strong,.daily-history-summary-card strong,.bn-summary-card strong) {
+    font-size:var(--admin-type-value) !important;
+    font-weight:750 !important;
+    line-height:1.2 !important;
+  }
+  .admin-main-inner :is(.barber-summary-card small,.payout-summary-card small,.payout-history-summary-card small,.advances-kpi-card small,.daily-history-summary-card small,.bn-summary-card small) {
+    font-size:var(--admin-type-caption) !important;
+    font-weight:400 !important;
+    line-height:1.4 !important;
+  }
+  .admin-main-inner :is(.barber-identity-cell strong,.bn-card-head strong,.daily-history-table-row > div:nth-child(2),.payout-table-row > div:first-child,.payout-history-table-row > div:nth-child(2)) {
+    font-size:var(--admin-type-body) !important;
+    font-weight:700 !important;
+    line-height:1.4 !important;
+  }
+  .admin-main-inner :is(.barber-identity-cell span,.barber-rfid-cell,.bn-card-code,.bn-card-meta,.payout-cycle-card p,.payout-table-toolbar p,.payout-history-filter-head p,.advances-header-top p,.financial-summary-head p,.daily-history-summary-card small) {
+    font-size:var(--admin-type-caption) !important;
+    font-weight:400 !important;
+    line-height:1.45 !important;
+  }
+  .admin-main-inner :is(.barber-pin-cell,.barber-actions > button,.barber-toolbar .add-button,.advances-header-actions .primary-button,.payout-export-actions > button,.financial-tab-btn,.financial-period-btn,.daily-history-select-field > span,.advances-filter-item > label,.financial-date-field > span:first-child,.financial-select-field > span:first-child) {
+    font-size:var(--admin-type-label) !important;
+    font-weight:650 !important;
+    line-height:1.4 !important;
+  }
+  .admin-main-inner :is(.admin-date-nav-picker > span,.bn-date-controls .bn-date-mobile-value,.financial-mobile-date-value) {
+    font-size:var(--admin-type-body) !important;
+    font-weight:650 !important;
+  }
+  .admin-main-inner :is(.payout-rule-note,.payout-data-note,.financial-overview-row,.advances-table tbody td,.payout-table-row,.payout-history-table-row,.daily-history-table-row) {
+    font-size:var(--admin-type-label) !important;
+    line-height:1.5 !important;
+  }
+  .admin-main-inner :is(.payout-table-row > div:nth-child(7),.payout-history-table-row > div:nth-child(6),.bn-card-sales strong) {
+    font-size:18px !important;
+    font-weight:750 !important;
+    line-height:1.25 !important;
+  }
+  .admin-main-inner :is(.payout-table-row > div::before,.payout-history-table-row > div::before,.barber-pin-cell::before) {
+    font-size:var(--admin-type-caption) !important;
+    font-weight:500 !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .admin-sidebar { transition:none !important; }
 }
