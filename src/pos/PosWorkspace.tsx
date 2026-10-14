@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { logout } from "../shared/firebase/auth";
 import type { Barber, PosBranch } from "../shared/domain/pos-attendance";
 import type { Checkout, PosTransaction } from "../shared/domain/pos-payment";
@@ -16,6 +16,8 @@ import { ShopExpenseModal } from "./features/expenses/ShopExpenseModal";
 
 export function PosWorkspace({ branch }: { branch: PosBranch }) {
   const attendance = useAttendance(branch);
+  const headerRef = useRef<HTMLElement>(null);
+  const appRef = useRef<HTMLElement>(null);
   const [services, setServices] = useState<ServiceRecord[]>([]);
   const [catalogReady, setCatalogReady] = useState(false);
   const [error, setError] = useState("");
@@ -37,6 +39,24 @@ export function PosWorkspace({ branch }: { branch: PosBranch }) {
   }, [branch.serviceGroup]);
   useEffect(() => { const timer = window.setInterval(() => setNow(new Date().toISOString()), 1000); return () => window.clearInterval(timer); }, []);
   useEffect(() => {
+    const header = headerRef.current;
+    const app = appRef.current;
+    if (!header || !app) return;
+    const updateHeaderSpace = () => {
+      const mobile = window.matchMedia("(max-width: 600px)").matches;
+      app.style.setProperty("--pos-phone-header-height", mobile ? `${header.getBoundingClientRect().height}px` : "0px");
+    };
+    updateHeaderSpace();
+    const observer = new ResizeObserver(updateHeaderSpace);
+    observer.observe(header);
+    window.addEventListener("resize", updateHeaderSpace);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateHeaderSpace);
+      app.style.removeProperty("--pos-phone-header-height");
+    };
+  }, []);
+  useEffect(() => {
     document.body.classList.toggle("modal-open", shift || history || expense || logoutConfirm || Boolean(checkout && !paymentScan));
     return () => document.body.classList.remove("modal-open");
   }, [shift, history, expense, checkout, paymentScan, logoutConfirm]);
@@ -57,7 +77,7 @@ export function PosWorkspace({ branch }: { branch: PosBranch }) {
     try { await logout(); } catch { setError("ออกจากระบบไม่สำเร็จ"); }
   }
   const ready = attendance.ready && catalogReady;
-  return <main id="mainApp" className="app"><header className="app-header">
+  return <main id="mainApp" ref={appRef} className="app"><header ref={headerRef} className="app-header">
     <div><div className="system-brand">BKK-CUTZ</div><div className="system-subbrand">BARBER POS SYSTEM</div></div>
     <div className="branch-block"><svg className="branch-pin" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z" /><circle cx="12" cy="10" r="2" /></svg><div><div className="branch-caption">สาขาปัจจุบัน</div><strong>{branch.name || branch.id}</strong></div></div>
     <div className="header-actions"><div className="pos-datetime" aria-label="วันที่และเวลาปัจจุบัน">{formatDateTime(now)}</div><button className="expense-header-button" aria-label="เบิกเงินร้านไปซื้อของ" title="เบิกเงินร้านไปซื้อของ" disabled={busy} onClick={() => setExpense(true)}><span className="material-symbols-outlined">shopping_bag</span></button><button className="history-header-button" aria-label="ประวัติรายการ" title="ประวัติรายการ" disabled={busy} onClick={() => setHistory(true)}><span className="material-symbols-outlined">receipt_long</span></button><button className="shift-header-button" aria-label="จัดการช่างวันนี้" title="จัดการช่างวันนี้" disabled={busy || !attendance.ready} onClick={() => setShift(true)}><span className="material-symbols-outlined">person_check</span></button><button className="shift-header-button" aria-label="ออกจากระบบ" title="ออกจากระบบ" disabled={busy} onClick={() => setLogoutConfirm(true)}><span className="material-symbols-outlined">logout</span></button></div>
