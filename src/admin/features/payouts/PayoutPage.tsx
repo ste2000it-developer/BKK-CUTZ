@@ -95,11 +95,10 @@ export function PayoutPage() {
     setSelectedRow(null);
 
     try {
-      const data = await loadPayoutCycleData(
-        cycle.startKey,
-        cycle.endKey,
-        cycle.payoutDateKey,
-      );
+      const data = await Promise.race([
+        loadPayoutCycleData(cycle.startKey, cycle.endKey, cycle.payoutDateKey),
+        new Promise<never>((_, reject) => window.setTimeout(() => reject(new Error("โหลดข้อมูลจ่ายเงินนานเกิน 20 วินาที กรุณาลองใหม่")), 20000)),
+      ]);
       const nextPaidRecords = new Map<string, PayoutRecord>();
 
       data.paidPayouts.forEach((record) => {
@@ -128,7 +127,10 @@ export function PayoutPage() {
     setError("");
 
     try {
-      const sources = await listPayoutCycleSources();
+      const sources = await Promise.race([
+        listPayoutCycleSources(),
+        new Promise<never>((_, reject) => window.setTimeout(() => reject(new Error("โหลดรอบจ่ายนานเกิน 20 วินาที กรุณาลองใหม่และตรวจสอบการเชื่อมต่อ")), 20000)),
+      ]);
       const nextCycles = buildPayoutCycles(sources);
       const nextIndex = selectLatest ? Math.max(0, nextCycles.length - 1) : 0;
 
