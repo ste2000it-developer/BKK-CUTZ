@@ -20,14 +20,14 @@ const adminPageLoaders = {
 };
 
 const navigation: Array<{ id: AdminPage; icon: string; label: string; title: string }> = [
-  { id: "network", icon: "◉", label: "จัดการสาขา", title: "จัดการสาขา" },
-  { id: "services", icon: "✂", label: "เมนูบริการ / ราคา", title: "เมนูบริการ / ราคา" },
-  { id: "barbers", icon: "♙", label: "จัดการช่าง", title: "จัดการช่าง" },
-  { id: "payouts", icon: "฿", label: "จ่ายเงินช่าง", title: "จ่ายเงินช่าง" },
-  { id: "payout-history", icon: "◷", label: "ประวัติจ่ายเงินช่าง", title: "ประวัติจ่ายเงินช่าง" },
-  { id: "daily-history", icon: "≡", label: "ประวัติรายวัน", title: "ประวัติรายวัน" },
-  { id: "advances", icon: "⇄", label: "เบิกล่วงหน้า", title: "เบิกล่วงหน้า" },
-  { id: "summary", icon: "∑", label: "สรุปยอด", title: "สรุปยอด" },
+  { id: "network", icon: "fa-store", label: "จัดการสาขา", title: "จัดการสาขา" },
+  { id: "services", icon: "fa-scissors", label: "เมนูบริการ / ราคา", title: "เมนูบริการ / ราคา" },
+  { id: "barbers", icon: "fa-user-group", label: "จัดการช่าง", title: "จัดการช่าง" },
+  { id: "payouts", icon: "fa-money-bill-transfer", label: "จ่ายเงินช่าง", title: "จ่ายเงินช่าง" },
+  { id: "payout-history", icon: "fa-clock-rotate-left", label: "ประวัติจ่ายเงินช่าง", title: "ประวัติจ่ายเงินช่าง" },
+  { id: "daily-history", icon: "fa-receipt", label: "ประวัติรายวัน", title: "ประวัติรายวัน" },
+  { id: "advances", icon: "fa-hand-holding-dollar", label: "เบิกล่วงหน้า", title: "เบิกล่วงหน้า" },
+  { id: "summary", icon: "fa-chart-pie", label: "สรุปยอด", title: "สรุปยอด" },
 ];
 
 export function AdminApp() {
@@ -87,6 +87,15 @@ export function AdminApp() {
       console.error("Admin network page preload failed:", error);
     });
   }, [user, loadedPages]);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileMenuOpen(false);
+    };
+    window.addEventListener("keydown", onEscape);
+    return () => window.removeEventListener("keydown", onEscape);
+  }, [mobileMenuOpen]);
 
   async function navigateToPage(nextPage: AdminPage) {
     const request = ++navigationRequest.current;
@@ -154,20 +163,20 @@ export function AdminApp() {
 
   return (
     <div className="admin-shell">
-      <div className="admin-mobile-header"><button type="button" className="admin-menu-toggle" aria-label="เปิดเมนู" aria-expanded={mobileMenuOpen} aria-controls="admin-navigation" onClick={() => setMobileMenuOpen(true)}>☰</button><strong>BKK-CUTZ</strong><span>ADMIN</span></div>
+      <div className="admin-mobile-header"><button type="button" className="admin-menu-toggle" aria-label="เปิดเมนู" aria-expanded={mobileMenuOpen} aria-controls="admin-navigation" onClick={() => setMobileMenuOpen(true)}><i className="fa-solid fa-bars" aria-hidden="true" /></button><strong>BKK-CUTZ</strong><span>ADMIN</span></div>
       {mobileMenuOpen && <button className="admin-menu-backdrop" type="button" aria-label="ปิดเมนู" onClick={() => setMobileMenuOpen(false)} />}
       <aside id="admin-navigation" className={`admin-sidebar${mobileMenuOpen ? " mobile-open" : ""}`}>
-        <button type="button" className="admin-menu-close" aria-label="ปิดเมนู" onClick={() => setMobileMenuOpen(false)}>×</button>
+        <button type="button" className="admin-menu-close" aria-label="ปิดเมนู" onClick={() => setMobileMenuOpen(false)}><i className="fa-solid fa-xmark" aria-hidden="true" /></button>
         <div><div className="sidebar-brand">BKK-CUTZ</div><div className="sidebar-subbrand">ADMIN PANEL</div></div>
         <div className="sidebar-menu-title">เมนูระบบ</div>
         <nav className="admin-nav" aria-label="เมนู Admin">
-          {navigation.map((item) => <button className={`admin-nav-button${page === item.id ? " active" : ""}`} key={item.id} type="button" aria-current={page === item.id ? "page" : undefined} onClick={() => void navigateToPage(item.id)}><span className="nav-icon" aria-hidden="true">{item.icon}</span><span>{item.label}</span><b aria-hidden="true">›</b></button>)}
+          {navigation.map((item) => <button className={`admin-nav-button${page === item.id ? " active" : ""}`} key={item.id} type="button" aria-current={page === item.id ? "page" : undefined} onClick={() => void navigateToPage(item.id)}><span className="nav-icon" aria-hidden="true"><i className={`fa-solid ${item.icon}`} /></span><span>{item.label}</span><b aria-hidden="true">›</b></button>)}
         </nav>
         <div className="sidebar-footer"><div>STAY SHARP</div><div>LOOK FRESH</div></div>
       </aside>
       <main className="admin-main">
         <div className="admin-main-inner">
-          <header className="admin-topbar"><div><div className="admin-kicker">BKK-CUTZ CONTROL</div><h1>{navigation.find((item) => item.id === page)?.title}</h1><div className="admin-email">{user.email || "Admin"}</div></div><div className="admin-header-actions"><NotificationCenter key={user.uid} userId={user.uid} /><button className="logout-button" type="button" onClick={() => void logout()}>ออกจากระบบ</button></div></header>
+          <header className="admin-topbar"><div><div className="admin-kicker">BKK-CUTZ CONTROL</div><h1>{navigation.find((item) => item.id === page)?.title}</h1><div className="admin-email">{user.email || "Admin"}</div></div><div className="admin-header-actions"><NotificationCenter key={user.uid} userId={user.uid} /><button className="logout-button" type="button" onClick={() => void logout()} aria-label="ออกจากระบบ"><i className="fa-solid fa-right-from-bracket" aria-hidden="true" /><span>ออกจากระบบ</span></button></div></header>
           {pageLoadError && <div className="error-box" role="alert">{pageLoadError}</div>}
           {BranchNetworkPage && <section className={page === "network" ? "" : "hidden"}><BranchNetworkPage /></section>}
           <section className={page === "services" ? "" : "hidden"}><ServicesPage /></section>
