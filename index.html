@@ -33,7 +33,34 @@
 </head>
 
 <body>
-  <div id="posReactRoot"></div>
+  <div id="posReactRoot">
+    <div id="posStartupFallback" style="font-family:system-ui,sans-serif;text-align:center;padding:64px 20px;color:#253247">
+      <strong style="font-size:22px">BKK-CUTZ</strong>
+      <p id="posStartupMessage">กำลังเปิดระบบ...</p>
+      <button id="posStartupRetry" type="button" style="display:none;padding:12px 24px;border:0;border-radius:10px;background:#253247;color:white;font-size:16px" onclick="location.reload()">ลองใหม่</button>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var failed = false;
+      function showFailure(reason) {
+        if (failed || !document.getElementById("posStartupFallback")) return;
+        failed = true;
+        console.error("POS startup failed:", reason);
+        document.getElementById("posStartupMessage").textContent = "ไม่สามารถเปิดระบบได้ กรุณาลองใหม่อีกครั้ง";
+        document.getElementById("posStartupRetry").style.display = "inline-block";
+      }
+      window.addEventListener("error", function (event) {
+        if (document.getElementById("posStartupFallback")) showFailure(event.message || "Resource loading error");
+      }, true);
+      window.addEventListener("unhandledrejection", function (event) {
+        if (document.getElementById("posStartupFallback")) showFailure(event.reason || "Unhandled startup rejection");
+      });
+      window.setTimeout(function () {
+        if (document.getElementById("posStartupFallback")) showFailure("Startup timed out after 15 seconds");
+      }, 15000);
+    })();
+  </script>
   <script type="module" src="/src/pos/main.tsx"></script>
 </body>
 </html>
