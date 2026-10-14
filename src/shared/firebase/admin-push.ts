@@ -37,7 +37,7 @@ async function messagingWorker() {
 }
 
 function waitForAdminRegistration(messaging: Messaging, uid: string) {
-  let stop = () => undefined;
+  let stop: () => void = () => {};
   const saved = new Promise<void>((resolve, reject) => {
     let settled = false;
     stop = onRegistered(messaging, (fid) => {
