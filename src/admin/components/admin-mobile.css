@@ -1,0 +1,492 @@
+/* BKK-CUTZ Admin mobile layout
+   Keeps the desktop visual system intact and only reshapes the Admin shell/content
+   on phone/tablet widths. */
+
+@media (max-width: 900px) {
+  html,
+  body,
+  #adminReactAppRoot {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .admin-shell {
+    display: block !important;
+    min-width: 0;
+  }
+
+  /* Turn the desktop sidebar into a compact, sticky mobile header + horizontal nav. */
+  .admin-sidebar {
+    position: sticky !important;
+    z-index: 80;
+    top: 0;
+    width: 100%;
+    height: auto !important;
+    max-height: none !important;
+    padding: 10px 12px 8px !important;
+    overflow: hidden !important;
+    border-bottom: 1px solid #2d2d2d;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, .12);
+  }
+
+  .admin-sidebar > div:first-child {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .sidebar-brand {
+    padding: 0 !important;
+    font-size: 18px !important;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  .sidebar-subbrand {
+    padding: 0 !important;
+    font-size: 8px !important;
+    letter-spacing: 1.6px !important;
+    white-space: nowrap;
+  }
+
+  .sidebar-menu-title,
+  .sidebar-footer {
+    display: none !important;
+  }
+
+  .admin-nav {
+    display: flex !important;
+    flex-direction: row !important;
+    grid-template-columns: none !important;
+    gap: 6px !important;
+    width: calc(100% + 2px);
+    margin-top: 8px;
+    padding: 0 2px 2px 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-nav-button {
+    flex: 0 0 auto;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 42px !important;
+    grid-template-columns: 20px auto !important;
+    gap: 6px !important;
+    padding: 0 11px !important;
+    border-color: #303030 !important;
+    border-radius: 10px !important;
+    background: #1b1b1b !important;
+    color: #c9c9c9 !important;
+    font-size: 11px !important;
+    scroll-snap-align: start;
+  }
+
+  .admin-nav-button.active {
+    border-color: #fdc717 !important;
+    background: #fdc717 !important;
+    color: #171717 !important;
+  }
+
+  .admin-nav-button .nav-icon {
+    width: 20px !important;
+    font-size: 16px !important;
+  }
+
+  .admin-nav-button b {
+    display: none !important;
+  }
+
+  .admin-main {
+    width: 100%;
+    min-width: 0;
+    padding: 16px 14px 42px !important;
+  }
+
+  .admin-main-inner,
+  .admin-main-inner > section,
+  .admin-main-inner > section > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .admin-topbar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center !important;
+    gap: 10px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .admin-topbar > div:first-child {
+    min-width: 0;
+  }
+
+  .admin-kicker {
+    font-size: 9px !important;
+    letter-spacing: 1.3px !important;
+  }
+
+  .admin-topbar h1 {
+    margin-top: 2px !important;
+    font-size: clamp(24px, 7vw, 30px) !important;
+    line-height: 1.18;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-email {
+    max-width: 58vw;
+    overflow: hidden;
+    font-size: 11px !important;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .admin-header-actions {
+    align-self: center;
+    gap: 7px !important;
+    margin-left: 0 !important;
+  }
+
+  .notification-bell {
+    width: 44px !important;
+    height: 44px !important;
+  }
+
+  .logout-button {
+    min-height: 44px !important;
+    padding: 0 12px !important;
+    font-size: 12px !important;
+    white-space: nowrap;
+  }
+
+  /* Keep editor/detail panes below the main content instead of squeezing two columns. */
+  .admin-workspace.is-editing,
+  .bn-workspace.has-detail {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .editor,
+  .bn-detail {
+    position: static !important;
+    top: auto !important;
+    width: 100%;
+  }
+
+  .bn-detail {
+    order: -1;
+  }
+
+  .group-card,
+  .service-section,
+  .editor,
+  .payout-section,
+  .payout-card,
+  .daily-history-card,
+  .payout-history-card,
+  .advances-card,
+  .financial-card {
+    max-width: 100%;
+  }
+
+  .group-buttons {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .service-toolbar,
+  .payout-table-toolbar,
+  .daily-history-filter-head,
+  .payout-history-filter-head,
+  .bn-top,
+  .bn-board-head {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+
+  .service-toolbar .add-button,
+  .payout-export-actions,
+  .payout-export-actions > button {
+    width: 100%;
+  }
+
+  /* All scrolling data areas remain usable with a finger instead of forcing the page wider. */
+  .service-list,
+  .payout-list,
+  .payout-daily-list,
+  .daily-history-table-card,
+  .payout-history-table-card,
+  .advances-table-wrap,
+  .financial-list-wrap,
+  .financial-tabs {
+    max-width: 100%;
+    overflow-x: auto !important;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Existing responsive cards/grids should collapse sooner on a real phone. */
+  .payout-summary-grid,
+  .payout-detail-summary,
+  .daily-history-summary-grid,
+  .payout-history-summary-grid,
+  .advances-kpi-grid,
+  .financial-kpi-grid,
+  .bn-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .bn-board {
+    padding: 14px !important;
+  }
+
+  .bn-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)) !important;
+  }
+
+  .bn-card {
+    min-height: 0 !important;
+    padding: 18px !important;
+  }
+
+  .bn-detail-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  /* Prevent iOS from zooming the whole page when a field receives focus. */
+  .admin-shell input,
+  .admin-shell select,
+  .admin-shell textarea,
+  .login-page input,
+  .login-page select,
+  .login-page textarea {
+    max-width: 100%;
+    font-size: 16px !important;
+  }
+
+  .admin-shell button,
+  .admin-shell [role="button"] {
+    touch-action: manipulation;
+  }
+
+  /* Dialogs/modals must fit inside the phone viewport. */
+  .admin-shell dialog,
+  .admin-shell [role="dialog"] {
+    max-width: calc(100vw - 24px) !important;
+    max-height: calc(100dvh - 24px) !important;
+  }
+
+  .daily-history-modal,
+  .payout-history-modal,
+  .barber-modal,
+  .branch-editor-modal,
+  .modal-card,
+  .dialog-card {
+    width: min(100%, calc(100vw - 24px)) !important;
+    max-height: calc(100dvh - 24px) !important;
+    margin: 12px auto !important;
+    overflow-y: auto;
+  }
+
+  .notification-panel {
+    position: fixed !important;
+    z-index: 120 !important;
+    inset: 10px !important;
+    width: auto !important;
+    max-width: none !important;
+    max-height: calc(100dvh - 20px) !important;
+    overflow-y: auto !important;
+    border-radius: 14px !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .login-page {
+    padding: 14px !important;
+  }
+
+  .login-card {
+    padding: 28px 18px !important;
+    border-radius: 16px !important;
+  }
+
+  .login-card h1 {
+    font-size: 31px !important;
+  }
+
+  .admin-main {
+    padding: 12px 10px 36px !important;
+  }
+
+  .admin-topbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .admin-topbar h1 {
+    font-size: 24px !important;
+  }
+
+  .admin-email {
+    max-width: 52vw;
+  }
+
+  .logout-button {
+    width: 44px;
+    overflow: hidden;
+    padding: 0 !important;
+    color: transparent;
+    position: relative;
+  }
+
+  .logout-button::after {
+    content: "ออก";
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #171717;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .group-card,
+  .service-section,
+  .editor {
+    border-radius: 13px !important;
+  }
+
+  .group-card,
+  .editor {
+    padding: 15px !important;
+  }
+
+  .service-toolbar {
+    padding: 15px !important;
+  }
+
+  .group-buttons {
+    gap: 8px !important;
+  }
+
+  .group-button {
+    min-height: 66px !important;
+    padding: 9px 11px !important;
+  }
+
+  .payout-summary-grid,
+  .payout-detail-summary,
+  .daily-history-summary-grid,
+  .payout-history-summary-grid,
+  .advances-kpi-grid,
+  .financial-kpi-grid,
+  .bn-summary {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .bn-top {
+    margin-bottom: 14px !important;
+  }
+
+  .bn-top h2 {
+    font-size: 24px !important;
+  }
+
+  .bn-live {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .bn-board {
+    padding: 10px !important;
+    border-radius: 13px !important;
+  }
+
+  .bn-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .bn-card {
+    padding: 16px !important;
+  }
+
+  .bn-card-meta {
+    flex-direction: column;
+    gap: 6px !important;
+  }
+
+  .bn-card-meta span:last-child {
+    text-align: left !important;
+  }
+
+  .bn-detail {
+    padding: 15px !important;
+  }
+
+  .bn-detail-metrics {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .notification-item {
+    padding: 13px !important;
+    gap: 9px !important;
+  }
+
+  .notification-icon {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .notification-heading,
+  .notification-push,
+  .notification-footer {
+    padding-left: 13px !important;
+    padding-right: 13px !important;
+  }
+
+  .admin-shell table {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .admin-sidebar {
+    padding-left: 9px !important;
+    padding-right: 9px !important;
+  }
+
+  .admin-nav-button {
+    padding: 0 9px !important;
+    font-size: 10.5px !important;
+  }
+
+  .admin-main {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  .admin-topbar {
+    gap: 7px !important;
+  }
+
+  .admin-topbar h1 {
+    font-size: 22px !important;
+  }
+
+  .admin-kicker {
+    display: none;
+  }
+
+  .group-buttons {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
