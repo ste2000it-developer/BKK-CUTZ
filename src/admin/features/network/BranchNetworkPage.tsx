@@ -67,6 +67,14 @@ export function BranchNetworkPage() {
   const [selected, setSelected] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!selected || !window.matchMedia("(max-width: 600px)").matches) return;
+    const frame = window.requestAnimationFrame(() => {
+      document.querySelector(".bn-detail")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [selected]);
+
+  useEffect(() => {
     const tick = () => setToday(bangkokBusinessDate());
     const timer = window.setInterval(tick, 15000);
     window.addEventListener("focus", tick);
