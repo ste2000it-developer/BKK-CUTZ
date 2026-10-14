@@ -500,6 +500,7 @@
 .admin-menu-backdrop,
 .bn-date-mobile-value,
 .daily-history-mobile-date-value,
+.financial-mobile-date-value,
 .daily-history-mobile-tools { display: none; }
 
 @media (max-width: 600px) {
@@ -577,6 +578,7 @@
   /* Branch network: compact toolbar, date picker, metrics, and branch cards. */
   .bn-page { min-width:0; }
   .bn-top { display:flex !important; flex-direction:column !important; gap:8px !important; padding:0 !important; margin-bottom:10px !important; }
+  .bn-top > div:first-child { display:none !important; }
   .bn-top .bn-kicker { display:none; }
   .bn-top h2 { font-size:18px !important; line-height:1.25; }
   .bn-top p { display:none; }
@@ -725,7 +727,7 @@
   .daily-history-filters:not(.mobile-filters-open) .daily-history-select-field { display:none !important; }
   .daily-history-select-field { min-width:0; }
   .daily-history-select-field > span { font-size:11px !important; }
-  .daily-history-select-field:nth-of-type(4) { grid-column:1 / -1; }
+  .daily-history-select-field:last-of-type { grid-column:1 / -1; }
   .daily-history-refresh-button { display:none !important; }
   .daily-history-summary-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:8px !important; margin:10px 0 !important; }
   .daily-history-summary-card { min-height:78px !important; padding:10px !important; border-radius:12px !important; }
