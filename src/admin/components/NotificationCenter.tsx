@@ -99,12 +99,12 @@ export function NotificationCenter({ userId }: { userId: string }) {
     if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget as Node)) setOpen(false);
   }}>
     <button ref={bell} type="button" className="notification-bell" aria-label={"การแจ้งเตือน" + (count ? " ยังไม่อ่าน " + unreadLabel(count) + " รายการ" : "")} aria-expanded={open} aria-controls="admin-notifications" onClick={() => setOpen(!open)}>
-      <svg viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg>
+      <i className="fa-regular fa-bell" aria-hidden="true" />
       {error ? <span className="notification-badge">!</span> : count !== null && count > 0 && <span className="notification-badge">{unreadLabel(count)}</span>}
     </button>
     {open && <section id="admin-notifications" className="notification-panel" aria-label="การแจ้งเตือน">
-      <div className="notification-heading"><div><h2>การแจ้งเตือน</h2><small>ทุกสาขา · 50 รายการล่าสุด</small></div><button ref={close} type="button" aria-label="ปิดการแจ้งเตือน" onClick={() => { setOpen(false); bell.current?.focus(); }}>✕</button></div>
-      <div className="notification-push"><div><strong>แจ้งเตือนเข้าโทรศัพท์</strong><span>{pushState === "enabled" ? "เครื่องนี้จะได้รับ Push เมื่อช่างเข้างาน" : "เปิดครั้งเดียวบนมือถือ Admin เครื่องนี้"}</span></div><button type="button" className={pushState === "enabled" ? "is-enabled" : ""} disabled={pushState === "enabling" || pushState === "unsupported" || pushState === "blocked"} onClick={() => void togglePush()}>{pushLabel}</button></div>
+      <div className="notification-heading"><div><h2>การแจ้งเตือน</h2><small>ทุกสาขา · 50 รายการล่าสุด</small></div><button ref={close} type="button" aria-label="ปิดการแจ้งเตือน" onClick={() => { setOpen(false); bell.current?.focus(); }}><i className="fa-solid fa-xmark" aria-hidden="true" /></button></div>
+      <div className="notification-push"><div><strong>แจ้งเตือนเข้าโทรศัพท์</strong><span>{pushState === "enabled" ? "เครื่องนี้จะได้รับ Push เมื่อช่างเข้างานหรือปิดร้าน" : "เปิดครั้งเดียวบนมือถือ Admin เครื่องนี้"}</span></div><button type="button" className={pushState === "enabled" ? "is-enabled" : ""} disabled={pushState === "enabling" || pushState === "unsupported" || pushState === "blocked"} onClick={() => void togglePush()}>{pushLabel}</button></div>
       {pushError && <div className="notification-status" role="alert">{pushError}</div>}
       {pushState === "blocked" && <div className="notification-status">อนุญาต Notification จากการตั้งค่าเว็บไซต์ของเบราว์เซอร์ แล้วโหลดหน้าใหม่</div>}
       {pushState === "unsupported" && <div className="notification-status">เปิดหน้า Admin ผ่าน HTTPS บนมือถือเพื่อใช้ Push Notification</div>}
@@ -114,9 +114,7 @@ export function NotificationCenter({ userId }: { userId: string }) {
       {ready && !rows.length && <p className="notification-status">ยังไม่มีการแจ้งเตือน</p>}
       <div className="notification-list" role="list">{rows.map((row) => <div key={row.id} role="listitem" className={"notification-item" + (row.read ? "" : " is-unread")} aria-label={row.message + " " + row.branchName + (row.read ? " อ่านแล้ว" : " ยังไม่อ่าน")}>
         <span className="notification-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" focusable="false">
-            {row.type === "store_closed" ? <><path d="M4 10v10h16V10M3 7l2-4h14l2 4v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0V7ZM3 7h18" /><path d="M9 20v-6h6v6" /></> : <><circle cx="9" cy="7" r="3.5" /><path d="M3 20v-2a6 6 0 0 1 10-4.5M15 16l2.5 2.5L22 14" /></>}
-          </svg>
+          <i className={`fa-solid ${row.type === "store_closed" ? "fa-store" : "fa-user-check"}`} />
         </span><span className="notification-copy"><strong>{row.message}</strong><span>{row.branchName || row.branchId} · {notificationTime(row.eventAt)}</span></span>{!row.read && <span className="notification-dot" aria-hidden="true" />}
       </div>)}</div>
       <p className="notification-footer">เปิดกระดิ่งเพื่อทำเครื่องหมายว่าอ่านทั้งหมดแล้ว</p>
