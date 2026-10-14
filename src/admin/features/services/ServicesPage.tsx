@@ -302,9 +302,7 @@ export function ServicesPage() {
                     setStatus("");
                     setForm(emptyForm);
                   }}
-                >
-                  ×
-                </button>
+                ><i className="fa-solid fa-xmark" aria-hidden="true" /></button>
               </div>
 
               <div className="service-editor-body">
