@@ -307,7 +307,7 @@ export function ShopExpenseModal({
                   step="1"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  autoFocus
+                  inputMode="decimal"
                 />
                 <span className="shop-expense-amount-unit">บาท</span>
               </div>
