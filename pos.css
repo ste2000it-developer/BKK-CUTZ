@@ -4121,3 +4121,18 @@ svg {
     appearance: none !important;
   }
 }
+
+/* Match history date picker to the barber select's branded control styling. */
+@media (max-width: 600px) {
+  .app .history-controls .history-date-picker {
+    border-color: var(--pos-control-border) !important;
+    border-radius: var(--pos-control-radius) !important;
+    outline: none !important;
+    outline-offset: 2px !important;
+  }
+  .app .history-controls .history-date-picker:focus-within {
+    border-color: var(--pos-control-accent) !important;
+    outline: 2px solid var(--pos-control-accent) !important;
+    outline-offset: 2px !important;
+  }
+}
