@@ -20,6 +20,12 @@ function adminUrl() {
 }
 
 messaging.onBackgroundMessage((payload) => {
+  // When Cloud Functions sends a notification payload, FCM/browser displays it
+  // automatically while the Admin app is backgrounded or closed. Do not show a
+  // second notification from the service worker.
+  if (payload.notification) return;
+
+  // Fallback for any legacy/data-only message.
   const data = payload.data || {};
   const title = data.title || "BKK-CUTZ";
   const body = data.body || "มีการแจ้งเตือนใหม่";
