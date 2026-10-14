@@ -5,6 +5,7 @@ const { getMessaging } = require("firebase-admin/messaging");
 
 initializeApp();
 const db = getFirestore();
+const ADMIN_URL = "https://ste2000it-developer.github.io/BKK-CUTZ/admin.html";
 
 function chunks(values, size) {
   const rows = [];
@@ -50,6 +51,7 @@ exports.pushAdminAttendance = onDocumentCreated({
   const time = bangkokTime(notification.eventAt);
   const title = "BKK-CUTZ • ช่างเข้างาน";
   const body = `${notification.barberName || "ช่าง"} เข้างานแล้ว • ${branch}${time ? ` • ${time}` : ""}`;
+  const tag = `attendance-${event.params.notificationId}`;
   const invalidFids = new Set();
   let successCount = 0;
   let failureCount = 0;
@@ -57,17 +59,30 @@ exports.pushAdminAttendance = onDocumentCreated({
   for (const group of chunks(uniqueFids, 500)) {
     const result = await getMessaging().sendEachForMulticast({
       fids: group,
+      // A notification payload lets iOS/Android display the push through the OS
+      // while the Home Screen web app is backgrounded or fully closed.
+      notification: {
+        title,
+        body,
+      },
       data: {
         title,
         body,
-        tag: `attendance-${event.params.notificationId}`,
+        tag,
+        url: ADMIN_URL,
         notificationId: event.params.notificationId,
         type: "attendance_checkin",
         branchId: String(notification.branchId || ""),
         barberId: String(notification.barberId || ""),
       },
       webpush: {
-        headers: { Urgency: "high" },
+        headers: {
+          Urgency: "high",
+          TTL: "86400",
+        },
+        fcmOptions: {
+          link: ADMIN_URL,
+        },
       },
     });
     successCount += result.successCount;
