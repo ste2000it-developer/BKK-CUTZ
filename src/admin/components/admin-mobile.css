@@ -611,7 +611,7 @@
   }
   .bn-date-field input[type="date"] {
     position:absolute !important; inset:auto 0 0 !important; width:100% !important;
-    height:44px !important; min-height:44px !important; padding:0 !important;
+    height:44px !important; min-height:44px !important; max-width:100% !important; padding:0 !important;
     opacity:0 !important; cursor:pointer; z-index:1;
   }
   .bn-date-field:focus-within .bn-date-mobile-value { outline:2px solid #fdc717; outline-offset:2px; }
@@ -652,7 +652,7 @@
   .bn-card-meta { grid-column:1 / -1; margin:0 !important; padding-top:7px !important; gap:6px !important; font-size:10px !important; }
   .bn-card-meta span { flex:1; padding:4px 6px; text-align:center !important; }
   .bn-card-meta b { font-size:12px; }
-  .bn-detail { padding:12px !important; border-radius:12px !important; }
+  .bn-detail { padding:12px !important; border-radius:12px !important; scroll-margin-top:calc(64px + env(safe-area-inset-top, 0px)); }
   .bn-detail-head h3 { font-size:18px !important; }
   .bn-detail-primary { margin-top:10px !important; padding:10px !important; }
   .bn-detail-primary strong { font-size:22px !important; }
@@ -904,7 +904,7 @@
 @media (min-width: 390px) and (max-width: 600px) {
   .bn-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
   .bn-card { display:flex !important; flex-direction:column; align-items:stretch; gap:7px !important; }
-  .bn-card-head { display:grid; grid-template-columns:26px minmax(0,1fr) 10px; gap:6px; }
+  .bn-card-head { display:grid; grid-template-columns:26px minmax(0,1fr) 10px !important; gap:6px; }
   .bn-store { width:26px; height:26px; }
   .bn-card-head strong { font-size:12px; }
   .bn-card-sales { margin:0 !important; }
