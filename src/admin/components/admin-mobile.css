@@ -494,7 +494,7 @@
 
 /* Mobile-first Admin shell and branch dashboard */
 .admin-mobile-header,.admin-menu-close,.admin-menu-backdrop{display:none}
-@media(max-width:900px){
+@media(max-width:600px){
  .admin-mobile-header{display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:90;height:56px;padding:0 16px;background:#171717;color:#fff}
  .admin-mobile-header strong{font-size:18px;letter-spacing:.3px}
  .admin-mobile-header span{font-size:10px;color:#fdc717;margin-left:auto;letter-spacing:1px}
