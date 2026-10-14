@@ -1,4 +1,4 @@
-const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
@@ -23,18 +23,42 @@ function bangkokTime(timestamp) {
   }).format(timestamp.toDate());
 }
 
-exports.pushAdminAttendance = onDocumentCreated({
-  document: "admin_notifications/{notificationId}",
-  region: "asia-southeast1",
-}, async (event) => {
-  const snapshot = event.data;
-  if (!snapshot) return;
-  const notification = snapshot.data();
-  if (notification.type !== "attendance_checkin") return;
+exports.pushAdminAttendance = onCall({ region: "asia-southeast1" }, async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) throw new HttpsError("unauthenticated", "กรุณาเข้าสู่ระบบก่อนส่ง Push");
 
-  // A retried Firestore event should not send a second push after a completed delivery.
-  const latest = await snapshot.ref.get();
-  if (latest.data()?.pushSentAt) return;
+  const notificationId = String(request.data?.notificationId || "").trim();
+  if (!notificationId.startsWith("attendance-checkin_")) {
+    throw new HttpsError("invalid-argument", "notificationId ไม่ถูกต้อง");
+  }
+
+  const profileSnapshot = await db.collection("users").doc(uid).get();
+  if (!profileSnapshot.exists) throw new HttpsError("permission-denied", "ไม่พบบัญชีผู้ใช้งาน");
+  const profile = profileSnapshot.data() || {};
+  if (profile.active !== true || !["branch", "admin"].includes(String(profile.role || ""))) {
+    throw new HttpsError("permission-denied", "บัญชีนี้ไม่มีสิทธิ์ส่ง Push");
+  }
+
+  const notificationRef = db.collection("admin_notifications").doc(notificationId);
+  const notificationSnapshot = await notificationRef.get();
+  if (!notificationSnapshot.exists) throw new HttpsError("not-found", "ไม่พบการแจ้งเตือนเข้างาน");
+  const notification = notificationSnapshot.data() || {};
+  if (notification.type !== "attendance_checkin") {
+    throw new HttpsError("failed-precondition", "รองรับเฉพาะแจ้งเตือนเข้างาน");
+  }
+
+  if (String(profile.role || "") === "branch"
+      && String(profile.branchId || "") !== String(notification.branchId || "")) {
+    throw new HttpsError("permission-denied", "ไม่สามารถส่ง Push ของสาขาอื่นได้");
+  }
+
+  if (notification.pushSentAt) {
+    return {
+      alreadySent: true,
+      successCount: Number(notification.pushSuccessCount || 0),
+      failureCount: Number(notification.pushFailureCount || 0),
+    };
+  }
 
   const deviceSnapshot = await db.collection("admin_push_devices").where("active", "==", true).get();
   const deviceRows = deviceSnapshot.docs
@@ -43,15 +67,19 @@ exports.pushAdminAttendance = onDocumentCreated({
   const uniqueFids = [...new Set(deviceRows.map((row) => row.fid.trim()))];
 
   if (!uniqueFids.length) {
-    await snapshot.ref.set({ pushSentAt: FieldValue.serverTimestamp(), pushSuccessCount: 0, pushFailureCount: 0 }, { merge: true });
-    return;
+    await notificationRef.set({
+      pushSentAt: FieldValue.serverTimestamp(),
+      pushSuccessCount: 0,
+      pushFailureCount: 0,
+    }, { merge: true });
+    return { alreadySent: false, successCount: 0, failureCount: 0 };
   }
 
   const branch = notification.branchName || notification.branchId || "ไม่ระบุสาขา";
   const time = bangkokTime(notification.eventAt);
   const title = "BKK-CUTZ • ช่างเข้างาน";
   const body = `${notification.barberName || "ช่าง"} เข้างานแล้ว • ${branch}${time ? ` • ${time}` : ""}`;
-  const tag = `attendance-${event.params.notificationId}`;
+  const tag = `attendance-${notificationId}`;
   const invalidFids = new Set();
   let successCount = 0;
   let failureCount = 0;
@@ -59,18 +87,13 @@ exports.pushAdminAttendance = onDocumentCreated({
   for (const group of chunks(uniqueFids, 500)) {
     const result = await getMessaging().sendEachForMulticast({
       fids: group,
-      // A notification payload lets iOS/Android display the push through the OS
-      // while the Home Screen web app is backgrounded or fully closed.
-      notification: {
-        title,
-        body,
-      },
+      notification: { title, body },
       data: {
         title,
         body,
         tag,
         url: ADMIN_URL,
-        notificationId: event.params.notificationId,
+        notificationId,
         type: "attendance_checkin",
         branchId: String(notification.branchId || ""),
         barberId: String(notification.barberId || ""),
@@ -80,9 +103,7 @@ exports.pushAdminAttendance = onDocumentCreated({
           Urgency: "high",
           TTL: "86400",
         },
-        fcmOptions: {
-          link: ADMIN_URL,
-        },
+        fcmOptions: { link: ADMIN_URL },
       },
     });
     successCount += result.successCount;
@@ -99,14 +120,18 @@ exports.pushAdminAttendance = onDocumentCreated({
   if (invalidFids.size) {
     const batch = db.batch();
     for (const row of deviceRows) {
-      if (invalidFids.has(row.fid.trim())) batch.set(row.ref, { active: false, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+      if (invalidFids.has(row.fid.trim())) {
+        batch.set(row.ref, { active: false, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+      }
     }
     await batch.commit();
   }
 
-  await snapshot.ref.set({
+  await notificationRef.set({
     pushSentAt: FieldValue.serverTimestamp(),
     pushSuccessCount: successCount,
     pushFailureCount: failureCount,
   }, { merge: true });
+
+  return { alreadySent: false, successCount, failureCount };
 });
