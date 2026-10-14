@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { collection, getDocsFromCache, query, where } from "firebase/firestore";
+import { db } from "../../../shared/firebase/client";
 import { barberByPin, localDateKey, type Barber } from "../../../shared/domain/pos-attendance";
 import { filterHistory, formatDateTime, formatMoney, historyAmounts, historyBarbers } from "../../../shared/domain/pos-history";
 import { isVoidedTransaction } from "../../../shared/domain/transaction-status";
@@ -35,6 +37,15 @@ export function HistoryModal({ branchId, barbers, onClose }: { branchId: string;
     setRows([]);
     setDetail(null);
     setError("");
+    // Show a cached day immediately while Firestore refreshes it in the background.
+    const cachedQuery = query(collection(db, "transactions"), where("branchId", "==", branchId), where("dateKey", "==", date || localDateKey()));
+    void getDocsFromCache(cachedQuery).then((snapshot) => {
+      if (!live || snapshot.empty) return;
+      const cachedRows = snapshot.docs.map((row) => ({ ...row.data(), id: row.id }) as TransactionHistoryRecord)
+        .sort((a, b) => (new Date(b.createdAt || 0).getTime() || 0) - (new Date(a.createdAt || 0).getTime() || 0));
+      setRows(cachedRows);
+      setLoading(false);
+    }).catch(() => undefined);
     void listPosTransactions(branchId, date || localDateKey()).then((result) => {
       if (!live) return;
       setRows(result);
@@ -110,7 +121,7 @@ export function HistoryModal({ branchId, barbers, onClose }: { branchId: string;
     <div className="history-modal-card">
       <div className="history-popup-head"><div><div className="page-kicker">ประวัติของสาขานี้</div><h2 id="historyTitle">ประวัติรายการ</h2><p>แตะรายการเพื่อดูรายละเอียดแบบหน้าสรุป</p></div><button className="modal-close" aria-label="ปิดประวัติ" onClick={onClose}>×</button></div>
       <div className="history-controls">
-        <label className="history-control"><span>วันที่</span><input type="date" value={date} onChange={(event) => { setDate(event.target.value); setNotice(""); }} /></label>
+        <label className="history-control"><span>วันที่</span><div className="history-date-picker"><span className="history-date-label" aria-hidden="true">{new Date(`${date || localDateKey()}T12:00:00`).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })}</span><span className="material-symbols-outlined history-date-icon" aria-hidden="true">calendar_month</span><input type="date" aria-label="วันที่" value={date} onChange={(event) => { setDate(event.target.value); setNotice(""); }} /></div></label>
         <div className="history-control"><span>ช่าง</span><div ref={select} className={`history-custom-select${selectOpen ? " open" : ""}`}><button className="history-custom-select-button" aria-haspopup="listbox" aria-expanded={selectOpen} onClick={() => setSelectOpen(!selectOpen)}>{barberOptions.find((barber) => barber.id === barberId)?.name || "ช่างทุกคน"}<span className="material-symbols-outlined">expand_more</span></button>
           {selectOpen && <div className="history-custom-select-menu" role="listbox" aria-label="ช่าง">{[{ id: "all", name: "ช่างทุกคน" }, ...barberOptions].map((barber) => <button type="button" role="option" aria-selected={barberId === barber.id} className={`history-custom-select-option${barberId === barber.id ? " selected" : ""}`} key={barber.id} onClick={() => { setBarberId(barber.id); setSelectOpen(false); }}>{barber.name}</button>)}</div>}
         </div></div>
