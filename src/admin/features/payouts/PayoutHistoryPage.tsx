@@ -207,7 +207,7 @@ export function PayoutHistoryPage() {
           <section className="payout-history-detail-card" role="dialog" aria-modal="true" aria-labelledby="reactPayoutHistoryTitle">
             <div className="payout-history-detail-heading">
               <div><div className="section-kicker">PAID DETAIL</div><h2 id="reactPayoutHistoryTitle">{String(selectedRecord.barberName || selectedRecord.barberId || "รายละเอียดการจ่าย")}</h2><p>รอบจ่าย {getCycleId(selectedRecord) ? formatThaiDate(getCycleId(selectedRecord), "long") : "-"}</p></div>
-              <button className="secondary-button payout-history-detail-close" type="button" aria-label="ปิด" onClick={() => setSelectedRecord(null)}>×</button>
+              <button className="secondary-button payout-history-detail-close" type="button" aria-label="ปิด" onClick={() => setSelectedRecord(null)}><i className="fa-solid fa-xmark" aria-hidden="true" /></button>
             </div>
             <div className="payout-detail-summary">
               <div><span>ค่ามือ</span><strong>{formatMoney(selectedRecord.commissionAmount)} บาท</strong></div>
