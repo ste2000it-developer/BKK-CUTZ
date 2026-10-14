@@ -293,7 +293,7 @@ export function PayoutPage() {
 
       {!loading && cycles.length === 0 && !error && (
         <section className="payout-empty-state">
-          <div className="payout-empty-icon">฿</div>
+          <div className="payout-empty-icon"><i className="fa-solid fa-money-bill-transfer" aria-hidden="true" /></div>
           <strong>ยังไม่มีข้อมูลสำหรับรอบจ่าย</strong>
           <p>เมื่อมีรายการขายหรือมีช่างเข้างาน ระบบจะแสดงรอบจ่ายให้อัตโนมัติ</p>
         </section>
