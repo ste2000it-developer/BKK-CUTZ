@@ -417,7 +417,7 @@ export function PayoutPage() {
                 {selectedRow.advances.length > 0 && (
                   <div className="payout-advances-breakdown">
                     <div className="payout-advances-title">
-                      <span className="material-symbols-outlined" style={{ fontSize: 18, color: "#dc2626" }}>payments</span>
+                      <i className="fa-solid fa-money-bill-transfer" aria-hidden="true" style={{ color: "#dc2626" }} />
                       <strong>รายการเบิกเงินของช่าง ({selectedRow.advances.length} รายการ)</strong>
                     </div>
                     <div className="payout-advances-table">
