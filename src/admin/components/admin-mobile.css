@@ -814,6 +814,103 @@
   .service-actions > button { min-height:38px; }
   .notification-item { padding:10px !important; }
 }
+
+/* Phone list layouts: information-dense cards rather than 1100px tables. */
+@media (max-width: 600px) {
+  .bn-store i { font-size:15px; }
+  .bn-date-controls > button i { font-size:15px; }
+  .financial-mobile-date-value { display:none; }
+  .financial-date-field { position:relative; min-width:0; }
+  .financial-date-field .financial-mobile-date-value {
+    display:flex; height:44px; width:100%; align-items:center; justify-content:center;
+    padding:0 4px; border:1px solid #d5d5d5; border-radius:10px;
+    color:#171717; background:#fff; font-size:12px; font-weight:700; white-space:nowrap;
+  }
+  .financial-date-field input[type="date"] {
+    position:absolute !important; inset:auto 0 0 !important;
+    height:44px !important; width:100% !important; opacity:0 !important;
+    padding:0 !important; z-index:1; cursor:pointer;
+  }
+  .financial-date-field:focus-within .financial-mobile-date-value { outline:2px solid #fdc717; outline-offset:2px; }
+  .payout-list,.payout-history-table-card,.payout-history-list { overflow:hidden !important; max-width:100%; }
+  .payout-table-head,.payout-history-table-head { display:none !important; }
+  .payout-table-row {
+    display:grid !important; width:100% !important; min-width:0 !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:8px 10px !important;
+    min-height:0 !important; padding:12px !important; font-size:12px !important;
+  }
+  .payout-table-row > div { min-width:0; }
+  .payout-table-row > div:nth-child(1) { grid-column:1; grid-row:1; }
+  .payout-table-row > div:nth-child(7) { grid-column:2; grid-row:1; text-align:right; font-size:18px; font-weight:800; }
+  .payout-table-row > div:nth-child(7)::before { content:"สุทธิ ฿"; display:block; font-size:10px; color:#777; font-weight:600; }
+  .payout-table-row > div:nth-child(2) { grid-column:1; grid-row:2; }
+  .payout-table-row > div:nth-child(3) { grid-column:2; grid-row:2; text-align:right; }
+  .payout-table-row > div:nth-child(4) { grid-column:1; grid-row:3; }
+  .payout-table-row > div:nth-child(5) { grid-column:2; grid-row:3; text-align:right; }
+  .payout-table-row > div:nth-child(6) { grid-column:1; grid-row:4; }
+  .payout-table-row > div:nth-child(8) { grid-column:2; grid-row:4; justify-self:end; }
+  .payout-table-row > div:nth-child(2)::before { content:"วันทำงาน "; color:#777; font-size:10px; }
+  .payout-table-row > div:nth-child(3)::before { content:"ค่ามือ ฿"; color:#777; font-size:10px; }
+  .payout-table-row > div:nth-child(4)::before { content:"ประกัน ฿"; color:#777; font-size:10px; }
+  .payout-table-row > div:nth-child(5)::before { content:"ทิป ฿"; color:#777; font-size:10px; }
+  .payout-table-row > div:nth-child(6)::before { content:"หักเบิก "; color:#777; font-size:10px; }
+  .payout-table-row > div:nth-child(9) { grid-column:1 / -1; grid-row:5; display:flex; gap:7px; justify-content:flex-end; }
+  .payout-actions > button { flex:1 1 auto; min-height:40px; }
+  .payout-history-table-row {
+    display:grid !important; width:100% !important; min-width:0 !important;
+    grid-template-columns:minmax(0,1fr) auto !important; gap:5px 10px !important;
+    min-height:0 !important; padding:12px !important; font-size:12px !important;
+  }
+  .payout-history-table-row > div { min-width:0; }
+  .payout-history-table-row > div:nth-child(1) { grid-column:1; grid-row:2; }
+  .payout-history-table-row > div:nth-child(2) { grid-column:1; grid-row:1; }
+  .payout-history-table-row > div:nth-child(3) { grid-column:1; grid-row:3; font-size:11px; }
+  .payout-history-table-row > div:nth-child(4),.payout-history-table-row > div:nth-child(5) { display:none; }
+  .payout-history-table-row > div:nth-child(6) { grid-column:2; grid-row:1; font-size:18px; text-align:right; font-weight:800; }
+  .payout-history-table-row > div:nth-child(6)::before { content:"฿"; font-size:12px; }
+  .payout-history-table-row > div:nth-child(7) { grid-column:2; grid-row:2; font-size:11px; text-align:right; }
+  .payout-history-table-row > div:nth-child(8) { grid-column:1 / -1; grid-row:4; font-size:10px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .payout-history-table-row > div:nth-child(9) { display:none; }
+  .advances-table-wrap { overflow:visible !important; max-width:100%; }
+  .advances-table { display:block; width:100% !important; min-width:0 !important; }
+  .advances-table thead { display:none; }
+  .advances-table tbody { display:grid; }
+  .advances-table tbody tr {
+    display:grid; grid-template-columns:minmax(0,1fr) auto;
+    gap:6px 8px; padding:12px; border-bottom:1px solid #eee;
+  }
+  .advances-table tbody td { display:block; width:auto !important; min-width:0; padding:0 !important; border:0 !important; }
+  .advances-table tbody td:nth-child(1) { grid-column:1; grid-row:1; font-size:11px; }
+  .advances-table tbody td:nth-child(2) { grid-column:1; grid-row:2; }
+  .advances-table tbody td:nth-child(3) { grid-column:2; grid-row:1 / 3; text-align:right; font-size:14px; }
+  .advances-table tbody td:nth-child(4) { grid-column:1; grid-row:3; font-size:11px; overflow-wrap:anywhere; }
+  .advances-table tbody td:nth-child(5) { grid-column:2; grid-row:3; text-align:right; }
+  .advances-table tbody td:nth-child(5) button { min-height:38px; }
+  .advances-delete-confirm { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:4px; }
+  .advances-delete-confirm span { width:100%; font-size:11px; }
+  .service-table-head { display:none !important; }
+  .service-list { overflow:hidden !important; }
+  .service-table-row { min-width:0 !important; }
+  .payout-detail-summary,.payout-history-paid-info { grid-template-columns:repeat(2,minmax(0,1fr)) !important; gap:7px !important; }
+  .payout-detail-summary > *, .payout-history-paid-info > * { min-width:0; }
+  .payout-daily-list { overflow-x:auto !important; }
+  .financial-list-wrap { overflow-x:auto !important; }
+  .financial-table { min-width:600px; }
+  .advances-modal-card { padding-bottom:max(16px,env(safe-area-inset-bottom)) !important; }
+}
+@media (min-width: 390px) and (max-width: 600px) {
+  .bn-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  .bn-card { display:flex !important; flex-direction:column; align-items:stretch; gap:7px !important; }
+  .bn-card-head { display:grid; grid-template-columns:26px minmax(0,1fr) 10px; gap:6px; }
+  .bn-store { width:26px; height:26px; }
+  .bn-card-head strong { font-size:12px; }
+  .bn-card-sales { margin:0 !important; }
+  .bn-card-sales strong { font-size:18px !important; }
+  .bn-card .bn-status { align-self:flex-start; margin:0 !important; }
+  .bn-card-meta { margin-top:auto !important; }
+  .bn-card-meta span { padding:3px 4px; }
+}
+
 @media (max-width: 360px) {
   .admin-main { padding-inline:9px !important; }
   .bn-date-caption { display:none; }
