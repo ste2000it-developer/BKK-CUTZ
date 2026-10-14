@@ -19,7 +19,7 @@ function BranchDetail({ node, close, historical, dateLabel, edit, registered }: 
         <h3 id="branch-detail-title">{node.name}</h3>
         <span className="bn-branch-code">{node.id} · {dateLabel}</span>
       </div>
-      <button type="button" className="bn-close" onClick={close} aria-label="ปิดรายละเอียดสาขา">×</button>
+      <button type="button" className="bn-close" onClick={close} aria-label="ปิดรายละเอียดสาขา"><i className="fa-solid fa-xmark" aria-hidden="true" /></button>
     </header>
 
     {registered && <div className="bn-manage-row"><span>สถานะปัจจุบัน: {registered.active === true ? "เปิดใช้งาน" : "ปิดใช้งาน"}</span><button type="button" className="bn-secondary" onClick={edit}>แก้ไขสาขา</button></div>}
