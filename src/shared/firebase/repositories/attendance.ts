@@ -6,8 +6,11 @@ import { bangkokBusinessDate, cashDifference, type CashClosingInput } from "../.
 import { loadCashClosingSummary } from "./cash-closing";
 export { loadCashClosingSummary } from "./cash-closing";
 
-const pushFunctions = getFunctions(app, "asia-southeast1");
-const requestAdminAttendancePush = httpsCallable<{ notificationId: string }>(pushFunctions, "pushAdminAttendance");
+async function sendAdminAttendancePush(notificationId: string) {
+  const pushFunctions = getFunctions(app, "asia-southeast1");
+  const requestAdminAttendancePush = httpsCallable<{ notificationId: string }>(pushFunctions, "pushAdminAttendance");
+  await requestAdminAttendancePush({ notificationId });
+}
 
 export async function listActiveBarbers(): Promise<Barber[]> {
   const result = await getDocs(query(collection(db, "barbers"), where("active", "==", true)));
@@ -57,7 +60,7 @@ export async function saveCheckIn(branch: PosBranch, barber: Barber, checkInMeth
   // function after the transaction commits instead.
   if (notificationId) {
     try {
-      await requestAdminAttendancePush({ notificationId });
+      await sendAdminAttendancePush(notificationId);
     } catch (issue) {
       console.error("Admin attendance push failed:", issue);
     }
