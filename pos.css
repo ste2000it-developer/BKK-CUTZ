@@ -3785,3 +3785,70 @@ svg {
     -webkit-appearance: none !important;
   }
 }
+
+
+/* POS phone-only usability fixes: sticky header, native-looking dialogs, clean tip input. */
+@media (max-width: 560px) {
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 300;
+    background: var(--black);
+  }
+  .notice-modal {
+    padding: max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px));
+    isolation: isolate;
+  }
+  .notice-modal > .modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10,10,10,.62);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 0;
+  }
+  .notice-modal-card {
+    position: relative;
+    z-index: 1;
+    width: min(420px, 100%);
+    max-height: calc(100dvh - 40px);
+    overflow-y: auto;
+    padding: 28px 22px;
+    border: 0;
+    border-radius: 18px;
+    background: #fff;
+    color: var(--text);
+    box-shadow: 0 24px 70px rgba(0,0,0,.24);
+    text-align: center;
+  }
+  .notice-modal-card h2 { margin: 0 0 12px; font-size: 24px; font-weight: 800; }
+  .notice-modal-card p { margin: 0; font-size: 15px; line-height: 1.6; }
+  .notice-modal-card .primary-button { width: 100%; margin-top: 24px; }
+  .modal > section, .notice-modal > section {
+    background-clip: padding-box;
+    border: 0;
+    outline: 0;
+  }
+  .tip-input-shell {
+    border: 1px solid #d8d8d8;
+    outline: none;
+  }
+  .tip-input-shell:focus-within { border-color: #777; }
+  .tip-input-shell input,
+  .tip-input-shell input:focus,
+  .tip-input-shell input:focus-visible {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    border: 0 !important;
+    outline: 0 !important;
+    outline-offset: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .tip-input-shell input::-webkit-inner-spin-button,
+  .tip-input-shell input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+}
