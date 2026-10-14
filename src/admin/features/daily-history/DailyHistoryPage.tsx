@@ -66,6 +66,7 @@ export function DailyHistoryPage() {
   const [branchFilter, setBranchFilter] = useState("all");
   const [barberFilter, setBarberFilter] = useState("all");
   const [paymentFilter, setPaymentFilter] = useState("all");
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [selected, setSelected] = useState<TransactionHistoryRecord | null>(null);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -147,8 +148,9 @@ export function DailyHistoryPage() {
     <div className="daily-history-react-page">
       <section className="daily-history-filter-card">
         <div className="daily-history-filter-head"><div><div className="section-kicker">DAILY TRANSACTIONS</div><h2>ประวัติรายวัน</h2><p>ดูรายการขายของทุกสาขา แยกตามวัน สาขา ช่าง และวิธีชำระเงิน</p></div></div>
-        <div className="daily-history-filters">
-          <label className="daily-history-date-field"><span>วันที่</span><input type="date" value={dateKey} onChange={(event) => { setDateKey(event.target.value); void load(event.target.value); }} /></label>
+        <div className="daily-history-mobile-tools"><button type="button" className="daily-history-filter-toggle" aria-expanded={mobileFiltersOpen} aria-controls="daily-history-filter-fields" onClick={() => setMobileFiltersOpen((open) => !open)}><i className="fa-solid fa-sliders" aria-hidden="true" /> ตัวกรอง{[branchFilter, barberFilter, paymentFilter].filter((value) => value !== "all").length ? ` (${[branchFilter, barberFilter, paymentFilter].filter((value) => value !== "all").length})` : ""}<i className={`fa-solid fa-chevron-${mobileFiltersOpen ? "up" : "down"}`} aria-hidden="true" /></button><button type="button" className="daily-history-mobile-refresh" disabled={loading} onClick={() => void load()} aria-label="โหลดข้อมูลใหม่"><i className="fa-solid fa-rotate-right" aria-hidden="true" /></button></div>
+        <div id="daily-history-filter-fields" className={`daily-history-filters${mobileFiltersOpen ? " mobile-filters-open" : ""}`}>
+          <label className="daily-history-date-field"><span>วันที่</span><span className="daily-history-mobile-date-value" aria-hidden="true">{dateKey ? new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "short", year: "numeric" }).format(new Date(`${dateKey}T12:00:00+07:00`)) : "เลือกวันที่"}</span><input type="date" aria-label="วันที่" value={dateKey} onChange={(event) => { if (event.target.value) { setDateKey(event.target.value); void load(event.target.value); } }} /></label>
           <div className="daily-history-select-field"><span>สาขา</span><AppSelect aria-label="สาขา"  value={branchFilter} onChange={(value) => setBranchFilter(value)}><option value="all">ทุกสาขา</option>{branchNames.map(([id, name]) => <option key={id} value={id}>{name}</option>)}</AppSelect></div>
           <div className="daily-history-select-field"><span>ช่าง</span><AppSelect aria-label="ช่าง"  value={barberFilter} onChange={(value) => setBarberFilter(value)}><option value="all">ช่างทุกคน</option>{barberNames.map(([id, name]) => <option key={id} value={id}>{name}</option>)}</AppSelect></div>
           <div className="daily-history-select-field"><span>ชำระเงิน</span><AppSelect aria-label="ชำระเงิน"  value={paymentFilter} onChange={(value) => setPaymentFilter(value)}><option value="all">ทุกช่องทาง</option><option value="cash">เงินสด</option><option value="scan">สแกนจ่าย</option></AppSelect></div>
