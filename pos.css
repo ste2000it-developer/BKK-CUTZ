@@ -3703,3 +3703,65 @@ svg {
   background: #ffffff !important;
   box-shadow: none !important;
 }
+
+/* POS iPhone/PWA polish — scoped to phones, does not change Admin. */
+@media (max-width: 600px) {
+  /* Keep the POS top bar visible while scrolling the transaction workspace. */
+  .app-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 110 !important;
+    isolation: isolate;
+  }
+  /* The warning dialog must be a proper opaque card above its dimmed backdrop. */
+  .notice-modal { isolation: isolate; }
+  .notice-modal > .modal-backdrop {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+    background: rgba(0,0,0,.64) !important;
+  }
+  .notice-modal-card {
+    position: relative !important;
+    z-index: 1 !important;
+    width: min(420px, 100%) !important;
+    max-height: calc(100dvh - 36px);
+    overflow-y: auto;
+    padding: 26px 22px !important;
+    border: 0 !important;
+    border-radius: 18px !important;
+    background: #ffffff !important;
+    box-shadow: 0 22px 65px rgba(0,0,0,.24) !important;
+    text-align: center;
+  }
+  .notice-modal-card h2 { margin: 0 0 12px; font-size: 24px; font-weight: 800; }
+  .notice-modal-card p { margin: 0 0 22px; font-size: 15px; line-height: 1.55; }
+  .notice-modal-card .primary-button { width: 100%; min-height: 52px; }
+  /* Uniform clean white dialogs: no external white frame. */
+  .modal > :is(.option-modal-card,.payment-modal-card,.shift-modal-card,.close-store-modal-card,.logout-confirm-card) {
+    border: 0 !important;
+    outline: none !important;
+    background: #ffffff !important;
+    background-clip: padding-box;
+    box-shadow: 0 22px 65px rgba(0,0,0,.22) !important;
+  }
+  /* One visible border on the tip amount control: outer shell only. */
+  .tip-input-shell input,
+  .tip-input-shell input:focus,
+  .tip-input-shell input:focus-visible {
+    min-width: 0;
+    border: 0 !important;
+    border-radius: 0 !important;
+    outline: 0 !important;
+    outline-offset: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .tip-input-shell:focus-within {
+    outline: none !important;
+    border-color: #111111 !important;
+    box-shadow: none !important;
+  }
+}
