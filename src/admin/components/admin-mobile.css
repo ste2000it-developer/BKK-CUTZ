@@ -512,6 +512,7 @@
     height:52px; align-items:center; gap:10px; padding:0 12px;
     background:#171717; color:#fff; border-bottom:1px solid #292929;
   }
+  .admin-mobile-header::before { content:""; position:absolute; bottom:100%; left:0; right:0; height:env(safe-area-inset-top, 0px); background:#171717; }
   .admin-mobile-header strong { font-size:16px; letter-spacing:.25px; white-space:nowrap; }
   .admin-mobile-header span { margin-left:auto; color:#fdc717; font-size:10px; letter-spacing:1.1px; }
   .admin-menu-toggle,.admin-menu-close {
@@ -566,7 +567,7 @@
   .logout-button::after { content:none !important; }
   .logout-button span { display:none; }
   .logout-button i { color:#b42318; }
-  .notification-panel { position:fixed !important; inset:8px !important; width:auto !important; max-height:calc(100dvh - 16px) !important; overflow-y:auto !important; }
+  .notification-panel { position:fixed !important; inset:calc(8px + env(safe-area-inset-top, 0px)) 8px calc(8px + env(safe-area-inset-bottom, 0px)) !important; width:auto !important; max-height:calc(100dvh - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important; overflow-y:auto !important; }
   .admin-main-inner > section,.admin-main-inner > section > * { min-width:0 !important; max-width:100%; }
   .admin-shell input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
   .admin-shell select,.admin-shell .app-select-trigger { height:44px !important; font-size:16px !important; max-width:100%; }
