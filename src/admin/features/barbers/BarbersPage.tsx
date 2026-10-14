@@ -253,7 +253,7 @@ export function BarbersPage() {
                 <h2 id="barberEditorTitle">{editing ? "แก้ไขข้อมูลช่าง" : "เพิ่มช่างใหม่"}</h2>
                 <p>{editing ? `รหัสช่าง ${editing.id}` : "สร้างข้อมูลช่างสำหรับ PIN และ RFID"}</p>
               </div>
-              <button className="secondary-button admin-modal-close" type="button" aria-label="ปิด" disabled={saving} onClick={closeEditor}>×</button>
+              <button className="secondary-button admin-modal-close" type="button" aria-label="ปิด" disabled={saving} onClick={closeEditor}><i className="fa-solid fa-xmark" aria-hidden="true" /></button>
             </div>
 
             <div className="barber-editor-body">
