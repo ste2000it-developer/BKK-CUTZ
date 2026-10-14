@@ -204,7 +204,7 @@ export function BarbersPage() {
 
         <div className="barber-filter-row">
           <label className="barber-search-field">
-            <span className="barber-search-icon" aria-hidden="true"><i className="fa-solid fa-magnifying-glass" /></span>
+            
             <input
               type="search"
               aria-label="ค้นหาช่าง" placeholder="ค้นหาชื่อ / PIN / RFID"
