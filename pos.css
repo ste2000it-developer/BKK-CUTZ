@@ -4098,3 +4098,26 @@ svg {
   }
   .app .history-controls .history-custom-select { align-self: end; }
 }
+
+/* Keep the branded history date field border visible on iOS PWA.
+   The transparent native date input must not paint its own focus outline. */
+@media (max-width: 600px) {
+  .app .history-controls .history-date-picker {
+    border: 1px solid #d8d8d8 !important;
+    border-radius: 12px !important;
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+  .app .history-controls .history-date-picker:focus-within {
+    border-color: #111 !important;
+  }
+  .app .history-controls .history-date-picker input[type="date"],
+  .app .history-controls .history-date-picker input[type="date"]:focus {
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+  }
+}
