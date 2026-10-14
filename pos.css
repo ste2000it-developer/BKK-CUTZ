@@ -4076,3 +4076,14 @@ svg {
   .app .payment-extras { margin-top: 24px; }
   .app .payment-extra-block { margin-bottom: 20px; }
 }
+
+/* Keep branch data loading centered below the POS header. */
+.pos-workspace-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 45vh;
+  min-height: 45dvh;
+  width: 100%;
+}
+.pos-workspace-loading > * { margin-inline: auto; }
