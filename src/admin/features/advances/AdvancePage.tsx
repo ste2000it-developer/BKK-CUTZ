@@ -53,6 +53,12 @@ export function AdvancePage() {
   });
 
   // Modal create
+  const advanceMonthLabel = monthFilter ? new Intl.DateTimeFormat("th-TH", { month: "long", year: "numeric" }).format(new Date(`${monthFilter}-01T12:00:00+07:00`)) : "ทุกเดือน";
+  const changeAdvanceMonth = (delta: number) => {
+    const [year, month] = (monthFilter || localDateKey(new Date()).slice(0, 7)).split("-").map(Number);
+    const date = new Date(year, month - 1 + delta, 1);
+    setMonthFilter(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`);
+  };
   const [showModal, setShowModal] = useState(false);
   const [selectedBarberId, setSelectedBarberId] = useState("");
   const [advanceDate, setAdvanceDate] = useState(() => localDateKey(new Date()));
@@ -186,12 +192,11 @@ export function AdvancePage() {
         <div className="advances-filter-bar">
           <div className="advances-filter-item">
             <label htmlFor="advMonthFilter">เดือนที่เบิก</label>
-            <input
-              id="advMonthFilter"
-              type="month"
-              value={monthFilter}
-              onChange={(e) => setMonthFilter(e.target.value)}
-            />
+            <div className="admin-date-nav advances-month-nav">
+              <button type="button" aria-label="เดือนก่อนหน้า" onClick={() => changeAdvanceMonth(-1)}><i className="fa-solid fa-chevron-left" aria-hidden="true" /></button>
+              <div className="admin-date-nav-picker"><span aria-hidden="true">{advanceMonthLabel}</span><input id="advMonthFilter" aria-label="เลือกเดือนที่เบิก" type="month" value={monthFilter} onChange={(e) => setMonthFilter(e.target.value)} /></div>
+              <button type="button" aria-label="เดือนถัดไป" onClick={() => changeAdvanceMonth(1)}><i className="fa-solid fa-chevron-right" aria-hidden="true" /></button>
+            </div>
           </div>
           <div className="advances-filter-item">
             <label id="advBarberFilterLabel">ช่าง</label>
