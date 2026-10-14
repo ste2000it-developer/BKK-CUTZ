@@ -541,3 +541,45 @@
  .bn-summary-card strong{font-size:22px!important}
 }
 @media(prefers-reduced-motion:reduce){.admin-sidebar{transition:none!important}}
+
+/* Phone-only corrective pass. Tablet and desktop remain unchanged. */
+@media (max-width: 600px) {
+  .admin-mobile-header { height: 52px; padding-inline: 12px; }
+  .admin-mobile-header strong { font-size: 16px; }
+  .admin-sidebar { width: min(280px, 82vw) !important; padding: 18px 12px !important; }
+  .admin-nav { gap: 3px !important; margin-top: 12px !important; }
+  .admin-nav-button { min-height: 44px !important; border-radius: 9px !important; font-size: 13px !important; }
+  .sidebar-menu-title { margin-top: 18px !important; }
+  .admin-main { padding: 10px 12px 28px !important; }
+  .admin-topbar { margin-bottom: 10px !important; }
+  .admin-kicker,.admin-email { display: none !important; }
+  .admin-topbar h1 { font-size: 20px !important; margin: 0 !important; }
+  .notification-bell,.logout-button { width: 40px !important; height: 40px !important; min-height: 40px !important; }
+  .bn-top { gap: 5px !important; }
+  .bn-top h2 { font-size: 19px !important; }
+  .bn-top p { font-size: 12px !important; margin: 0 !important; }
+  .bn-top-actions { grid-template-columns: auto minmax(0,1fr) !important; gap: 6px !important; }
+  .bn-top-actions .bn-primary { min-height: 40px !important; padding: 0 12px !important; font-size: 13px !important; }
+  .bn-live { min-height: 40px !important; justify-self:end !important; font-size: 11px !important; }
+  .bn-toolbar { padding: 10px !important; }
+  .bn-date-controls { display: grid !important; grid-template-columns: 40px minmax(0,1fr) 40px !important; gap: 6px !important; align-items:end !important; }
+  .bn-date-controls > button { width: 40px !important; min-width: 40px !important; height: 44px !important; position:static !important; transform:none !important; margin:0 !important; }
+  .bn-date-controls label { display:block !important; min-width:0 !important; width:100% !important; }
+  .bn-date-controls input { display:block !important; width:100% !important; min-width:0 !important; height:44px !important; font-size:14px !important; padding:0 6px !important; text-align:center; }
+  .bn-shortcuts { margin:0 !important; }
+  .bn-summary { grid-template-columns: repeat(2,minmax(0,1fr)) !important; gap:8px !important; }
+  .bn-summary-card { min-height:88px !important; padding:10px !important; border-radius:12px !important; }
+  .bn-summary-card strong { font-size:24px !important; }
+  .bn-summary-card small { font-size:10px !important; }
+  .bn-board { padding:8px !important; }
+  .bn-grid { gap:8px !important; }
+  .bn-card { padding:11px !important; border-radius:12px !important; }
+  .bn-detail-metrics { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  .admin-shell .barber-search-field input { padding-left:48px !important; }
+  .admin-shell .barber-search-icon { left:14px !important; }
+  .admin-shell input[type="date"] { width:100% !important; max-width:100% !important; min-width:0 !important; box-sizing:border-box !important; }
+  .daily-history-card,.daily-history-filter-card,.payout-history-card,.payout-section,.financial-card,.advances-card { max-width:100% !important; min-width:0 !important; }
+  .daily-history-filter-head,.payout-history-filter-head { gap:8px !important; }
+  .admin-shell .app-select-trigger,.admin-shell select { min-width:0 !important; }
+  .admin-shell section,.admin-shell form { min-width:0; }
+}
