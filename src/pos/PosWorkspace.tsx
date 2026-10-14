@@ -84,7 +84,7 @@ export function PosWorkspace({ branch }: { branch: PosBranch }) {
   </header>
     {logoutConfirm && <div className="modal"><button className="modal-backdrop" type="button" aria-label="ยกเลิกออกจากระบบ" onClick={() => setLogoutConfirm(false)} /><section className="logout-confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="logoutConfirmTitle" aria-describedby="logoutConfirmDescription"><button className="modal-close" type="button" aria-label="ปิด" onClick={() => setLogoutConfirm(false)}>×</button><h2 id="logoutConfirmTitle">ออกจากระบบ?</h2><p id="logoutConfirmDescription">ต้องการออกจากระบบสาขานี้หรือไม่</p><div className="logout-confirm-actions"><button className="secondary-button" type="button" autoFocus onClick={() => setLogoutConfirm(false)}>ยกเลิก</button><button className="primary-button" type="button" onClick={() => void confirmLogout()}>ออกจากระบบ</button></div></section></div>}
     {(error || attendance.error) && <div className="error-box" role="alert">{error || attendance.error}</div>}
-    {!ready && !error && !attendance.error && <LoadingScreen message="กำลังโหลดข้อมูลสาขา..." spinnerClassName="loading-spinner" />}
+    {!ready && !error && !attendance.error && <section className="pos-workspace-loading" aria-live="polite"><LoadingScreen message="กำลังโหลดข้อมูลสาขา..." spinnerClassName="loading-spinner" /></section>}
     {ready && <>
       <section id="barberPage" className={`page${barber || transaction ? " hidden" : ""}`}>
 <div id="barberReactRoot"><BarberSelectionPage barbers={attendance.barbers} onSelect={selectBarber} onOpenShift={() => setShift(true)} /></div></section>
