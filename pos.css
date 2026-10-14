@@ -3765,3 +3765,88 @@ svg {
     box-shadow: none !important;
   }
 }
+
+
+/* POS phone-only UI fixes: fixed-in-flow header, solid dialogs and clean tip input. */
+@media (max-width: 600px) {
+  .app-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    background: #111111 !important;
+    isolation: isolate;
+  }
+  .notice-modal {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 1500 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .notice-modal > .modal-backdrop,
+  .notice-modal > .notice-backdrop {
+    position: absolute !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, .6) !important;
+  }
+  .notice-modal > .notice-modal-card,
+  .notice-modal > .notice-card {
+    position: relative !important;
+    z-index: 1 !important;
+    display: block !important;
+    width: min(420px, 100%) !important;
+    max-height: calc(100dvh - 40px) !important;
+    overflow-y: auto !important;
+    padding: 26px 22px !important;
+    border: 0 !important;
+    border-radius: 18px !important;
+    background: #fff !important;
+    color: #171717 !important;
+    box-shadow: 0 20px 65px rgba(0,0,0,.25) !important;
+    text-align: center !important;
+  }
+  .notice-modal > .notice-modal-card h2 {
+    margin: 0 0 12px !important;
+    font-size: 24px !important;
+    font-weight: 800 !important;
+  }
+  .notice-modal > .notice-modal-card p {
+    margin: 0 0 22px !important;
+    font-size: 15px !important;
+    line-height: 1.5 !important;
+  }
+  .notice-modal > .notice-modal-card .primary-button {
+    width: 100% !important;
+    min-height: 50px !important;
+  }
+  .modal > :is(.option-modal-card,.payment-modal-card,.shift-modal-card,.close-store-modal-card,.logout-confirm-card,.shop-expense-modal-card) {
+    border: 0 !important;
+    outline: 0 !important;
+    background: #fff !important;
+    box-shadow: 0 20px 65px rgba(0,0,0,.22) !important;
+    background-clip: padding-box !important;
+  }
+  .tip-input-shell {
+    outline: 0 !important;
+    box-shadow: none !important;
+  }
+  .tip-input-shell input,
+  .tip-input-shell input:focus,
+  .tip-input-shell input:focus-visible {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    border: 0 !important;
+    outline: 0 !important;
+    outline-offset: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+  }
+  .tip-input-shell:focus-within {
+    border-color: #d8d8d8 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+  }
+}
