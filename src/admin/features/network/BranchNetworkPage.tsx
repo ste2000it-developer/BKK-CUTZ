@@ -8,7 +8,7 @@ import { BranchEditor } from "./BranchEditor";
 import "./branch-network.css";
 
 function StoreIcon() {
-  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 10v10h16V10M3 7l2-4h14l2 4v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0V7ZM3 7h18M9 20v-6h6v6" /></svg>;
+  return <i className="fa-solid fa-store" aria-hidden="true" />;
 }
 
 function BranchDetail({ node, close, historical, dateLabel, edit, registered }: { node: BranchNode; close: () => void; historical: boolean; dateLabel: string; edit: () => void; registered?: NetworkBranch }) {
@@ -112,9 +112,9 @@ export function BranchNetworkPage() {
 
     <div className="bn-toolbar">
       <div className="bn-date-controls">
-        <button type="button" aria-label="วันก่อนหน้า" onClick={() => setChosenDate(shiftNetworkDate(dateKey, -1))}>‹</button>
+        <button type="button" aria-label="วันก่อนหน้า" onClick={() => setChosenDate(shiftNetworkDate(dateKey, -1))}><i className="fa-solid fa-chevron-left" aria-hidden="true" /></button>
         <label className="bn-date-field"><span>วันที่แสดงข้อมูล</span><span className="bn-date-mobile-value" aria-hidden="true">{thaiDate}</span><input aria-label="วันที่แสดงข้อมูล" type="date" value={dateKey} max={today} onChange={(event) => { const value = event.target.value; if (/^\d{4}-\d{2}-\d{2}$/.test(value) && value <= today) setChosenDate(value === today ? null : value); }} /></label>
-        <button type="button" aria-label="วันถัดไป" disabled={!historical} onClick={() => { const next = shiftNetworkDate(dateKey, 1); setChosenDate(next >= today ? null : next); }}>›</button>
+        <button type="button" aria-label="วันถัดไป" disabled={!historical} onClick={() => { const next = shiftNetworkDate(dateKey, 1); setChosenDate(next >= today ? null : next); }}><i className="fa-solid fa-chevron-right" aria-hidden="true" /></button>
       </div>
       <div className="bn-shortcuts"><button type="button" aria-pressed={!historical} className={!historical ? "is-active" : ""} onClick={() => setChosenDate(null)}>วันนี้</button><button type="button" aria-pressed={dateKey === shiftNetworkDate(today, -1)} className={dateKey === shiftNetworkDate(today, -1) ? "is-active" : ""} onClick={() => setChosenDate(shiftNetworkDate(today, -1))}>เมื่อวาน</button></div>
       <span className="bn-date-caption">{thaiDate}</span>
@@ -140,7 +140,7 @@ export function BranchNetworkPage() {
               <div className="bn-card-head">
                 <span className="bn-store"><StoreIcon /></span>
                 <div><span className="bn-card-code">{node.id}</span><strong>{node.name}</strong></div>
-                <span className="bn-arrow" aria-hidden="true">›</span>
+                <span className="bn-arrow" aria-hidden="true"><i className="fa-solid fa-chevron-right" /></span>
               </div>
               <span className={"bn-status " + node.status}><i />{branchStatus[node.status]}</span>
               <div className="bn-card-sales"><span>{historical ? "ยอดขายในวันที่เลือก" : "ยอดขายวันนี้"}</span><strong>฿{formatMoney(node.sales)}</strong></div>
