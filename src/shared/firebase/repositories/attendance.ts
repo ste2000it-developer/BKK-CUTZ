@@ -117,11 +117,10 @@ export async function saveStoreClosing(branch: PosBranch, barbers: readonly Barb
     }
   });
 
-  try {
-    await sendAdminNotificationPush(notificationId);
-  } catch (issue) {
-    // Store closing already committed successfully; a push failure must not
-    // undo or report the closing itself as failed.
+  // The Firestore transaction is the source of truth for closing success.
+  // Deliver the admin push independently so a slow FCM request cannot keep
+  // the cashier stuck on the "saving" screen after closing has committed.
+  void sendAdminNotificationPush(notificationId).catch((issue: unknown) => {
     console.error("Admin store-closing push failed:", issue);
-  }
+  });
 }
