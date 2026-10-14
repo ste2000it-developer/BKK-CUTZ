@@ -78,7 +78,10 @@ export function PayoutHistoryPage() {
     setLoading(true);
     setError("");
     try {
-      const result = await listPayoutHistory();
+      const result = await Promise.race([
+        listPayoutHistory(),
+        new Promise<never>((_, reject) => window.setTimeout(() => reject(new Error("โหลดประวัตินานเกิน 20 วินาที กรุณาลองใหม่และตรวจสอบการเชื่อมต่อ")), 20000)),
+      ]);
       const paidRecords = result
         .filter((record) => !record.status || record.status === "paid")
         .sort((first, second) => {
