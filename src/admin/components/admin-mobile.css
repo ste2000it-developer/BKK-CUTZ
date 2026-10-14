@@ -914,6 +914,54 @@
   .bn-card-meta span { padding:3px 4px; }
 }
 
+
+/* Final phone polish: uniform typography and a shared payout-style date navigator. */
+@media (max-width: 600px) {
+  .admin-main-inner { --admin-phone-label:12px; --admin-phone-body:14px; --admin-phone-heading:18px; }
+  .admin-main-inner :is(.bn-top h2,.bn-board-head h3,.barber-toolbar h2,.payout-cycle-card h2,.payout-table-toolbar h2,.payout-history-filter-head h2,.advances-header-top h2,.financial-summary-head h2,.daily-history-table-card h2) { font-size:var(--admin-phone-heading) !important; line-height:1.35 !important; }
+  .admin-main-inner :is(.bn-summary-card > span,.barber-summary-card span,.payout-summary-card span,.payout-history-summary-card span,.advances-kpi-card span,.financial-kpi-card span,.daily-history-summary-card span) { font-size:var(--admin-phone-label) !important; line-height:1.4 !important; }
+  .admin-main-inner :is(.bn-summary-card strong,.barber-summary-card strong,.payout-summary-card strong,.payout-history-summary-card strong,.advances-kpi-card strong,.daily-history-summary-card strong) { font-size:24px !important; line-height:1.2 !important; }
+  .admin-main-inner :is(.bn-summary-card small,.barber-summary-card small,.payout-summary-card small,.payout-history-summary-card small,.advances-kpi-card small,.daily-history-summary-card small) { font-size:11px !important; line-height:1.4 !important; }
+  .admin-main-inner :is(.bn-card-head strong,.barber-identity-cell strong,.payout-table-row,.payout-history-table-row,.daily-history-table-row) { font-size:var(--admin-phone-body) !important; }
+  .admin-main-inner :is(.bn-card-code,.bn-card-meta,.barber-identity-cell span,.payout-cycle-card p,.advances-header-top p) { font-size:11px !important; line-height:1.45 !important; }
+  .admin-main-inner :is(.admin-date-nav,.bn-date-controls,.payout-cycle-controls) {
+    display:grid !important; grid-template-columns:44px minmax(0,1fr) 44px !important;
+    gap:7px !important; align-items:end !important; width:100% !important; min-width:0 !important;
+  }
+  .admin-main-inner :is(.admin-date-nav,.bn-date-controls,.payout-cycle-controls) > button {
+    width:44px !important; min-width:44px !important; height:44px !important;
+    display:grid !important; place-items:center !important; padding:0 !important;
+    border:1px solid #dedede !important; border-radius:10px !important;
+    background:#fff !important; color:#222 !important;
+  }
+  .admin-main-inner :is(.admin-date-nav,.bn-date-controls,.payout-cycle-controls) > button:disabled { opacity:.38 !important; }
+  .admin-main-inner :is(.admin-date-nav,.bn-date-controls,.payout-cycle-controls) > button i { font-size:15px !important; }
+  .admin-date-nav-picker { position:relative; display:flex; align-items:center; justify-content:center; min-width:0; height:44px; border:1px solid #d5d5d5; border-radius:10px; background:#fff; overflow:hidden; }
+  .admin-date-nav-picker > span { font-size:14px !important; font-weight:700; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 6px; }
+  .admin-main-inner .admin-date-nav-picker input:is([type="date"],[type="month"]) {
+    position:absolute !important; inset:0 !important; width:100% !important; height:100% !important;
+    padding:0 !important; opacity:0 !important; cursor:pointer; z-index:1;
+  }
+  .admin-date-nav-picker:focus-within { outline:2px solid #fdc717; outline-offset:2px; }
+  .bn-date-controls .bn-date-field { min-width:0; }
+  .bn-date-controls .bn-date-mobile-value { font-size:14px !important; }
+  .daily-history-date-field { grid-column:1 / -1; }
+  .daily-history-date-field > span:first-child { margin-bottom:5px; }
+  .daily-history-date-field .admin-date-nav { width:100%; }
+  .daily-history-date-field .admin-date-nav-picker { width:100%; }
+  .advances-filter-bar { grid-template-columns:minmax(0,1fr) !important; gap:9px !important; }
+  .advances-filter-item { min-width:0 !important; width:100% !important; }
+  .advances-filter-item > label { display:block; margin-bottom:5px; }
+  .advances-month-nav { width:100%; }
+  .advances-filter-item .app-select,.advances-filter-item .app-select-trigger { width:100% !important; min-width:0 !important; max-width:100% !important; }
+  .barber-search-field { display:block; }
+  .admin-shell .barber-search-field input[type="search"] {
+    padding-left:14px !important; padding-right:14px !important;
+    width:100% !important; min-width:0 !important; font-size:16px !important;
+  }
+  .barber-search-field::before,.barber-search-field::after { content:none !important; }
+}
+
 @media (max-width: 360px) {
   .admin-main { padding-inline:9px !important; }
   .bn-date-caption { display:none; }
