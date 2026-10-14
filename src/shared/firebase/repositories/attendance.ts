@@ -6,10 +6,10 @@ import { bangkokBusinessDate, cashDifference, type CashClosingInput } from "../.
 import { loadCashClosingSummary } from "./cash-closing";
 export { loadCashClosingSummary } from "./cash-closing";
 
-async function sendAdminAttendancePush(notificationId: string) {
+async function sendAdminNotificationPush(notificationId: string) {
   const pushFunctions = getFunctions(app, "asia-southeast1");
-  const requestAdminAttendancePush = httpsCallable<{ notificationId: string }>(pushFunctions, "pushAdminAttendance");
-  await requestAdminAttendancePush({ notificationId });
+  const requestAdminPush = httpsCallable<{ notificationId: string }>(pushFunctions, "pushAdminAttendance");
+  await requestAdminPush({ notificationId });
 }
 
 export async function listActiveBarbers(): Promise<Barber[]> {
@@ -60,7 +60,7 @@ export async function saveCheckIn(branch: PosBranch, barber: Barber, checkInMeth
   // function after the transaction commits instead.
   if (notificationId) {
     try {
-      await sendAdminAttendancePush(notificationId);
+      await sendAdminNotificationPush(notificationId);
     } catch (issue) {
       console.error("Admin attendance push failed:", issue);
     }
@@ -89,6 +89,8 @@ export async function saveStoreClosing(branch: PosBranch, barbers: readonly Barb
   }
   const difference = cashDifference(actualCash, fresh.expectedCash);
   const id = `${branch.id}_${dateKey}`;
+  const notificationId = "store-closed_" + id;
+
   await runTransaction(db, async (batch) => {
     const closingRef = doc(db, "daily_closings", id);
     const existing = await batch.get(closingRef);
@@ -100,7 +102,6 @@ export async function saveStoreClosing(branch: PosBranch, barbers: readonly Barb
       branchName: branch.name || "", dateKey, closedByBarberId: closer.id,
       closedByBarberName: closer.name, closedAt: serverTimestamp(), closedBarberCount: barbers.length,
     });
-    const notificationId = "store-closed_" + id;
     batch.set(doc(db, "admin_notifications", notificationId), {
       id: notificationId, type: "store_closed", closingId: id,
       barberId: closer.id, barberName: closer.name, branchId: branch.id, branchName: branch.name || "",
@@ -115,4 +116,12 @@ export async function saveStoreClosing(branch: PosBranch, barbers: readonly Barb
       }, { merge: true });
     }
   });
+
+  try {
+    await sendAdminNotificationPush(notificationId);
+  } catch (issue) {
+    // Store closing already committed successfully; a push failure must not
+    // undo or report the closing itself as failed.
+    console.error("Admin store-closing push failed:", issue);
+  }
 }
