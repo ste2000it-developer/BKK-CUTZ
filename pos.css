@@ -3852,3 +3852,120 @@ svg {
   .tip-input-shell input::-webkit-inner-spin-button,
   .tip-input-shell input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 }
+
+
+/* POS phone bottom sheets: history and cash/tip withdrawal only.
+   Do not change tablet/desktop layouts or Admin. */
+@media (max-width: 600px) {
+  /* History: anchored to the bottom, with all content scrollable inside the sheet. */
+  .app .history-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    overflow: hidden;
+  }
+  .app .history-modal-card {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    max-height: min(88dvh, calc(100dvh - env(safe-area-inset-top, 0px) - 12px));
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 18px 16px max(22px, env(safe-area-inset-bottom, 0px));
+    border-radius: 22px 22px 0 0;
+  }
+  .app .history-popup-head {
+    position: sticky;
+    top: -18px;
+    z-index: 5;
+    margin: -18px -16px 16px;
+    padding: 20px 16px 12px;
+    background: #fff;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .app .history-popup-head > div { min-width: 0; padding-right: 50px; }
+  .app .history-popup-head .modal-close { top: 18px; right: 16px; }
+  .app .history-controls { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .app .history-control,
+  .app .history-control input,
+  .app .history-custom-select,
+  .app .history-custom-select-button {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .app .history-control input[type="date"] {
+    width: 100%;
+    min-width: 0;
+    display: block;
+    font-size: 16px;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .app .history-control input[type="date"]::-webkit-date-and-time-value { min-width: 0; text-align: left; }
+  .app .history-refresh-button { grid-column: 1 / -1; width: 100%; }
+  .app .history-list {
+    min-height: 0;
+    flex: none;
+    overflow: visible;
+    padding: 0;
+  }
+  .app .history-item-compact { min-width: 0; max-width: 100%; }
+  .app .history-compact-main, .app .history-compact-right { min-width: 0; }
+
+  /* Expense/tip: use the same bottom-sheet pattern, with breathing room. */
+  .app .modal:has(> .shop-expense-modal-card) {
+    align-items: flex-end !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    overflow: hidden;
+  }
+  .app .modal > .shop-expense-modal-card {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    max-height: min(88dvh, calc(100dvh - env(safe-area-inset-top, 0px) - 12px)) !important;
+    height: auto;
+    margin: 0 !important;
+    padding: 22px 20px max(28px, env(safe-area-inset-bottom, 0px)) !important;
+    border-radius: 22px 22px 0 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .app .shop-expense-modal-card > .modal-close {
+    position: sticky !important;
+    float: right;
+    top: 0 !important;
+    right: 0 !important;
+    z-index: 12;
+    width: 42px;
+    height: 42px;
+    margin: 0 0 -42px 8px;
+  }
+  .app .shop-expense-modal-card form,
+  .app .shop-expense-success { min-width: 0; }
+  .app .shop-expense-head { padding-right: 48px; margin-bottom: 24px; }
+  .app .shop-expense-head h2 { font-size: 25px; line-height: 1.3; margin: 6px 0 8px; }
+  .app .shop-expense-head p { font-size: 14px; line-height: 1.55; }
+  .app .shop-expense-head .page-kicker { font-size: 11px; line-height: 1.45; }
+  .app .shop-expense-form-group { min-width: 0; margin-bottom: 22px; }
+  .app .shop-expense-form-group label { font-size: 14px; margin-bottom: 9px; line-height: 1.45; }
+  .app .shop-expense-type-chips { gap: 10px; }
+  .app .shop-expense-type-btn { min-width: 0; min-height: 48px; padding: 9px 8px; font-size: 13px; }
+  .app .shop-expense-amount-wrap input { height: 58px; font-size: 26px; }
+  .app .shop-expense-quick-chips { gap: 8px; margin-top: 12px; }
+  .app .shop-expense-chip { min-height: 40px; padding: 8px 13px; }
+  .app .shop-expense-suggest-tags { gap: 8px; margin-top: 12px; }
+  .app .shop-expense-tag { min-height: 38px; padding: 7px 11px; font-size: 13px; }
+  .app .shop-expense-submit { min-height: 54px; margin-top: 8px; }
+}
