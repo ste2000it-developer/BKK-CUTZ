@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { PosBranch } from "../../../shared/domain/pos-attendance";
 import { normalizedTip, type Checkout, type PaymentMethod, type PosTransaction } from "../../../shared/domain/pos-payment";
 import { calculatePosServiceTotal } from "../../../shared/domain/pos-services";
@@ -9,12 +9,6 @@ export function PaymentPage({ branch, checkout, onCancel, onSuccess, onBusy, onS
   branch: PosBranch; checkout: Checkout; onCancel: () => void; onSuccess: (transaction: PosTransaction) => void; onBusy: (busy: boolean) => void; onScanChange: (scan: boolean) => void;
 }) {
   const [scan, setScan] = useState(false);
-  // The QR screen replaces the previous page in-place. Reset its scroll position
-  // before paint so phone users always see the QR first, not the previous page's offset.
-  useLayoutEffect(() => {
-    if (!scan) return;
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-  }, [scan]);
   const [tipOpen, setTipOpen] = useState(false);
   const [tip, setTip] = useState(0);
   const [file, setFile] = useState<File | null>(null);
