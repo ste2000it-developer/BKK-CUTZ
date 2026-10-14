@@ -338,9 +338,7 @@ export function AdvancePage() {
               type="button"
               aria-label="ปิด"
               onClick={() => setShowModal(false)}
-            >
-              ×
-            </button>
+            ><i className="fa-solid fa-xmark" aria-hidden="true" /></button>
 
             <div className="advances-modal-head">
               <div>
