@@ -490,3 +490,54 @@
     grid-template-columns: minmax(0, 1fr) !important;
   }
 }
+
+
+/* Mobile-first Admin shell and branch dashboard */
+.admin-mobile-header,.admin-menu-close,.admin-menu-backdrop{display:none}
+@media(max-width:900px){
+ .admin-mobile-header{display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:90;height:56px;padding:0 16px;background:#171717;color:#fff}
+ .admin-mobile-header strong{font-size:18px;letter-spacing:.3px}
+ .admin-mobile-header span{font-size:10px;color:#fdc717;margin-left:auto;letter-spacing:1px}
+ .admin-menu-toggle{display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:white;font-size:24px;cursor:pointer}
+ .admin-menu-backdrop{display:block;position:fixed;inset:0;z-index:100;border:0;background:#0009}
+ .admin-sidebar{position:fixed!important;top:0!important;left:0!important;bottom:0!important;z-index:101!important;width:min(310px,85vw)!important;height:100dvh!important;max-height:100dvh!important;padding:25px 16px!important;overflow-y:auto!important;transform:translateX(-105%);transition:transform .22s ease;box-shadow:none!important}
+ .admin-sidebar.mobile-open{transform:translateX(0);box-shadow:12px 0 40px #0004!important}
+ .admin-menu-close{display:grid;place-items:center;position:absolute;top:12px;right:12px;width:44px;height:44px;background:#292929;border:1px solid #444;border-radius:10px;color:#fff;font-size:28px}
+ .sidebar-menu-title{display:block!important;margin-top:26px}
+ .admin-nav{display:flex!important;flex-direction:column!important;overflow:visible!important;width:100%!important;margin-top:16px!important;gap:7px!important}
+ .admin-nav-button{width:100%!important;min-height:48px!important;justify-content:initial!important;grid-template-columns:28px minmax(0,1fr) 12px!important;font-size:13px!important;text-align:left!important;padding:0 12px!important}
+ .admin-nav-button b{display:block!important}
+ .admin-main{padding:14px 12px 40px!important}
+ .admin-topbar{margin-bottom:14px!important}
+ .admin-topbar h1{font-size:23px!important}
+ .bn-top{gap:12px!important;margin-bottom:14px!important;padding:0!important}
+ .bn-top h2{font-size:22px!important}
+ .bn-top p{font-size:12px!important}
+ .bn-top-actions{width:100%;display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:center!important;gap:8px!important}
+ .bn-top-actions .bn-primary{min-height:44px;justify-self:start}
+ .bn-live{width:auto!important;min-height:44px;padding:0 10px!important;font-size:11px!important}
+ .bn-toolbar{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:10px!important;padding:12px!important;margin-bottom:12px!important}
+ .bn-date-controls{display:grid!important;grid-template-columns:44px minmax(0,1fr) 44px!important;align-items:end!important;gap:8px!important;width:100%}
+ .bn-date-controls>button{width:44px!important;height:48px!important;align-self:end!important}
+ .bn-date-controls label{min-width:0;width:100%}
+ .bn-date-controls input{width:100%!important;max-width:none!important;height:48px!important;min-width:0;font-size:16px!important}
+ .bn-shortcuts{justify-self:start}
+ .bn-date-caption{margin:0!important}
+ .bn-summary{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+ .bn-summary-card{padding:14px!important;min-height:110px!important}
+ .bn-summary-card strong{font-size:25px!important}
+ .bn-summary-card>span{font-size:11px!important}
+ .bn-summary-card small{font-size:10px!important}
+ .bn-board{padding:10px!important}
+ .bn-card{min-height:0!important;padding:15px!important}
+ .bn-card-meta{flex-direction:row!important;flex-wrap:wrap}
+ .bn-detail-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:380px){
+ .bn-top-actions{grid-template-columns:1fr!important}
+ .bn-live{justify-self:start}
+ .bn-date-controls{gap:5px!important}
+ .bn-summary-card{padding:11px!important}
+ .bn-summary-card strong{font-size:22px!important}
+}
+@media(prefers-reduced-motion:reduce){.admin-sidebar{transition:none!important}}
