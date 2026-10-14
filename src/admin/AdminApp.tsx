@@ -170,7 +170,7 @@ export function AdminApp() {
         <div><div className="sidebar-brand">BKK-CUTZ</div><div className="sidebar-subbrand">ADMIN PANEL</div></div>
         <div className="sidebar-menu-title">เมนูระบบ</div>
         <nav className="admin-nav" aria-label="เมนู Admin">
-          {navigation.map((item) => <button className={`admin-nav-button${page === item.id ? " active" : ""}`} key={item.id} type="button" aria-current={page === item.id ? "page" : undefined} onClick={() => void navigateToPage(item.id)}><span className="nav-icon" aria-hidden="true"><i className={`fa-solid ${item.icon}`} /></span><span>{item.label}</span><b aria-hidden="true">›</b></button>)}
+          {navigation.map((item) => <button className={`admin-nav-button${page === item.id ? " active" : ""}`} key={item.id} type="button" aria-current={page === item.id ? "page" : undefined} onClick={() => void navigateToPage(item.id)}><span className="nav-icon" aria-hidden="true"><i className={`fa-solid ${item.icon}`} /></span><span>{item.label}</span><b aria-hidden="true"><i className="fa-solid fa-chevron-right" /></b></button>)}
         </nav>
         <div className="sidebar-footer"><div>STAY SHARP</div><div>LOOK FRESH</div></div>
       </aside>
