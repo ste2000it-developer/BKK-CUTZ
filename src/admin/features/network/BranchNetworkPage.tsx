@@ -113,7 +113,7 @@ export function BranchNetworkPage() {
     <div className="bn-toolbar">
       <div className="bn-date-controls">
         <button type="button" aria-label="วันก่อนหน้า" onClick={() => setChosenDate(shiftNetworkDate(dateKey, -1))}>‹</button>
-        <label><span>วันที่แสดงข้อมูล</span><input aria-label="วันที่แสดงข้อมูล" type="date" value={dateKey} max={today} onChange={(event) => { const value = event.target.value; if (/^\d{4}-\d{2}-\d{2}$/.test(value) && value <= today) setChosenDate(value === today ? null : value); }} /></label>
+        <label className="bn-date-field"><span>วันที่แสดงข้อมูล</span><span className="bn-date-mobile-value" aria-hidden="true">{thaiDate}</span><input aria-label="วันที่แสดงข้อมูล" type="date" value={dateKey} max={today} onChange={(event) => { const value = event.target.value; if (/^\d{4}-\d{2}-\d{2}$/.test(value) && value <= today) setChosenDate(value === today ? null : value); }} /></label>
         <button type="button" aria-label="วันถัดไป" disabled={!historical} onClick={() => { const next = shiftNetworkDate(dateKey, 1); setChosenDate(next >= today ? null : next); }}>›</button>
       </div>
       <div className="bn-shortcuts"><button type="button" aria-pressed={!historical} className={!historical ? "is-active" : ""} onClick={() => setChosenDate(null)}>วันนี้</button><button type="button" aria-pressed={dateKey === shiftNetworkDate(today, -1)} className={dateKey === shiftNetworkDate(today, -1) ? "is-active" : ""} onClick={() => setChosenDate(shiftNetworkDate(today, -1))}>เมื่อวาน</button></div>
