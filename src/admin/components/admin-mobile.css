@@ -640,10 +640,10 @@
   }
   .bn-card::before { height:3px; left:12px; right:12px; }
   .bn-card-head { grid-column:1 / -1; grid-template-columns:30px minmax(0,1fr) 14px; gap:8px; }
-  .bn-store { width:30px; height:30px; border-radius:8px; }
+  .bn-store { width:30px !important; height:30px !important; border-radius:8px; }
   .bn-store svg { width:17px; height:17px; }
   .bn-card-code { font-size:9px; }
-  .bn-card-head strong { font-size:14px; }
+  .bn-card-head strong { font-size:14px !important; }
   .bn-arrow { font-size:17px; }
   .bn-card .bn-status { grid-column:2; grid-row:2; align-self:center; justify-self:end; margin:0 !important; padding:5px 7px; font-size:10px; }
   .bn-card-sales { grid-column:1; grid-row:2; margin:0 !important; }
@@ -905,8 +905,8 @@
   .bn-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
   .bn-card { display:flex !important; flex-direction:column; align-items:stretch; gap:7px !important; }
   .bn-card-head { display:grid; grid-template-columns:26px minmax(0,1fr) 10px !important; gap:6px; }
-  .bn-store { width:26px; height:26px; }
-  .bn-card-head strong { font-size:12px; }
+  .bn-store { width:26px !important; height:26px !important; }
+  .bn-card-head strong { font-size:12px !important; }
   .bn-card-sales { margin:0 !important; }
   .bn-card-sales strong { font-size:18px !important; }
   .bn-card .bn-status { align-self:flex-start; margin:0 !important; }
