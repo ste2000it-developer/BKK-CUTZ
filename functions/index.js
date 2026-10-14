@@ -23,12 +23,33 @@ function bangkokTime(timestamp) {
   }).format(timestamp.toDate());
 }
 
+function pushContent(notification, notificationId) {
+  const branch = notification.branchName || notification.branchId || "ไม่ระบุสาขา";
+  const time = bangkokTime(notification.eventAt);
+  const suffix = `${branch}${time ? ` • ${time}` : ""}`;
+
+  if (notification.type === "store_closed") {
+    return {
+      title: "BKK-CUTZ • ปิดร้านแล้ว",
+      body: `${notification.barberName || "พนักงาน"} ปิดร้านแล้ว • ${suffix}`,
+      tag: `store-closed-${notificationId}`,
+    };
+  }
+
+  return {
+    title: "BKK-CUTZ • ช่างเข้างาน",
+    body: `${notification.barberName || "ช่าง"} เข้างานแล้ว • ${suffix}`,
+    tag: `attendance-${notificationId}`,
+  };
+}
+
 exports.pushAdminAttendance = onCall({ region: "asia-southeast1" }, async (request) => {
   const uid = request.auth?.uid;
   if (!uid) throw new HttpsError("unauthenticated", "กรุณาเข้าสู่ระบบก่อนส่ง Push");
 
   const notificationId = String(request.data?.notificationId || "").trim();
-  if (!notificationId.startsWith("attendance-checkin_")) {
+  const validId = notificationId.startsWith("attendance-checkin_") || notificationId.startsWith("store-closed_");
+  if (!validId) {
     throw new HttpsError("invalid-argument", "notificationId ไม่ถูกต้อง");
   }
 
@@ -41,10 +62,10 @@ exports.pushAdminAttendance = onCall({ region: "asia-southeast1" }, async (reque
 
   const notificationRef = db.collection("admin_notifications").doc(notificationId);
   const notificationSnapshot = await notificationRef.get();
-  if (!notificationSnapshot.exists) throw new HttpsError("not-found", "ไม่พบการแจ้งเตือนเข้างาน");
+  if (!notificationSnapshot.exists) throw new HttpsError("not-found", "ไม่พบการแจ้งเตือน");
   const notification = notificationSnapshot.data() || {};
-  if (notification.type !== "attendance_checkin") {
-    throw new HttpsError("failed-precondition", "รองรับเฉพาะแจ้งเตือนเข้างาน");
+  if (!["attendance_checkin", "store_closed"].includes(String(notification.type || ""))) {
+    throw new HttpsError("failed-precondition", "ประเภทการแจ้งเตือนไม่รองรับ Push");
   }
 
   if (String(profile.role || "") === "branch"
@@ -75,11 +96,7 @@ exports.pushAdminAttendance = onCall({ region: "asia-southeast1" }, async (reque
     return { alreadySent: false, successCount: 0, failureCount: 0 };
   }
 
-  const branch = notification.branchName || notification.branchId || "ไม่ระบุสาขา";
-  const time = bangkokTime(notification.eventAt);
-  const title = "BKK-CUTZ • ช่างเข้างาน";
-  const body = `${notification.barberName || "ช่าง"} เข้างานแล้ว • ${branch}${time ? ` • ${time}` : ""}`;
-  const tag = `attendance-${notificationId}`;
+  const { title, body, tag } = pushContent(notification, notificationId);
   const invalidFids = new Set();
   let successCount = 0;
   let failureCount = 0;
@@ -94,7 +111,7 @@ exports.pushAdminAttendance = onCall({ region: "asia-southeast1" }, async (reque
         tag,
         url: ADMIN_URL,
         notificationId,
-        type: "attendance_checkin",
+        type: String(notification.type || ""),
         branchId: String(notification.branchId || ""),
         barberId: String(notification.barberId || ""),
       },
