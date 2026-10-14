@@ -268,7 +268,7 @@ export function PayoutPage() {
             aria-label="รอบก่อนหน้า"
             disabled={loading || selectedCycleIndex <= 0}
             onClick={() => void selectCycle(selectedCycleIndex - 1)}
-          >‹</button>
+          ><i className="fa-solid fa-chevron-left" aria-hidden="true" /></button>
           <AppSelect
             aria-label="เลือกรอบจ่าย"
             value={selectedCycle ? String(selectedCycleIndex) : ""}
@@ -287,7 +287,7 @@ export function PayoutPage() {
             aria-label="รอบถัดไป"
             disabled={loading || selectedCycleIndex >= cycles.length - 1}
             onClick={() => void selectCycle(selectedCycleIndex + 1)}
-          >›</button>
+          ><i className="fa-solid fa-chevron-right" aria-hidden="true" /></button>
         </div>
       </section>
 
@@ -398,9 +398,7 @@ export function PayoutPage() {
                     type="button"
                     aria-label="ปิดรายละเอียด"
                     onClick={() => setSelectedRow(null)}
-                  >
-                    ×
-                  </button>
+                  ><i className="fa-solid fa-xmark" aria-hidden="true" /></button>
                 </div>
                 <div className="payout-detail-summary">
                   <div><span>ค่ามือ</span><strong>{formatMoney(selectedRow.commissionAmount)} บาท</strong></div>
