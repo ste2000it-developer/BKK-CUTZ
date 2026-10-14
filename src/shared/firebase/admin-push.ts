@@ -36,6 +36,33 @@ async function messagingWorker() {
   return registration;
 }
 
+function waitForAdminRegistration(messaging: Messaging, uid: string) {
+  let stop = () => undefined;
+  const saved = new Promise<void>((resolve, reject) => {
+    let settled = false;
+    stop = onRegistered(messaging, (fid) => {
+      void saveAdminPushDevice(uid, fid).then(() => {
+        if (settled) return;
+        settled = true;
+        resolve();
+      }).catch((issue: unknown) => {
+        if (settled) return;
+        settled = true;
+        reject(issue);
+      });
+    });
+  });
+
+  const timeout = new Promise<never>((_, reject) => {
+    window.setTimeout(() => reject(new Error("ลงทะเบียนเครื่องรับแจ้งเตือนไม่สำเร็จ กรุณาลองใหม่")), 15000);
+  });
+
+  return {
+    wait: () => Promise.race([saved, timeout]),
+    stop: () => stop(),
+  };
+}
+
 export async function adminPushAvailability(): Promise<AdminPushState> {
   if (!window.isSecureContext || !("serviceWorker" in navigator) || !("Notification" in window)) return "unsupported";
   if (!(await isSupported())) return "unsupported";
@@ -46,20 +73,30 @@ export async function adminPushAvailability(): Promise<AdminPushState> {
 
 export async function enableAdminPush(uid: string): Promise<void> {
   if (!window.isSecureContext) throw new Error("ต้องเปิด Admin ผ่าน HTTPS เพื่อใช้แจ้งเตือนมือถือ");
+  if (!("Notification" in window)) throw new Error("เบราว์เซอร์นี้ไม่รองรับ Push Notification");
+
+  // iPhone/iPad requires the permission prompt to be triggered directly from
+  // the user's tap. Do this before any async Firebase/service-worker work.
+  if (Notification.permission === "denied") {
+    throw new Error("การแจ้งเตือนถูกบล็อก กรุณาอนุญาต Notification ในการตั้งค่าของเครื่อง");
+  }
+  if (Notification.permission !== "granted") {
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") throw new Error("ยังไม่ได้อนุญาตการแจ้งเตือนบนเครื่องนี้");
+  }
+
   const messaging = await messagingInstance();
   if (!messaging) throw new Error("เบราว์เซอร์นี้ไม่รองรับ Push Notification");
   const sw = await messagingWorker();
-  let saved: Promise<void> | null = null;
-  const stop = onRegistered(messaging, (fid) => {
-    saved = saveAdminPushDevice(uid, fid);
-  });
+  const registration = waitForAdminRegistration(messaging, uid);
+
   try {
     const vapidKey = String(import.meta.env.VITE_FIREBASE_VAPID_KEY || "").trim();
     await register(messaging, { serviceWorkerRegistration: sw, ...(vapidKey ? { vapidKey } : {}) });
-    if (saved) await saved;
+    await registration.wait();
     setAdminPushPreference(true);
   } finally {
-    stop();
+    registration.stop();
   }
 }
 
@@ -89,12 +126,22 @@ export function showForegroundAdminPush(payload: MessagePayload) {
   const data = payload.data || {};
   const title = data.title || payload.notification?.title || "BKK-CUTZ";
   const body = data.body || payload.notification?.body || "มีการแจ้งเตือนใหม่";
+  const options: NotificationOptions = {
+    body,
+    tag: data.tag || `bkk-admin-${adminPushDeviceId()}`,
+    data: { url: new URL("admin.html", document.baseURI).href },
+  };
+
+  // Service-worker notifications are reliable on iOS Home Screen web apps.
+  if ("serviceWorker" in navigator) {
+    void navigator.serviceWorker.ready
+      .then((registration) => registration.showNotification(title, options))
+      .catch(() => undefined);
+    return;
+  }
+
   try {
-    new Notification(title, {
-      body,
-      tag: data.tag || `bkk-admin-${adminPushDeviceId()}`,
-      data: { url: new URL("admin.html", document.baseURI).href },
-    });
+    new Notification(title, options);
   } catch {
     // Some mobile browsers only allow service-worker notifications.
   }
