@@ -1,0 +1,436 @@
+[debug] [2026-10-14T05:25:17.934Z] ----------------------------------------------------------------------
+[debug] [2026-10-14T05:25:17.935Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\tepat\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only firestore:rules,functions
+[debug] [2026-10-14T05:25:17.935Z] CLI Version:   15.30.0
+[debug] [2026-10-14T05:25:17.935Z] Platform:      win32
+[debug] [2026-10-14T05:25:17.935Z] Node Version:  v24.21.0
+[debug] [2026-10-14T05:25:17.935Z] Detected Agent: unknown
+[debug] [2026-10-14T05:25:17.935Z] Time:          Wed Oct 14 2026 12:25:17 GMT+0700 (เวลาอินโดจีน)
+[debug] [2026-10-14T05:25:17.935Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-10-14T05:25:17.942Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-10-14T05:25:30.455Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-10-14T05:25:30.455Z] > authorizing via signed-in user (ste2000.it@gmail.com)
+[debug] [2026-10-14T05:25:30.455Z] [iam] checking project bkk-cutz for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]
+[debug] [2026-10-14T05:25:30.456Z] Checked if tokens are valid: false, expires at: 1791773702432
+[debug] [2026-10-14T05:25:30.456Z] Checked if tokens are valid: false, expires at: 1791773702432
+[debug] [2026-10-14T05:25:30.456Z] > refreshing access token with scopes: []
+[debug] [2026-10-14T05:25:30.457Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-10-14T05:25:30.457Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-10-14T05:25:30.585Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-10-14T05:25:30.585Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-10-14T05:25:30.592Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/bkk-cutz:testIamPermissions [none]
+[debug] [2026-10-14T05:25:30.593Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/bkk-cutz:testIamPermissions  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:25:30.593Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/bkk-cutz:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2026-10-14T05:25:30.928Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-10-14T05:25:30.928Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2026-10-14T05:25:31.780Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/bkk-cutz:testIamPermissions 200
+[debug] [2026-10-14T05:25:31.780Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/bkk-cutz:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","datastore.indexes.create","datastore.indexes.delete","datastore.indexes.list","datastore.indexes.update","firebase.projects.get"]}
+[debug] [2026-10-14T05:25:31.780Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:31.780Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:31.780Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/bkk-cutz/serviceAccounts/bkk-cutz@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2026-10-14T05:25:31.780Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/bkk-cutz/serviceAccounts/bkk-cutz@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2026-10-14T05:25:33.272Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/bkk-cutz/serviceAccounts/bkk-cutz@appspot.gserviceaccount.com:testIamPermissions 404
+[debug] [2026-10-14T05:25:33.272Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/bkk-cutz/serviceAccounts/bkk-cutz@appspot.gserviceaccount.com:testIamPermissions {"error":{"code":404,"message":"Unknown service account","status":"NOT_FOUND"}}
+[debug] [2026-10-14T05:25:33.273Z] [functions] service account IAM check errored, deploy may fail: Request to https://iam.googleapis.com/v1/projects/bkk-cutz/serviceAccounts/bkk-cutz@appspot.gserviceaccount.com:testIamPermissions had HTTP Error: 404, Unknown service account {"name":"FirebaseError","children":[],"context":{"body":{"error":{"code":404,"message":"Unknown service account","status":"NOT_FOUND"}},"response":{"statusCode":404}},"exit":1,"message":"Request to https://iam.googleapis.com/v1/projects/bkk-cutz/serviceAccounts/bkk-cutz@appspot.gserviceaccount.com:testIamPermissions had HTTP Error: 404, Unknown service account","status":404}
+[info] 
+[info] === Deploying to 'bkk-cutz'...
+[info] 
+[info] i  deploying firestore, functions 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-10-14T05:25:33.275Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:33.275Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:33.275Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/firestore.googleapis.com [none]
+[debug] [2026-10-14T05:25:33.275Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/firestore.googleapis.com  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:25:34.936Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/firestore.googleapis.com 200
+[debug] [2026-10-14T05:25:34.936Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/firestore.googleapis.com [omitted]
+[info] +  firestore: required API firestore.googleapis.com is enabled 
+[info] i  firestore: ensuring required API firestore.googleapis.com is enabled... 
+[debug] [2026-10-14T05:25:34.940Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:34.940Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:34.940Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/bkk-cutz/databases/(default) [none]
+[debug] [2026-10-14T05:25:35.313Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/bkk-cutz/databases/(default) 200
+[debug] [2026-10-14T05:25:35.313Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/bkk-cutz/databases/(default) {"name":"projects/bkk-cutz/databases/(default)","uid":"1a993586-217e-4581-8676-c0f1070ea455","createTime":"2026-09-21T03:26:28.952785Z","updateTime":"2026-09-21T03:26:28.952785Z","locationId":"asia-southeast3","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2026-10-14T04:25:34.338943Z","appEngineIntegrationMode":"DISABLED","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","etag":"IOe0z8jiuJcDMMCVvdbu/pYD"}
+[info] i  cloud.firestore: checking firestore.rules for compilation errors... 
+[debug] [2026-10-14T05:25:35.314Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:35.314Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:35.314Z] >>> [apiv2][query] POST https://firebaserules.googleapis.com/v1/projects/bkk-cutz:test [none]
+[debug] [2026-10-14T05:25:35.314Z] >>> [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/bkk-cutz:test [omitted]
+[debug] [2026-10-14T05:25:36.849Z] <<< [apiv2][status] POST https://firebaserules.googleapis.com/v1/projects/bkk-cutz:test 200
+[debug] [2026-10-14T05:25:36.850Z] <<< [apiv2][body] POST https://firebaserules.googleapis.com/v1/projects/bkk-cutz:test {}
+[info] +  cloud.firestore: rules file firestore.rules compiled successfully 
+[debug] [2026-10-14T05:25:36.851Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:36.851Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:36.851Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudresourcemanager.googleapis.com [none]
+[debug] [2026-10-14T05:25:36.851Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudresourcemanager.googleapis.com  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:25:37.260Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudresourcemanager.googleapis.com 200
+[debug] [2026-10-14T05:25:37.260Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudresourcemanager.googleapis.com [omitted]
+[debug] [2026-10-14T05:25:37.263Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:37.263Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:37.263Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/bkk-cutz [none]
+[debug] [2026-10-14T05:25:38.472Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/bkk-cutz 200
+[debug] [2026-10-14T05:25:38.472Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/bkk-cutz {"projectNumber":"539745181048","projectId":"bkk-cutz","lifecycleState":"ACTIVE","name":"BKK-CUTZ","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2026-09-20T13:49:35.762Z"}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[debug] [2026-10-14T05:25:38.474Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:38.474Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:38.474Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:38.474Z] Checked if tokens are valid: true, expires at: 1791959129585
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[debug] [2026-10-14T05:25:38.475Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:38.475Z] Checked if tokens are valid: true, expires at: 1791959129585
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2026-10-14T05:25:38.475Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:38.476Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:38.476Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudfunctions.googleapis.com [none]
+[debug] [2026-10-14T05:25:38.476Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudfunctions.googleapis.com  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:25:38.476Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/runtimeconfig.googleapis.com [none]
+[debug] [2026-10-14T05:25:38.476Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/runtimeconfig.googleapis.com  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:25:38.477Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbuild.googleapis.com [none]
+[debug] [2026-10-14T05:25:38.477Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbuild.googleapis.com  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:25:38.477Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/artifactregistry.googleapis.com [none]
+[debug] [2026-10-14T05:25:38.477Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/artifactregistry.googleapis.com  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:25:39.949Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudfunctions.googleapis.com 200
+[debug] [2026-10-14T05:25:39.949Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudfunctions.googleapis.com [omitted]
+[warn] !  functions: missing required API cloudfunctions.googleapis.com. Enabling now... 
+[debug] [2026-10-14T05:25:39.950Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:39.950Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:39.950Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudfunctions.googleapis.com:enable [none]
+[debug] [2026-10-14T05:25:39.950Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudfunctions.googleapis.com:enable  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:25:39.956Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/runtimeconfig.googleapis.com 200
+[debug] [2026-10-14T05:25:39.956Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/runtimeconfig.googleapis.com [omitted]
+[debug] [2026-10-14T05:25:39.961Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/artifactregistry.googleapis.com 200
+[debug] [2026-10-14T05:25:39.961Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/artifactregistry.googleapis.com [omitted]
+[warn] !  artifactregistry: missing required API artifactregistry.googleapis.com. Enabling now... 
+[debug] [2026-10-14T05:25:39.961Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:39.961Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:39.961Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/artifactregistry.googleapis.com:enable [none]
+[debug] [2026-10-14T05:25:39.961Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/artifactregistry.googleapis.com:enable  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:25:39.963Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbuild.googleapis.com 200
+[debug] [2026-10-14T05:25:39.963Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbuild.googleapis.com [omitted]
+[warn] !  functions: missing required API cloudbuild.googleapis.com. Enabling now... 
+[debug] [2026-10-14T05:25:39.963Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:39.963Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:39.963Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbuild.googleapis.com:enable [none]
+[debug] [2026-10-14T05:25:39.963Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbuild.googleapis.com:enable  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:25:40.501Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/artifactregistry.googleapis.com:enable 200
+[debug] [2026-10-14T05:25:40.501Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/artifactregistry.googleapis.com:enable [omitted]
+[debug] [2026-10-14T05:25:41.633Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudfunctions.googleapis.com:enable 200
+[debug] [2026-10-14T05:25:41.633Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudfunctions.googleapis.com:enable [omitted]
+[debug] [2026-10-14T05:25:41.796Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbuild.googleapis.com:enable 200
+[debug] [2026-10-14T05:25:41.796Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbuild.googleapis.com:enable [omitted]
+[debug] [2026-10-14T05:25:51.802Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:51.802Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:51.802Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/bkk-cutz/adminSdkConfig [none]
+[debug] [2026-10-14T05:25:52.625Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/bkk-cutz/adminSdkConfig 200
+[debug] [2026-10-14T05:25:52.625Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/bkk-cutz/adminSdkConfig {"projectId":"bkk-cutz","storageBucket":"bkk-cutz.firebasestorage.app"}
+[debug] [2026-10-14T05:25:52.626Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:52.626Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:52.626Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/bkk-cutz/configs [none]
+[debug] [2026-10-14T05:25:53.085Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/bkk-cutz/configs 200
+[debug] [2026-10-14T05:25:53.086Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/bkk-cutz/configs {}
+[debug] [2026-10-14T05:25:53.086Z] Validating nodejs source
+[debug] [2026-10-14T05:25:53.831Z] > [functions] package.json contents: {
+  "name": "bkk-cutz-functions",
+  "private": true,
+  "main": "index.js",
+  "engines": {
+    "node": "22"
+  },
+  "dependencies": {
+    "firebase-admin": "latest",
+    "firebase-functions": "latest"
+  }
+}
+[debug] [2026-10-14T05:25:53.831Z] Building nodejs source
+[info] i  functions: Loading and analyzing source code for codebase default to determine what to deploy 
+[debug] [2026-10-14T05:25:53.832Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-10-14T05:25:53.838Z] Found firebase-functions binary at 'T:\Project\BKK-CUTZ\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8833
+
+[debug] [2026-10-14T05:25:54.146Z] Got response from /__/functions.yaml {"specVersion":"v1alpha1","endpoints":{"pushAdminAttendance":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["asia-southeast1"],"labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"admin_notifications/{notificationId}"},"retry":false},"entryPoint":"pushAdminAttendance"}},"extensions":{},"requiredAPIs":[]}
+[debug] [2026-10-14T05:25:57.176Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:57.176Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:57.176Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/bkk-cutz/locations/-/functions [none]
+[debug] [2026-10-14T05:25:58.077Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v1/projects/bkk-cutz/locations/-/functions 200
+[debug] [2026-10-14T05:25:58.078Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v1/projects/bkk-cutz/locations/-/functions {}
+[debug] [2026-10-14T05:25:58.078Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:58.078Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:58.078Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/bkk-cutz/locations/-/functions filter=environment%3D%22GEN_2%22
+[debug] [2026-10-14T05:25:59.624Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/bkk-cutz/locations/-/functions 200
+[debug] [2026-10-14T05:25:59.624Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/bkk-cutz/locations/-/functions {}
+[info] i  extensions: ensuring required API firebaseextensions.googleapis.com is enabled... 
+[debug] [2026-10-14T05:25:59.625Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:59.625Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:25:59.625Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/firebaseextensions.googleapis.com [none]
+[debug] [2026-10-14T05:25:59.625Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/firebaseextensions.googleapis.com  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:26:01.221Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/firebaseextensions.googleapis.com 200
+[debug] [2026-10-14T05:26:01.221Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/firebaseextensions.googleapis.com [omitted]
+[warn] !  extensions: missing required API firebaseextensions.googleapis.com. Enabling now... 
+[debug] [2026-10-14T05:26:01.222Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:01.222Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:01.222Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/firebaseextensions.googleapis.com:enable [none]
+[debug] [2026-10-14T05:26:01.222Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/firebaseextensions.googleapis.com:enable  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:26:02.934Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/firebaseextensions.googleapis.com:enable 200
+[debug] [2026-10-14T05:26:02.934Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/firebaseextensions.googleapis.com:enable [omitted]
+[debug] [2026-10-14T05:26:12.945Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-10-14T05:26:12.945Z] > authorizing via signed-in user (ste2000.it@gmail.com)
+[debug] [2026-10-14T05:26:12.945Z] [iam] checking project bkk-cutz for permissions ["firebase.projects.get","firebaseextensions.instances.list"]
+[debug] [2026-10-14T05:26:12.945Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:12.945Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:12.945Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/bkk-cutz:testIamPermissions [none]
+[debug] [2026-10-14T05:26:12.945Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/bkk-cutz:testIamPermissions  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:26:12.945Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/bkk-cutz:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[debug] [2026-10-14T05:26:14.120Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/bkk-cutz:testIamPermissions 200
+[debug] [2026-10-14T05:26:14.120Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/bkk-cutz:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[debug] [2026-10-14T05:26:14.120Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:14.120Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:14.120Z] >>> [apiv2][query] GET https://firebaseextensions.googleapis.com/v1beta/projects/bkk-cutz/instances pageSize=100&pageToken=
+[debug] [2026-10-14T05:26:16.675Z] <<< [apiv2][status] GET https://firebaseextensions.googleapis.com/v1beta/projects/bkk-cutz/instances 200
+[debug] [2026-10-14T05:26:16.675Z] <<< [apiv2][body] GET https://firebaseextensions.googleapis.com/v1beta/projects/bkk-cutz/instances {}
+[debug] [2026-10-14T05:26:16.676Z] Attempting to merge .env secret bindings {} into declared secrets...)}
+[debug] [2026-10-14T05:26:16.676Z] pushAdminAttendance declared secrets: undefined
+[info] i  functions: preparing functions directory for uploading... 
+[info] i  functions: packaged T:\Project\BKK-CUTZ\functions (32.53 KB) for uploading 
+[debug] [2026-10-14T05:26:16.692Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:16.692Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:16.692Z] >>> [apiv2][query] GET https://firestore.googleapis.com/v1/projects/bkk-cutz/databases/(default) [none]
+[debug] [2026-10-14T05:26:16.982Z] <<< [apiv2][status] GET https://firestore.googleapis.com/v1/projects/bkk-cutz/databases/(default) 200
+[debug] [2026-10-14T05:26:16.982Z] <<< [apiv2][body] GET https://firestore.googleapis.com/v1/projects/bkk-cutz/databases/(default) {"name":"projects/bkk-cutz/databases/(default)","uid":"1a993586-217e-4581-8676-c0f1070ea455","createTime":"2026-09-21T03:26:28.952785Z","updateTime":"2026-09-21T03:26:28.952785Z","locationId":"asia-southeast3","type":"FIRESTORE_NATIVE","concurrencyMode":"PESSIMISTIC","versionRetentionPeriod":"3600s","earliestVersionTime":"2026-10-14T04:26:16.008893Z","appEngineIntegrationMode":"DISABLED","pointInTimeRecoveryEnablement":"POINT_IN_TIME_RECOVERY_DISABLED","deleteProtectionState":"DELETE_PROTECTION_DISABLED","databaseEdition":"STANDARD","freeTier":true,"realtimeUpdatesMode":"REALTIME_UPDATES_MODE_ENABLED","etag":"IJzfvtziuJcDMMCVvdbu/pYD"}
+[info] i  functions: ensuring required API run.googleapis.com is enabled... 
+[debug] [2026-10-14T05:26:16.984Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:16.984Z] Checked if tokens are valid: true, expires at: 1791959129585
+[info] i  functions: ensuring required API eventarc.googleapis.com is enabled... 
+[debug] [2026-10-14T05:26:16.985Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:16.985Z] Checked if tokens are valid: true, expires at: 1791959129585
+[info] i  functions: ensuring required API pubsub.googleapis.com is enabled... 
+[debug] [2026-10-14T05:26:16.985Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:16.985Z] Checked if tokens are valid: true, expires at: 1791959129585
+[info] i  functions: ensuring required API storage.googleapis.com is enabled... 
+[debug] [2026-10-14T05:26:16.986Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:16.986Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:16.986Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/run.googleapis.com [none]
+[debug] [2026-10-14T05:26:16.986Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/run.googleapis.com  x-goog-user-project=539745181048
+[debug] [2026-10-14T05:26:16.987Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/eventarc.googleapis.com [none]
+[debug] [2026-10-14T05:26:16.987Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/eventarc.googleapis.com  x-goog-user-project=539745181048
+[debug] [2026-10-14T05:26:16.987Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/pubsub.googleapis.com [none]
+[debug] [2026-10-14T05:26:16.987Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/pubsub.googleapis.com  x-goog-user-project=539745181048
+[debug] [2026-10-14T05:26:16.988Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/storage.googleapis.com [none]
+[debug] [2026-10-14T05:26:16.988Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/storage.googleapis.com  x-goog-user-project=539745181048
+[debug] [2026-10-14T05:26:18.481Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/eventarc.googleapis.com 200
+[debug] [2026-10-14T05:26:18.481Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/eventarc.googleapis.com [omitted]
+[warn] !  functions: missing required API eventarc.googleapis.com. Enabling now... 
+[debug] [2026-10-14T05:26:18.481Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:18.481Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:18.481Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/539745181048/services/eventarc.googleapis.com:enable [none]
+[debug] [2026-10-14T05:26:18.481Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/539745181048/services/eventarc.googleapis.com:enable  x-goog-user-project=539745181048
+[debug] [2026-10-14T05:26:18.529Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/pubsub.googleapis.com 200
+[debug] [2026-10-14T05:26:18.529Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/pubsub.googleapis.com [omitted]
+[info] +  functions: required API pubsub.googleapis.com is enabled 
+[debug] [2026-10-14T05:26:18.587Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/run.googleapis.com 200
+[debug] [2026-10-14T05:26:18.587Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/run.googleapis.com [omitted]
+[warn] !  functions: missing required API run.googleapis.com. Enabling now... 
+[debug] [2026-10-14T05:26:18.588Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:18.588Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:18.588Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/539745181048/services/run.googleapis.com:enable [none]
+[debug] [2026-10-14T05:26:18.588Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/539745181048/services/run.googleapis.com:enable  x-goog-user-project=539745181048
+[debug] [2026-10-14T05:26:18.670Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/storage.googleapis.com 200
+[debug] [2026-10-14T05:26:18.670Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/539745181048/services/storage.googleapis.com [omitted]
+[info] +  functions: required API storage.googleapis.com is enabled 
+[debug] [2026-10-14T05:26:20.027Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/539745181048/services/eventarc.googleapis.com:enable 200
+[debug] [2026-10-14T05:26:20.027Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/539745181048/services/eventarc.googleapis.com:enable [omitted]
+[debug] [2026-10-14T05:26:20.306Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/539745181048/services/run.googleapis.com:enable 200
+[debug] [2026-10-14T05:26:20.306Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/539745181048/services/run.googleapis.com:enable [omitted]
+[info] i  functions: generating the service identity for pubsub.googleapis.com... 
+[debug] [2026-10-14T05:26:30.324Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:30.324Z] Checked if tokens are valid: true, expires at: 1791959129585
+[info] i  functions: generating the service identity for eventarc.googleapis.com... 
+[debug] [2026-10-14T05:26:30.324Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:30.324Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:30.324Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1beta1/projects/539745181048/services/pubsub.googleapis.com:generateServiceIdentity [none]
+[debug] [2026-10-14T05:26:30.324Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1beta1/projects/539745181048/services/pubsub.googleapis.com:generateServiceIdentity  x-goog-user-project=539745181048
+[debug] [2026-10-14T05:26:30.324Z] >>> [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/539745181048/services/pubsub.googleapis.com:generateServiceIdentity {}
+[debug] [2026-10-14T05:26:30.324Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1beta1/projects/539745181048/services/eventarc.googleapis.com:generateServiceIdentity [none]
+[debug] [2026-10-14T05:26:30.324Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1beta1/projects/539745181048/services/eventarc.googleapis.com:generateServiceIdentity  x-goog-user-project=539745181048
+[debug] [2026-10-14T05:26:30.324Z] >>> [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/539745181048/services/eventarc.googleapis.com:generateServiceIdentity {}
+[debug] [2026-10-14T05:26:32.237Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1beta1/projects/539745181048/services/eventarc.googleapis.com:generateServiceIdentity 200
+[debug] [2026-10-14T05:26:32.237Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/539745181048/services/eventarc.googleapis.com:generateServiceIdentity {"name":"operations/finished.DONE_OPERATION","done":true,"response":{"@type":"type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity","email":"service-539745181048@gcp-sa-eventarc.iam.gserviceaccount.com","uniqueId":"117723044563179100704"}}
+[debug] [2026-10-14T05:26:32.288Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1beta1/projects/539745181048/services/pubsub.googleapis.com:generateServiceIdentity 200
+[debug] [2026-10-14T05:26:32.288Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/539745181048/services/pubsub.googleapis.com:generateServiceIdentity {"name":"operations/finished.DONE_OPERATION","done":true,"response":{"@type":"type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity","email":"service-539745181048@gcp-sa-pubsub.iam.gserviceaccount.com","uniqueId":"116772595333545620734"}}
+[debug] [2026-10-14T05:26:32.289Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:32.289Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:32.289Z] >>> [apiv2][query] GET https://compute.googleapis.com/compute/v1/projects/539745181048 [none]
+[debug] [2026-10-14T05:26:33.867Z] <<< [apiv2][status] GET https://compute.googleapis.com/compute/v1/projects/539745181048 403
+[debug] [2026-10-14T05:26:33.867Z] <<< [apiv2][body] GET https://compute.googleapis.com/compute/v1/projects/539745181048 {"error":{"code":403,"message":"Compute Engine API has not been used in project 539745181048 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=539745181048 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","errors":[{"message":"Compute Engine API has not been used in project 539745181048 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=539745181048 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","domain":"usageLimits","reason":"accessNotConfigured","extendedHelp":"https://console.developers.google.com"}],"status":"PERMISSION_DENIED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"SERVICE_DISABLED","domain":"googleapis.com","metadata":{"containerInfo":"539745181048","consumer":"projects/539745181048","activationUrl":"https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=539745181048","service":"compute.googleapis.com","serviceTitle":"Compute Engine API"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"Compute Engine API has not been used in project 539745181048 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=539745181048 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."},{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Google developers console API activation","url":"https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=539745181048"}]}]}}
+[debug] [2026-10-14T05:26:33.867Z] unable to look up default compute service account. Falling back to 539745181048-compute@developer.gserviceaccount.com. Error: {"name":"FirebaseError","children":[],"context":{"body":{"error":{"code":403,"message":"Compute Engine API has not been used in project 539745181048 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=539745181048 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","errors":[{"message":"Compute Engine API has not been used in project 539745181048 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=539745181048 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","domain":"usageLimits","reason":"accessNotConfigured","extendedHelp":"https://console.developers.google.com"}],"status":"PERMISSION_DENIED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"SERVICE_DISABLED","domain":"googleapis.com","metadata":{"containerInfo":"539745181048","consumer":"projects/539745181048","activationUrl":"https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=539745181048","service":"compute.googleapis.com","serviceTitle":"Compute Engine API"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"Compute Engine API has not been used in project 539745181048 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=539745181048 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."},{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Google developers console API activation","url":"https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=539745181048"}]}]}},"response":{"statusCode":403}},"exit":1,"message":"Request to https://compute.googleapis.com/compute/v1/projects/539745181048 had HTTP Error: 403, Compute Engine API has not been used in project 539745181048 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=539745181048 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","status":403}
+[debug] [2026-10-14T05:26:33.867Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:33.867Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:33.867Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/539745181048:getIamPolicy [none]
+[debug] [2026-10-14T05:26:35.312Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/539745181048:getIamPolicy 200
+[debug] [2026-10-14T05:26:35.312Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/539745181048:getIamPolicy {"version":1,"etag":"BwZdxivtZwo=","bindings":[{"role":"roles/cloudbuild.builds.builder","members":["serviceAccount:539745181048@cloudbuild.gserviceaccount.com"]},{"role":"roles/cloudbuild.serviceAgent","members":["serviceAccount:service-539745181048@gcp-sa-cloudbuild.iam.gserviceaccount.com"]},{"role":"roles/cloudfunctions.standardServiceAgent","members":["serviceAccount:service-539745181048@gcf-admin-robot.iam.gserviceaccount.com"]},{"role":"roles/containerregistry.ServiceAgent","members":["serviceAccount:service-539745181048@containerregistry.iam.gserviceaccount.com"]},{"role":"roles/editor","members":["serviceAccount:539745181048-compute@developer.gserviceaccount.com","serviceAccount:539745181048@cloudservices.gserviceaccount.com","serviceAccount:bkk-cutz@appspot.gserviceaccount.com"]},{"role":"roles/firebase.managementServiceAgent","members":["serviceAccount:service-539745181048@gcp-sa-firebase.iam.gserviceaccount.com"]},{"role":"roles/firebase.sdkAdminServiceAgent","members":["serviceAccount:firebase-adminsdk-fbsvc@bkk-cutz.iam.gserviceaccount.com"]},{"role":"roles/firebaseauth.admin","members":["serviceAccount:firebase-adminsdk-fbsvc@bkk-cutz.iam.gserviceaccount.com"]},{"role":"roles/firebasemods.serviceAgent","members":["serviceAccount:service-539745181048@gcp-sa-firebasemods.iam.gserviceaccount.com"]},{"role":"roles/firebaserules.system","members":["serviceAccount:service-539745181048@firebase-rules.iam.gserviceaccount.com"]},{"role":"roles/firebasestorage.serviceAgent","members":["serviceAccount:service-539745181048@gcp-sa-firebasestorage.iam.gserviceaccount.com"]},{"role":"roles/firestore.serviceAgent","members":["serviceAccount:service-539745181048@gcp-sa-firestore.iam.gserviceaccount.com"]},{"role":"roles/iam.serviceAccountTokenCreator","members":["serviceAccount:firebase-adminsdk-fbsvc@bkk-cutz.iam.gserviceaccount.com"]},{"role":"roles/owner","members":["user:ste2000.it@gmail.com"]},{"role":"roles/run.serviceAgent","members":["serviceAccount:service-539745181048@serverless-robot-prod.iam.gserviceaccount.com"]},{"role":"roles/storage.admin","members":["serviceAccount:firebase-adminsdk-fbsvc@bkk-cutz.iam.gserviceaccount.com"]}]}
+[debug] [2026-10-14T05:26:35.312Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:35.312Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:35.312Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/539745181048:setIamPolicy [none]
+[debug] [2026-10-14T05:26:35.312Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/539745181048:setIamPolicy {"policy":{"version":1,"etag":"BwZdxivtZwo=","bindings":[{"role":"roles/cloudbuild.builds.builder","members":["serviceAccount:539745181048@cloudbuild.gserviceaccount.com"]},{"role":"roles/cloudbuild.serviceAgent","members":["serviceAccount:service-539745181048@gcp-sa-cloudbuild.iam.gserviceaccount.com"]},{"role":"roles/cloudfunctions.standardServiceAgent","members":["serviceAccount:service-539745181048@gcf-admin-robot.iam.gserviceaccount.com"]},{"role":"roles/containerregistry.ServiceAgent","members":["serviceAccount:service-539745181048@containerregistry.iam.gserviceaccount.com"]},{"role":"roles/editor","members":["serviceAccount:539745181048-compute@developer.gserviceaccount.com","serviceAccount:539745181048@cloudservices.gserviceaccount.com","serviceAccount:bkk-cutz@appspot.gserviceaccount.com"]},{"role":"roles/firebase.managementServiceAgent","members":["serviceAccount:service-539745181048@gcp-sa-firebase.iam.gserviceaccount.com"]},{"role":"roles/firebase.sdkAdminServiceAgent","members":["serviceAccount:firebase-adminsdk-fbsvc@bkk-cutz.iam.gserviceaccount.com"]},{"role":"roles/firebaseauth.admin","members":["serviceAccount:firebase-adminsdk-fbsvc@bkk-cutz.iam.gserviceaccount.com"]},{"role":"roles/firebasemods.serviceAgent","members":["serviceAccount:service-539745181048@gcp-sa-firebasemods.iam.gserviceaccount.com"]},{"role":"roles/firebaserules.system","members":["serviceAccount:service-539745181048@firebase-rules.iam.gserviceaccount.com"]},{"role":"roles/firebasestorage.serviceAgent","members":["serviceAccount:service-539745181048@gcp-sa-firebasestorage.iam.gserviceaccount.com"]},{"role":"roles/firestore.serviceAgent","members":["serviceAccount:service-539745181048@gcp-sa-firestore.iam.gserviceaccount.com"]},{"role":"roles/iam.serviceAccountTokenCreator","members":["serviceAccount:firebase-adminsdk-fbsvc@bkk-cutz.iam.gserviceaccount.com","serviceAccount:service-539745181048@gcp-sa-pubsub.iam.gserviceaccount.com"]},{"role":"roles/owner","members":["user:ste2000.it@gmail.com"]},{"role":"roles/run.serviceAgent","members":["serviceAccount:service-539745181048@serverless-robot-prod.iam.gserviceaccount.com"]},{"role":"roles/storage.admin","members":["serviceAccount:firebase-adminsdk-fbsvc@bkk-cutz.iam.gserviceaccount.com"]},{"role":"roles/run.invoker","members":["serviceAccount:539745181048-compute@developer.gserviceaccount.com"]},{"role":"roles/eventarc.eventReceiver","members":["serviceAccount:539745181048-compute@developer.gserviceaccount.com"]}]},"updateMask":"bindings"}
+[debug] [2026-10-14T05:26:36.308Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/539745181048:setIamPolicy 200
+[debug] [2026-10-14T05:26:36.308Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/539745181048:setIamPolicy {"version":1,"etag":"BwZdxiy02ho=","bindings":[{"role":"roles/cloudbuild.builds.builder","members":["serviceAccount:539745181048@cloudbuild.gserviceaccount.com"]},{"role":"roles/cloudbuild.serviceAgent","members":["serviceAccount:service-539745181048@gcp-sa-cloudbuild.iam.gserviceaccount.com"]},{"role":"roles/cloudfunctions.standardServiceAgent","members":["serviceAccount:service-539745181048@gcf-admin-robot.iam.gserviceaccount.com"]},{"role":"roles/containerregistry.ServiceAgent","members":["serviceAccount:service-539745181048@containerregistry.iam.gserviceaccount.com"]},{"role":"roles/editor","members":["serviceAccount:539745181048-compute@developer.gserviceaccount.com","serviceAccount:539745181048@cloudservices.gserviceaccount.com","serviceAccount:bkk-cutz@appspot.gserviceaccount.com"]},{"role":"roles/eventarc.eventReceiver","members":["serviceAccount:539745181048-compute@developer.gserviceaccount.com"]},{"role":"roles/firebase.managementServiceAgent","members":["serviceAccount:service-539745181048@gcp-sa-firebase.iam.gserviceaccount.com"]},{"role":"roles/firebase.sdkAdminServiceAgent","members":["serviceAccount:firebase-adminsdk-fbsvc@bkk-cutz.iam.gserviceaccount.com"]},{"role":"roles/firebaseauth.admin","members":["serviceAccount:firebase-adminsdk-fbsvc@bkk-cutz.iam.gserviceaccount.com"]},{"role":"roles/firebasemods.serviceAgent","members":["serviceAccount:service-539745181048@gcp-sa-firebasemods.iam.gserviceaccount.com"]},{"role":"roles/firebaserules.system","members":["serviceAccount:service-539745181048@firebase-rules.iam.gserviceaccount.com"]},{"role":"roles/firebasestorage.serviceAgent","members":["serviceAccount:service-539745181048@gcp-sa-firebasestorage.iam.gserviceaccount.com"]},{"role":"roles/firestore.serviceAgent","members":["serviceAccount:service-539745181048@gcp-sa-firestore.iam.gserviceaccount.com"]},{"role":"roles/iam.serviceAccountTokenCreator","members":["serviceAccount:firebase-adminsdk-fbsvc@bkk-cutz.iam.gserviceaccount.com","serviceAccount:service-539745181048@gcp-sa-pubsub.iam.gserviceaccount.com"]},{"role":"roles/owner","members":["user:ste2000.it@gmail.com"]},{"role":"roles/run.invoker","members":["serviceAccount:539745181048-compute@developer.gserviceaccount.com"]},{"role":"roles/run.serviceAgent","members":["serviceAccount:service-539745181048@serverless-robot-prod.iam.gserviceaccount.com"]},{"role":"roles/storage.admin","members":["serviceAccount:firebase-adminsdk-fbsvc@bkk-cutz.iam.gserviceaccount.com"]}]}
+[debug] [2026-10-14T05:26:36.308Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:36.308Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:36.308Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/bkk-cutz/releases pageSize=10&pageToken=
+[debug] [2026-10-14T05:26:37.640Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/bkk-cutz/releases 200
+[debug] [2026-10-14T05:26:37.640Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/bkk-cutz/releases {"releases":[{"name":"projects/bkk-cutz/releases/cloud.firestore","rulesetName":"projects/bkk-cutz/rulesets/a98f6f37-5619-499c-ac28-4a03f3f32e94","createTime":"2026-09-21T03:26:34.222765Z","updateTime":"2026-10-14T05:23:24.707276Z"},{"name":"projects/bkk-cutz/releases/firebase.storage/bkk-cutz.firebasestorage.app","rulesetName":"projects/bkk-cutz/rulesets/e2c7828b-e145-4bfe-a629-ba0b1e543090","createTime":"2026-09-29T03:40:17.544545Z","updateTime":"2026-09-29T04:41:34.602236Z"}]}
+[debug] [2026-10-14T05:26:37.646Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:37.646Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:37.646Z] >>> [apiv2][query] GET https://firebaserules.googleapis.com/v1/projects/bkk-cutz/rulesets/a98f6f37-5619-499c-ac28-4a03f3f32e94 [none]
+[debug] [2026-10-14T05:26:38.911Z] <<< [apiv2][status] GET https://firebaserules.googleapis.com/v1/projects/bkk-cutz/rulesets/a98f6f37-5619-499c-ac28-4a03f3f32e94 200
+[debug] [2026-10-14T05:26:38.911Z] <<< [apiv2][body] GET https://firebaserules.googleapis.com/v1/projects/bkk-cutz/rulesets/a98f6f37-5619-499c-ac28-4a03f3f32e94 [omitted]
+[info] i  firestore: latest version of firestore.rules already up to date, skipping upload... 
+[debug] [2026-10-14T05:26:38.913Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:38.913Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:38.913Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbilling.googleapis.com [none]
+[debug] [2026-10-14T05:26:38.913Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbilling.googleapis.com  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:26:40.434Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbilling.googleapis.com 200
+[debug] [2026-10-14T05:26:40.434Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbilling.googleapis.com [omitted]
+[debug] [2026-10-14T05:26:40.434Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:40.434Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:40.434Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbilling.googleapis.com:enable [none]
+[debug] [2026-10-14T05:26:40.434Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbilling.googleapis.com:enable  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:26:40.911Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbilling.googleapis.com:enable 200
+[debug] [2026-10-14T05:26:40.911Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/bkk-cutz/services/cloudbilling.googleapis.com:enable [omitted]
+[debug] [2026-10-14T05:26:50.930Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:50.930Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:50.930Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/bkk-cutz/billingInfo [none]
+[debug] [2026-10-14T05:26:50.930Z] >>> [apiv2][(partial)header] GET https://cloudbilling.googleapis.com/v1/projects/bkk-cutz/billingInfo  x-goog-user-project=bkk-cutz
+[debug] [2026-10-14T05:26:52.375Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/bkk-cutz/billingInfo 200
+[debug] [2026-10-14T05:26:52.375Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/bkk-cutz/billingInfo {"name":"projects/bkk-cutz/billingInfo","projectId":"bkk-cutz","billingAccountName":"billingAccounts/01CC7A-E3514C-ECBDC3","billingEnabled":true}
+[debug] [2026-10-14T05:26:52.376Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:52.376Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:52.376Z] >>> [apiv2][query] POST https://cloudfunctions.googleapis.com/v2/projects/bkk-cutz/locations/asia-southeast1/functions:generateUploadUrl [none]
+[debug] [2026-10-14T05:26:56.077Z] <<< [apiv2][status] POST https://cloudfunctions.googleapis.com/v2/projects/bkk-cutz/locations/asia-southeast1/functions:generateUploadUrl 200
+[debug] [2026-10-14T05:26:56.078Z] <<< [apiv2][body] POST https://cloudfunctions.googleapis.com/v2/projects/bkk-cutz/locations/asia-southeast1/functions:generateUploadUrl {"uploadUrl":"https://storage.googleapis.com/gcf-v2-uploads-539745181048.asia-southeast1.cloudfunctions.appspot.com/16ce6bd8-a893-4e50-a00d-2530321b3c81.zip?GoogleAccessId=service-539745181048@gcf-admin-robot.iam.gserviceaccount.com&Expires=1791957415&Signature=EG5ctTrBo5NGjnqHxwVNpZtc9625iJMKfQwsT%2BA9kjbO7kspbZU20OPvmEICqYWFBzg05NJjHoYOuTutyuq%2FZXCBx%2Bn0AEYyn3m629o1jI1bkqEuxlyAmw3II1WqW5%2BUzxfidp9dz1WPfzZ5mkyv6sdeVQR075eRCwJynDG3khd1iwiLPhlj574XKpnc%2BU6U273mAEp%2FgKbzdc7WouMLJ5gIW%2FFyS5lRoXannlP86sYQICgFfCHEU6g0PdHqa%2B6clFtGjQ1YJZAIz2D%2BVqroEBYwZH0cLR9i9wYsePcLwYjt28%2Br%2F070prR3df2teFUpgaa5%2F3XVo2Vmx%2BNlhEjbaA%3D%3D","storageSource":{"bucket":"gcf-v2-uploads-539745181048.asia-southeast1.cloudfunctions.appspot.com","object":"16ce6bd8-a893-4e50-a00d-2530321b3c81.zip"}}
+[debug] [2026-10-14T05:26:56.078Z] >>> [apiv2][query] PUT https://storage.googleapis.com/gcf-v2-uploads-539745181048.asia-southeast1.cloudfunctions.appspot.com/16ce6bd8-a893-4e50-a00d-2530321b3c81.zip GoogleAccessId=service-539745181048%40gcf-admin-robot.iam.gserviceaccount.com&Expires=1791957415&Signature=EG5ctTrBo5NGjnqHxwVNpZtc9625iJMKfQwsT%2BA9kjbO7kspbZU20OPvmEICqYWFBzg05NJjHoYOuTutyuq%2FZXCBx%2Bn0AEYyn3m629o1jI1bkqEuxlyAmw3II1WqW5%2BUzxfidp9dz1WPfzZ5mkyv6sdeVQR075eRCwJynDG3khd1iwiLPhlj574XKpnc%2BU6U273mAEp%2FgKbzdc7WouMLJ5gIW%2FFyS5lRoXannlP86sYQICgFfCHEU6g0PdHqa%2B6clFtGjQ1YJZAIz2D%2BVqroEBYwZH0cLR9i9wYsePcLwYjt28%2Br%2F070prR3df2teFUpgaa5%2F3XVo2Vmx%2BNlhEjbaA%3D%3D
+[debug] [2026-10-14T05:26:56.078Z] >>> [apiv2][body] PUT https://storage.googleapis.com/gcf-v2-uploads-539745181048.asia-southeast1.cloudfunctions.appspot.com/16ce6bd8-a893-4e50-a00d-2530321b3c81.zip [stream]
+[debug] [2026-10-14T05:26:56.315Z] <<< [apiv2][status] PUT https://storage.googleapis.com/gcf-v2-uploads-539745181048.asia-southeast1.cloudfunctions.appspot.com/16ce6bd8-a893-4e50-a00d-2530321b3c81.zip 200
+[debug] [2026-10-14T05:26:56.315Z] <<< [apiv2][body] PUT https://storage.googleapis.com/gcf-v2-uploads-539745181048.asia-southeast1.cloudfunctions.appspot.com/16ce6bd8-a893-4e50-a00d-2530321b3c81.zip [omitted]
+[info] +  functions: functions source uploaded successfully 
+[debug] [2026-10-14T05:26:56.315Z] [rules] releasing cloud.firestore with ruleset projects/bkk-cutz/rulesets/a98f6f37-5619-499c-ac28-4a03f3f32e94
+[debug] [2026-10-14T05:26:56.316Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:56.316Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:56.316Z] >>> [apiv2][query] PATCH https://firebaserules.googleapis.com/v1/projects/bkk-cutz/releases/cloud.firestore [none]
+[debug] [2026-10-14T05:26:56.316Z] >>> [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/bkk-cutz/releases/cloud.firestore {"release":{"name":"projects/bkk-cutz/releases/cloud.firestore","rulesetName":"projects/bkk-cutz/rulesets/a98f6f37-5619-499c-ac28-4a03f3f32e94"}}
+[debug] [2026-10-14T05:26:57.828Z] <<< [apiv2][status] PATCH https://firebaserules.googleapis.com/v1/projects/bkk-cutz/releases/cloud.firestore 200
+[debug] [2026-10-14T05:26:57.828Z] <<< [apiv2][body] PATCH https://firebaserules.googleapis.com/v1/projects/bkk-cutz/releases/cloud.firestore {"name":"projects/bkk-cutz/releases/cloud.firestore","rulesetName":"projects/bkk-cutz/rulesets/a98f6f37-5619-499c-ac28-4a03f3f32e94","createTime":"2026-09-21T03:26:34.222765Z","updateTime":"2026-10-14T05:26:56.759081Z"}
+[debug] [2026-10-14T05:26:57.828Z] [rules] updated release projects/bkk-cutz/releases/cloud.firestore
+[info] +  firestore: released rules firestore.rules to cloud.firestore 
+[info] i  functions: creating Node.js 22 (2nd Gen) function pushAdminAttendance(asia-southeast1)... 
+[debug] [2026-10-14T05:26:57.830Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:57.830Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:26:57.830Z] >>> [apiv2][query] POST https://cloudfunctions.googleapis.com/v2/projects/bkk-cutz/locations/asia-southeast1/functions functionId=pushAdminAttendance
+[debug] [2026-10-14T05:26:57.830Z] >>> [apiv2][body] POST https://cloudfunctions.googleapis.com/v2/projects/bkk-cutz/locations/asia-southeast1/functions {"name":"projects/bkk-cutz/locations/asia-southeast1/functions/pushAdminAttendance","buildConfig":{"runtime":"nodejs22","entryPoint":"pushAdminAttendance","source":{"storageSource":{"bucket":"gcf-v2-uploads-539745181048.asia-southeast1.cloudfunctions.appspot.com","object":"16ce6bd8-a893-4e50-a00d-2530321b3c81.zip"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""}},"serviceConfig":{"environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"bkk-cutz\",\"storageBucket\":\"bkk-cutz.firebasestorage.app\"}","GCLOUD_PROJECT":"bkk-cutz","EVENTARC_CLOUD_EVENT_SOURCE":"projects/bkk-cutz/locations/asia-southeast1/services/pushAdminAttendance","FUNCTION_REGION":"asia-southeast1","FUNCTION_SIGNATURE_TYPE":"cloudevent","FUNCTION_TARGET":"pushAdminAttendance","LOG_EXECUTION_ID":"true"},"ingressSettings":null,"timeoutSeconds":null,"serviceAccountEmail":null,"availableMemory":"256Mi","minInstanceCount":null,"maxInstanceCount":null,"maxInstanceRequestConcurrency":80,"availableCpu":"1","vpcConnector":null,"vpcConnectorEgressSettings":null,"directVpcNetworkInterface":null,"directVpcEgress":null},"labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"98fad9a73cf2d4b52d6a8804d2872dc67c5bd2b2"},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","retryPolicy":"RETRY_POLICY_DO_NOT_RETRY","eventFilters":[{"attribute":"database","value":"(default)"},{"attribute":"namespace","value":"(default)"},{"attribute":"document","value":"admin_notifications/{notificationId}","operator":"match-path-pattern"}],"triggerRegion":"asia-southeast3"}}
+[debug] [2026-10-14T05:27:00.840Z] <<< [apiv2][status] POST https://cloudfunctions.googleapis.com/v2/projects/bkk-cutz/locations/asia-southeast1/functions 400
+[debug] [2026-10-14T05:27:00.840Z] <<< [apiv2][body] POST https://cloudfunctions.googleapis.com/v2/projects/bkk-cutz/locations/asia-southeast1/functions {"error":{"code":400,"message":"Trigger region 'asia-southeast3' is not supported. Available regions are: africa-south1, asia, asia-east1, asia-east2, asia-northeast1, asia-northeast2, asia-northeast3, asia-south1, asia-south2, asia-southeast1, asia-southeast2, asia1, australia-southeast1, australia-southeast2, eu, eur3, eur4, europe-central2, europe-north1, europe-north2, europe-southwest1, europe-west1, europe-west10, europe-west12, europe-west15, europe-west2, europe-west3, europe-west4, europe-west6, europe-west8, europe-west9, global, me-central1, me-central2, me-west1, nam4, nam5, nam7, northamerica-northeast1, northamerica-northeast2, northamerica-south1, southamerica-east1, southamerica-west1, us, us-central1, us-east1, us-east4, us-east5, us-east7, us-south1, us-west1, us-west2, us-west3, us-west4, us-west8.","status":"INVALID_ARGUMENT"}}
+[warn] !  functions: Request to https://cloudfunctions.googleapis.com/v2/projects/bkk-cutz/locations/asia-southeast1/functions?functionId=pushAdminAttendance had HTTP Error: 400, Trigger region 'asia-southeast3' is not supported. Available regions are: africa-south1, asia, asia-east1, asia-east2, asia-northeast1, asia-northeast2, asia-northeast3, asia-south1, asia-south2, asia-southeast1, asia-southeast2, asia1, australia-southeast1, australia-southeast2, eu, eur3, eur4, europe-central2, europe-north1, europe-north2, europe-southwest1, europe-west1, europe-west10, europe-west12, europe-west15, europe-west2, europe-west3, europe-west4, europe-west6, europe-west8, europe-west9, global, me-central1, me-central2, me-west1, nam4, nam5, nam7, northamerica-northeast1, northamerica-northeast2, northamerica-south1, southamerica-east1, southamerica-west1, us, us-central1, us-east1, us-east4, us-east5, us-east7, us-south1, us-west1, us-west2, us-west3, us-west4, us-west8. 
+[warn] !  functions:  failed to create function projects/bkk-cutz/locations/asia-southeast1/functions/pushAdminAttendance 
+[error] Failed to create function projects/bkk-cutz/locations/asia-southeast1/functions/pushAdminAttendance
+[warn] !  functions: Deploys failed. Skipping deletes. 
+[debug] [2026-10-14T05:27:00.843Z] Total Function Deployment time: 3011
+[debug] [2026-10-14T05:27:00.843Z] 1 Functions Deployed
+[debug] [2026-10-14T05:27:00.843Z] 1 Functions Errored
+[debug] [2026-10-14T05:27:00.843Z] 0 Function Deployments Aborted
+[debug] [2026-10-14T05:27:00.843Z] Average Function Deployment time: 3011
+[info] 
+[info] Functions deploy had errors with the following functions:
+	pushAdminAttendance(asia-southeast1)
+[debug] [2026-10-14T05:27:00.983Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:27:00.983Z] Checked if tokens are valid: true, expires at: 1791959129585
+[debug] [2026-10-14T05:27:00.983Z] >>> [apiv2][query] GET https://artifactregistry.googleapis.com/v1/projects/bkk-cutz/locations/asia-southeast1/repositories/gcf-artifacts [none]
+[debug] [2026-10-14T05:27:01.170Z] <<< [apiv2][status] GET https://artifactregistry.googleapis.com/v1/projects/bkk-cutz/locations/asia-southeast1/repositories/gcf-artifacts 404
+[debug] [2026-10-14T05:27:01.170Z] <<< [apiv2][body] GET https://artifactregistry.googleapis.com/v1/projects/bkk-cutz/locations/asia-southeast1/repositories/gcf-artifacts {"error":{"code":404,"message":"Requested entity was not found.","status":"NOT_FOUND"}}
+[debug] [2026-10-14T05:27:01.170Z] Failed to check artifact cleanup policy for region asia-southeast1: Request to https://artifactregistry.googleapis.com/v1/projects/bkk-cutz/locations/asia-southeast1/repositories/gcf-artifacts had HTTP Error: 404, Requested entity was not found. {"name":"FirebaseError","children":[],"context":{"body":{"error":{"code":404,"message":"Requested entity was not found.","status":"NOT_FOUND"}},"response":{"statusCode":404}},"exit":1,"message":"Request to https://artifactregistry.googleapis.com/v1/projects/bkk-cutz/locations/asia-southeast1/repositories/gcf-artifacts had HTTP Error: 404, Requested entity was not found.","status":404}
+[debug] [2026-10-14T05:27:01.170Z] Functions deploy failed.
+[debug] [2026-10-14T05:27:01.170Z] {
+  "endpoint": {
+    "id": "pushAdminAttendance",
+    "project": "bkk-cutz",
+    "region": "asia-southeast1",
+    "entryPoint": "pushAdminAttendance",
+    "platform": "gcfv2",
+    "runtime": "nodejs22",
+    "eventTrigger": {
+      "eventType": "google.cloud.firestore.document.v1.created",
+      "retry": false,
+      "eventFilters": {
+        "database": "(default)",
+        "namespace": "(default)"
+      },
+      "eventFilterPathPatterns": {
+        "document": "admin_notifications/{notificationId}"
+      },
+      "region": "asia-southeast3"
+    },
+    "labels": {
+      "deployment-tool": "cli-firebase"
+    },
+    "serviceAccount": null,
+    "ingressSettings": null,
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "maxInstances": null,
+    "minInstances": null,
+    "concurrency": 80,
+    "vpc": null,
+    "environmentVariables": {
+      "FIREBASE_CONFIG": "{\"projectId\":\"bkk-cutz\",\"storageBucket\":\"bkk-cutz.firebasestorage.app\"}",
+      "GCLOUD_PROJECT": "bkk-cutz",
+      "EVENTARC_CLOUD_EVENT_SOURCE": "projects/bkk-cutz/locations/asia-southeast1/services/pushAdminAttendance",
+      "FUNCTION_REGION": "asia-southeast1"
+    },
+    "codebase": "default",
+    "cpu": 1,
+    "targetedByOnly": false,
+    "hash": "98fad9a73cf2d4b52d6a8804d2872dc67c5bd2b2"
+  },
+  "op": "create",
+  "original": {
+    "name": "FirebaseError",
+    "children": [],
+    "context": {
+      "function": "projects/bkk-cutz/locations/asia-southeast1/functions/pushAdminAttendance"
+    },
+    "exit": 1,
+    "message": "Failed to create function projects/bkk-cutz/locations/asia-southeast1/functions/pushAdminAttendance",
+    "original": {
+      "name": "FirebaseError",
+      "children": [],
+      "context": {
+        "body": {
+          "error": {
+            "code": 400,
+            "message": "Trigger region 'asia-southeast3' is not supported. Available regions are: africa-south1, asia, asia-east1, asia-east2, asia-northeast1, asia-northeast2, asia-northeast3, asia-south1, asia-south2, asia-southeast1, asia-southeast2, asia1, australia-southeast1, australia-southeast2, eu, eur3, eur4, europe-central2, europe-north1, europe-north2, europe-southwest1, europe-west1, europe-west10, europe-west12, europe-west15, europe-west2, europe-west3, europe-west4, europe-west6, europe-west8, europe-west9, global, me-central1, me-central2, me-west1, nam4, nam5, nam7, northamerica-northeast1, northamerica-northeast2, northamerica-south1, southamerica-east1, southamerica-west1, us, us-central1, us-east1, us-east4, us-east5, us-east7, us-south1, us-west1, us-west2, us-west3, us-west4, us-west8.",
+            "status": "INVALID_ARGUMENT"
+          }
+        },
+        "response": {
+          "statusCode": 400
+        }
+      },
+      "exit": 1,
+      "message": "Request to https://cloudfunctions.googleapis.com/v2/projects/bkk-cutz/locations/asia-southeast1/functions?functionId=pushAdminAttendance had HTTP Error: 400, Trigger region 'asia-southeast3' is not supported. Available regions are: africa-south1, asia, asia-east1, asia-east2, asia-northeast1, asia-northeast2, asia-northeast3, asia-south1, asia-south2, asia-southeast1, asia-southeast2, asia1, australia-southeast1, australia-southeast2, eu, eur3, eur4, europe-central2, europe-north1, europe-north2, europe-southwest1, europe-west1, europe-west10, europe-west12, europe-west15, europe-west2, europe-west3, europe-west4, europe-west6, europe-west8, europe-west9, global, me-central1, me-central2, me-west1, nam4, nam5, nam7, northamerica-northeast1, northamerica-northeast2, northamerica-south1, southamerica-east1, southamerica-west1, us, us-central1, us-east1, us-east4, us-east5, us-east7, us-south1, us-west1, us-west2, us-west3, us-west4, us-west8.",
+      "status": 400
+    },
+    "status": 400,
+    "code": 400
+  }
+}
+[debug] [2026-10-14T05:27:01.242Z] Error: Failed to create function pushAdminAttendance in region asia-southeast1
+    at C:\Users\tepat\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:457:27
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Fabricator.createV2Function (C:\Users\tepat\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:434:30)
+    at async Fabricator.createEndpoint (C:\Users\tepat\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:273:13)
+    at async Fabricator.wrapOperation (C:\Users\tepat\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:258:13)
+    at async Promise.all (index 0)
+    at async Promise.allSettled (index 0)
+    at async Fabricator.applyPlan (C:\Users\tepat\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:175:45)
+    at async release (C:\Users\tepat\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\index.js:89:21)
+    at async chain (C:\Users\tepat\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\index.js:114:9)
+[error] 
+[error] Error: There was an error deploying functions

@@ -158,6 +158,32 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Push devices ของ Admin แต่ละเครื่อง ใช้ส่ง Web Push/FCM
+    match /admin_push_devices/{deviceId} {
+      allow get: if isAdmin()
+        && resource.data.uid == request.auth.uid;
+
+      allow create: if isAdmin()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.deviceId is string
+        && request.resource.data.fid is string
+        && request.resource.data.fid.size() > 0
+        && request.resource.data.active == true
+        && request.resource.data.updatedAt == request.time;
+
+      allow update: if isAdmin()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.deviceId == resource.data.deviceId
+        && request.resource.data.fid is string
+        && request.resource.data.fid.size() > 0
+        && request.resource.data.active == true
+        && request.resource.data.updatedAt == request.time;
+
+      allow delete: if isAdmin()
+        && resource.data.uid == request.auth.uid;
+    }
+
     match /daily_closings/{closingId} {
       // The closing transaction checks for an existing record before creating it.
       // A missing document has no branchId; permit only this absence check.

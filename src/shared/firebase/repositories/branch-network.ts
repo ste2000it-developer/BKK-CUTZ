@@ -1,13 +1,13 @@
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db } from "../client";
 import type { NetworkData } from "../../domain/branch-network";
-export function watchBranchNetwork(dateKey: string, next: (data: NetworkData, cached: boolean) => void, error: (issue: Error) => void) {
+export function watchBranchNetwork(dateKey: string, next: (data: NetworkData, cached: boolean) => void, error: (issue: Error) => void, historical = false) {
   const data: NetworkData = { branches: [], transactions: [], presence: [], closings: [] };
   const ready = new Set<string>(); const cached = new Set<string>();
   let live = true;
   const sources = [
     ["branches", "branches"], ["transactions", "transactions"],
-    ["presence", "barber_presence"], ["closings", "daily_closings"],
+    ["presence", historical ? "barber_attendance" : "barber_presence"], ["closings", "daily_closings"],
   ] as const;
   const stops = sources.map(([key, name]) => {
     const ref = collection(db, name);

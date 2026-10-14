@@ -20,7 +20,7 @@ const adminPageLoaders = {
 };
 
 const navigation: Array<{ id: AdminPage; icon: string; label: string; title: string }> = [
-  { id: "network", icon: "◉", label: "ผังเครือข่ายสาขา", title: "ผังเครือข่ายสาขา" },
+  { id: "network", icon: "◉", label: "จัดการสาขา", title: "จัดการสาขา" },
   { id: "services", icon: "✂", label: "เมนูบริการ / ราคา", title: "เมนูบริการ / ราคา" },
   { id: "barbers", icon: "♙", label: "จัดการช่าง", title: "จัดการช่าง" },
   { id: "payouts", icon: "฿", label: "จ่ายเงินช่าง", title: "จ่ายเงินช่าง" },
@@ -162,7 +162,7 @@ export function AdminApp() {
       </aside>
       <main className="admin-main">
         <div className="admin-main-inner">
-          <header className="admin-topbar"><div><div className="admin-kicker">BKK-CUTZ CONTROL</div><h1>{navigation.find((item) => item.id === page)?.title}</h1><div className="admin-email">{user.email || "Admin"}</div></div><div className="admin-header-actions"><NotificationCenter key={user.uid} /><button className="logout-button" type="button" onClick={() => void logout()}>ออกจากระบบ</button></div></header>
+          <header className="admin-topbar"><div><div className="admin-kicker">BKK-CUTZ CONTROL</div><h1>{navigation.find((item) => item.id === page)?.title}</h1><div className="admin-email">{user.email || "Admin"}</div></div><div className="admin-header-actions"><NotificationCenter key={user.uid} userId={user.uid} /><button className="logout-button" type="button" onClick={() => void logout()}>ออกจากระบบ</button></div></header>
           {pageLoadError && <div className="error-box" role="alert">{pageLoadError}</div>}
           {BranchNetworkPage && <section className={page === "network" ? "" : "hidden"}><BranchNetworkPage /></section>}
           <section className={page === "services" ? "" : "hidden"}><ServicesPage /></section>

@@ -204,7 +204,12 @@ export function BarbersPage() {
 
         <div className="barber-filter-row">
           <label className="barber-search-field">
-            <span className="material-symbols-outlined" aria-hidden="true">search</span>
+            <span className="barber-search-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-4-4" />
+              </svg>
+            </span>
             <input
               type="search"
               placeholder="ค้นหาชื่อ, PIN, RFID หรือรหัสช่าง"

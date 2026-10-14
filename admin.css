@@ -136,18 +136,6 @@ select {
 .editor input,
 .editor select {
   width: 100%;
-  height: 54px;
-  padding: 0 14px;
-  border: 1px solid #d7d7d7;
-  border-radius: 10px;
-  background: #ffffff;
-  outline: none;
-}
-
-.login-card input:focus,
-.editor input:focus,
-.editor select:focus {
-  border-color: #111111;
 }
 
 .error-box,
@@ -636,7 +624,6 @@ select {
 
 .checkbox-row input {
   width: auto;
-  height: auto;
 }
 
 .editor-actions {
@@ -799,10 +786,6 @@ select {
   position: relative;
 }
 
-.password-field input {
-  padding-right: 52px;
-}
-
 .password-toggle-button {
   position: absolute;
   top: 50%;
@@ -904,15 +887,6 @@ select {
 .payout-cycle-select {
   width: 100%;
   min-width: 0;
-  height: 44px;
-  padding: 0 12px;
-  border: 1px solid #d7d7d7;
-  border-radius: 10px;
-  background: #ffffff;
-  color: var(--text);
-  font: inherit;
-  font-size: 13px;
-  text-align: center;
 }
 
 .payout-period-text {
@@ -1441,161 +1415,10 @@ select {
 
 /* CUSTOM DROPDOWN */
 
-.native-app-select {
-  width: 100%;
-  min-width: 0;
-  height: 46px;
-  padding: 0 12px;
-  border: 1px solid #d7d7d7;
-  border-radius: 10px;
-  background: #ffffff;
-  color: #111111;
-  cursor: pointer;
-}
-
 .payout-export-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-}
-
-.app-select {
-  position: relative;
-  width: 100%;
-  z-index: 30;
-}
-
-.app-select.open {
-  z-index: 80;
-}
-
-.app-select-trigger {
-  width: 100%;
-  min-height: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 0 14px;
-  border: 1px solid #d7d7d7;
-  border-radius: 10px;
-  background: #ffffff;
-  color: #111111;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    border-color .16s ease,
-    box-shadow .16s ease,
-    background .16s ease;
-}
-
-.app-select-trigger:hover {
-  border-color: #a9a9a9;
-}
-
-.app-select.open
-.app-select-trigger {
-  border-color: #111111;
-  box-shadow:
-    0 0 0 2px
-    rgba(17, 17, 17, .06);
-}
-
-.app-select-trigger i {
-  color: #777777;
-  font-size: 11px;
-  transition:
-    transform .16s ease;
-}
-
-.app-select.open
-.app-select-trigger i {
-  transform:
-    rotate(180deg);
-}
-
-.app-select-trigger:disabled {
-  background: #f2f2f1;
-  color: #a0a0a0;
-  cursor: default;
-}
-
-.app-select-menu {
-  position: absolute;
-  top: calc(100% + 7px);
-  left: 0;
-  right: 0;
-  max-height: 272px;
-  display: none;
-  overflow-y: auto;
-  padding: 6px;
-  border: 1px solid #d8d8d8;
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow:
-    0 14px 34px
-    rgba(0, 0, 0, .12);
-}
-
-.app-select.open
-.app-select-menu {
-  display: block;
-}
-
-.app-select-option {
-  width: 100%;
-  min-height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 10px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: #222222;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  text-align: left;
-  cursor: pointer;
-}
-
-.app-select-option:hover {
-  background: #f1f1f0;
-}
-
-.app-select-option:focus-visible {
-  outline: 2px solid #777777;
-  outline-offset: -2px;
-}
-
-.app-select-option.selected {
-  background: #111111;
-  color: #ffffff;
-}
-
-.app-select-option i {
-  display: none;
-  font-size: 11px;
-}
-
-.app-select-option.selected i {
-  display: block;
-}
-
-.payout-cycle-controls
-.app-select-trigger {
-  height: 44px;
-  min-height: 44px;
-}
-
-.payout-cycle-controls
-.app-select-menu {
-  min-width: 270px;
 }
 
 .payout-empty-state {
@@ -1702,17 +1525,6 @@ select {
 
 .daily-history-date-field input {
   width: 100%;
-  height: 46px;
-  padding: 0 12px;
-  border: 1px solid #d7d7d7;
-  border-radius: 10px;
-  background: #ffffff;
-  color: #111111;
-  outline: none;
-}
-
-.daily-history-date-field input:focus {
-  border-color: #111111;
 }
 
 .daily-history-refresh-button {
@@ -2068,12 +1880,6 @@ body.daily-history-modal-open {
   gap: 6px;
 }
 
-.payout-history-select-field > span {
-  color: #777777;
-  font-size: 12px;
-  font-weight: 700;
-}
-
 .payout-history-summary-grid {
   display: grid;
   grid-template-columns:
@@ -2418,16 +2224,10 @@ body.payout-history-modal-open {
   color: var(--black);
 }
 
-.group-button.active,
-.app-select-option.selected {
+.group-button.active {
   border-color: var(--accent);
   background: var(--accent);
   color: var(--black);
-}
-
-.app-select.open .app-select-trigger {
-  border-color: #927000;
-  box-shadow: 0 0 0 3px rgb(253 199 23 / 20%);
 }
 
 .payout-summary-card-dark strong,
@@ -2521,19 +2321,6 @@ body.payout-history-modal-open {
 .payout-detail-heading {
   flex-wrap: wrap;
 }
-.app-select-trigger > span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.app-select-trigger > i { flex-shrink: 0; }
-.app-select-option { overflow-wrap: anywhere; }
-.payout-cycle-controls .app-select-menu {
-  min-width: 0;
-  max-width: 100%;
-}
-.app-select-menu { max-height: min(272px, 40dvh); }
 .login-card { min-width: 0; }
 @media (min-width: 1051px) {
   .admin-workspace.is-editing .service-table-head { display: none; }
@@ -2571,9 +2358,6 @@ body.payout-history-modal-open {
   .payout-cycle-card,
   .daily-history-filter-card,
   .payout-history-filter-card { padding: 16px 12px; }
-  .editor input,
-  .login-card input,
-  .daily-history-date-field input { font-size: 16px; }
 }
 
 /* ========================================
@@ -2646,17 +2430,6 @@ body.payout-history-modal-open {
   font-weight: 700;
 }
 
-.advances-filter-field input,
-.advances-filter-item input,
-.financial-date-field input {
-  height: 46px;
-  padding: 0 14px;
-  border: 1px solid #d8d8d8;
-  border-radius: 10px;
-  background: #ffffff;
-  outline: none;
-}
-
 .advances-filter-item {
   min-width: 0;
 }
@@ -2664,15 +2437,6 @@ body.payout-history-modal-open {
 .advances-filter-item input {
   width: 100%;
   min-width: 0;
-  color: var(--text);
-  font: inherit;
-  font-size: 14px;
-  color-scheme: light;
-}
-
-.advances-filter-item input:focus-visible {
-  border-color: #e0b900;
-  box-shadow: 0 0 0 3px rgba(255, 216, 77, .2);
 }
 
 .advances-clear-filter {
@@ -2990,17 +2754,6 @@ body.payout-history-modal-open {
 
 .service-editor-body input:not([type="checkbox"]) {
   width: 100%;
-  height: 48px;
-  padding: 0 14px;
-  border: 1px solid #d5d5d5;
-  border-radius: 10px;
-  background: #ffffff;
-  font-size: 15px;
-  outline: none;
-}
-
-.service-editor-body input:not([type="checkbox"]):focus {
-  border-color: #111111;
 }
 
 .service-editor-modal .editor-actions {
@@ -3092,140 +2845,6 @@ body.payout-history-modal-open {
 
 .advances-form-row > input {
   width: 100%;
-  height: 52px;
-  padding: 0 14px;
-  border: 1px solid #d5d5d5;
-  border-radius: 10px;
-  background: #ffffff;
-  color: #111111;
-  font-family: inherit;
-  font-size: 15px;
-  outline: none;
-  transition: border-color .15s;
-}
-
-.advances-form-row > input:focus {
-  border-color: #111111;
-}
-
-.advances-form-row .app-select {
-  position: relative;
-  width: 100%;
-}
-
-.advances-form-row .app-select.open {
-  z-index: 80;
-}
-
-.advances-form-row .app-select-trigger {
-  width: 100%;
-  min-height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 0 16px;
-  border: 1px solid #d5d5d5;
-  border-radius: 10px;
-  background: #ffffff;
-  color: #111111;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 700;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    border-color .16s ease,
-    box-shadow .16s ease,
-    background .16s ease;
-}
-
-.advances-form-row .app-select-trigger:hover {
-  border-color: #999999;
-}
-
-.advances-form-row .app-select.open .app-select-trigger {
-  border-color: #111111;
-  box-shadow: 0 0 0 2px rgba(17, 17, 17, .06);
-}
-
-.advances-form-row .app-select-trigger i {
-  color: #777777;
-  font-size: 13px;
-  transition: transform .16s ease;
-}
-
-.advances-form-row .app-select.open .app-select-trigger i {
-  transform: rotate(180deg);
-}
-
-.advances-form-row .app-select-trigger:disabled {
-  background: #f2f2f1;
-  color: #a0a0a0;
-  cursor: default;
-}
-
-.advances-form-row .app-select-menu {
-  position: absolute;
-  top: calc(100% + 7px);
-  left: 0;
-  right: 0;
-  max-height: 272px;
-  display: none;
-  overflow-y: auto;
-  padding: 6px;
-  border: 1px solid #d8d8d8;
-  border-radius: 12px;
-  background: #ffffff;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, .14);
-  z-index: 100;
-}
-
-.advances-form-row .app-select.open .app-select-menu {
-  display: block;
-}
-
-.advances-form-row .app-select-option {
-  width: 100%;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: #222222;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  text-align: left;
-  cursor: pointer;
-}
-
-.advances-form-row .app-select-option:hover {
-  background: #f1f1f0;
-}
-
-.advances-form-row .app-select-option:focus-visible {
-  outline: 2px solid #777777;
-  outline-offset: -2px;
-}
-
-.advances-form-row .app-select-option.selected {
-  background: var(--accent, #fdc717);
-  color: #111111;
-  font-weight: 700;
-}
-
-.advances-form-row .app-select-option i {
-  display: none;
-  font-size: 13px;
-}
-
-.advances-form-row .app-select-option.selected i {
-  display: block;
 }
 
 .advances-amount-input-wrap {
@@ -3236,21 +2855,6 @@ body.payout-history-modal-open {
 
 .advances-amount-input-wrap input {
   width: 100%;
-  height: 64px;
-  padding: 0 54px 0 16px;
-  border: 1px solid #d5d5d5;
-  border-radius: 12px;
-  background: #f7f7f6;
-  font-size: 32px;
-  font-weight: 800;
-  text-align: center;
-  outline: none;
-  transition: border-color .15s, background .15s;
-}
-
-.advances-amount-input-wrap input:focus {
-  border-color: #111111;
-  background: #ffffff;
 }
 
 .advances-unit {
@@ -3724,29 +3328,22 @@ body.payout-history-modal-open {
 
 .barber-search-field {
   width: min(440px, 100%);
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 12px;
-  border: 1px solid #d8d8d8;
-  border-radius: 10px;
-  background: #ffffff;
+  position: relative;
 }
 
 .barber-search-field .material-symbols-outlined {
   color: #888888;
   font-size: 20px;
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .barber-search-field input {
   width: 100%;
   min-width: 0;
-  height: 42px;
-  padding: 0;
-  border: none;
-  outline: none;
-  background: transparent;
 }
 
 .barber-table-head,
@@ -3862,33 +3459,6 @@ body.payout-history-modal-open {
 
 .barber-editor-body > input {
   width: 100%;
-  height: 50px;
-  padding: 0 14px;
-  border: 1px solid #d5d5d5;
-  border-radius: 10px;
-  background: #ffffff;
-  outline: none;
-  font-size: 15px;
-}
-
-.barber-editor-body > input:focus {
-  border-color: #111111;
-}
-
-.barber-pin-input,
-.barber-rfid-input {
-  text-align: center;
-}
-
-.barber-pin-input {
-  font-size: 20px !important;
-  font-weight: 800;
-  letter-spacing: 6px;
-}
-
-.barber-rfid-input {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  letter-spacing: 1px;
 }
 
 .barber-field-note {
@@ -3911,7 +3481,6 @@ body.payout-history-modal-open {
 
 .barber-active-row input {
   width: 18px;
-  height: 18px;
   margin-top: 2px;
 }
 

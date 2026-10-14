@@ -15,6 +15,7 @@ export default defineConfig({
       "firebase/auth",
       "firebase/firestore",
       "firebase/storage",
+      "firebase/messaging",
     ],
   },
   build: {

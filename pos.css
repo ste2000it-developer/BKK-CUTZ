@@ -3604,3 +3604,102 @@ svg {
     right: 16px;
   }
 }
+
+/* =========================================================
+   BKK-CUTZ POS — canonical form controls
+   Same geometry as Admin; POS accent = black.
+   ========================================================= */
+:root {
+  --pos-control-accent: #111111;
+  --pos-control-border: #d5d5d5;
+  --pos-control-radius: 10px;
+}
+
+/* Standard POS fields. Keep special field sizes, unify their shell language. */
+.field-shell input,
+.range-service-area > input,
+.custom-service-area > input,
+.shift-pin-input,
+.cash-closing-actual,
+.history-control input,
+.history-control select,
+.shop-expense-form-group select,
+.shop-expense-form-group > input,
+.shop-expense-amount-wrap input,
+.history-void-form input,
+.history-void-form textarea {
+  border-color: var(--pos-control-border) !important;
+  border-radius: var(--pos-control-radius) !important;
+  background-color: #ffffff !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: border-color .14s ease, outline-color .14s ease, background .14s ease !important;
+}
+
+.field-shell input:focus,
+.range-service-area > input:focus,
+.custom-service-area > input:focus,
+.shift-pin-input:focus,
+.cash-closing-actual:focus,
+.history-control input:focus,
+.history-control select:focus,
+.shop-expense-form-group select:focus,
+.shop-expense-form-group > input:focus,
+.shop-expense-amount-wrap input:focus,
+.history-void-form input:focus,
+.history-void-form textarea:focus {
+  border-color: var(--pos-control-accent) !important;
+  outline: 2px solid var(--pos-control-accent) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+/* POS custom dropdowns use the same double-line black focus. */
+.shop-expense-form-group .app-select-trigger,
+.history-custom-select-button {
+  border-color: var(--pos-control-border) !important;
+  border-radius: var(--pos-control-radius) !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.shop-expense-form-group .app-select.open .app-select-trigger,
+.shop-expense-form-group .app-select-trigger:focus-visible,
+.history-custom-select.open .history-custom-select-button,
+.history-custom-select-button:focus-visible {
+  border-color: var(--pos-control-accent) !important;
+  outline: 2px solid var(--pos-control-accent) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+/* POS selected dropdown item = black, Admin uses yellow. */
+.shop-expense-form-group .app-select-option.selected,
+.history-custom-select-option.selected {
+  background: #111111 !important;
+  color: #ffffff !important;
+}
+
+/* Existing composite amount/tip shells use the same focus language on the outer shell. */
+.tip-input-shell:focus-within,
+.large-price-input:focus-within {
+  border-color: var(--pos-control-accent) !important;
+  outline: 2px solid var(--pos-control-accent) !important;
+  outline-offset: 2px !important;
+  box-shadow: none !important;
+}
+
+/* Text areas follow the same focus geometry without forcing a single-line height. */
+.history-void-form textarea {
+  border-radius: var(--pos-control-radius) !important;
+}
+
+/* Composite POS fields keep their semantic height, but use the same neutral shell. */
+.tip-input-shell,
+.large-price-input {
+  border: 1px solid var(--pos-control-border) !important;
+  border-radius: var(--pos-control-radius) !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
