@@ -231,8 +231,10 @@ export function FinancialSummaryPage() {
         <div className="financial-summary-filters">
           <label className="financial-date-field">
             <span>ตั้งแต่วันที่</span>
+            <span className="financial-mobile-date-value" aria-hidden="true">{startDateKey ? new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "short", year: "2-digit" }).format(new Date(`${startDateKey}T12:00:00+07:00`)) : "เลือกวันที่"}</span>
             <input
               type="date"
+              aria-label="ตั้งแต่วันที่"
               value={startDateKey}
               onChange={(e) => {
                 setPeriodType("custom");
@@ -242,8 +244,10 @@ export function FinancialSummaryPage() {
           </label>
           <label className="financial-date-field">
             <span>ถึงวันที่</span>
+            <span className="financial-mobile-date-value" aria-hidden="true">{endDateKey ? new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "short", year: "2-digit" }).format(new Date(`${endDateKey}T12:00:00+07:00`)) : "เลือกวันที่"}</span>
             <input
               type="date"
+              aria-label="ถึงวันที่"
               value={endDateKey}
               onChange={(e) => {
                 setPeriodType("custom");
