@@ -34,6 +34,7 @@ export function AdminApp() {
   const [user, setUser] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
   const [page, setPage] = useState<AdminPage>("network");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loadedPages, setLoadedPages] = useState(() => new Map<AdminPage, ComponentType>([["services", ServicesPage]]));
   const [pageLoadError, setPageLoadError] = useState("");
   const navigationRequest = useRef(0);
@@ -96,6 +97,7 @@ export function AdminApp() {
 
       setLoadedPages((loaded) => new Map(loaded).set(nextPage, Page));
       setPage(nextPage);
+      setMobileMenuOpen(false);
     } catch (error) {
       if (request !== navigationRequest.current) return;
       console.error("Admin page load failed:", error);
@@ -152,7 +154,10 @@ export function AdminApp() {
 
   return (
     <div className="admin-shell">
-      <aside className="admin-sidebar">
+      <div className="admin-mobile-header"><button type="button" className="admin-menu-toggle" aria-label="เปิดเมนู" aria-expanded={mobileMenuOpen} aria-controls="admin-navigation" onClick={() => setMobileMenuOpen(true)}>☰</button><strong>BKK-CUTZ</strong><span>ADMIN</span></div>
+      {mobileMenuOpen && <button className="admin-menu-backdrop" type="button" aria-label="ปิดเมนู" onClick={() => setMobileMenuOpen(false)} />}
+      <aside id="admin-navigation" className={`admin-sidebar${mobileMenuOpen ? " mobile-open" : ""}`}>
+        <button type="button" className="admin-menu-close" aria-label="ปิดเมนู" onClick={() => setMobileMenuOpen(false)}>×</button>
         <div><div className="sidebar-brand">BKK-CUTZ</div><div className="sidebar-subbrand">ADMIN PANEL</div></div>
         <div className="sidebar-menu-title">เมนูระบบ</div>
         <nav className="admin-nav" aria-label="เมนู Admin">
