@@ -1042,3 +1042,22 @@
 @media (prefers-reduced-motion: reduce) {
   .admin-sidebar { transition:none !important; }
 }
+
+/* Mobile sidebar: separate navigation with dividers instead of outlined cards. */
+@media (max-width: 600px) {
+  .admin-sidebar .admin-nav { gap: 0 !important; }
+  .admin-sidebar .admin-nav-button {
+    border: 0 !important;
+    border-bottom: 1px solid #343434 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    min-height: 52px !important;
+    padding: 0 12px !important;
+  }
+  .admin-sidebar .admin-nav-button.active {
+    background: #fdc717 !important;
+    color: #171717 !important;
+    border-bottom-color: transparent !important;
+    border-radius: 9px !important;
+  }
+}
