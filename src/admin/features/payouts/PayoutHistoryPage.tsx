@@ -192,7 +192,7 @@ export function PayoutHistoryPage() {
                     <div className="payout-history-total-cell">{formatMoney(record.totalAmount)}</div>
                     <div className="payout-history-paid-at">{formatPaidAt(record)}</div>
                     <div className="payout-history-paid-by">{String(record.paidByEmail || record.paidByUid || "-")}</div>
-                    <div className="payout-history-chevron">›</div>
+                    <div className="payout-history-chevron"><i className="fa-solid fa-chevron-right" aria-hidden="true" /></div>
                   </button>
                 );
               })}
