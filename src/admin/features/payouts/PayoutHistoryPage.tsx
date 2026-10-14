@@ -167,7 +167,7 @@ export function PayoutHistoryPage() {
 
       {error ? <section className="payout-history-empty-state"><strong>โหลดประวัติการจ่ายไม่สำเร็จ</strong><p>{error}</p></section> : null}
       {!error && loaded && filteredRecords.length === 0 ? (
-        <section className="payout-history-empty-state"><div className="payout-history-empty-icon">฿</div><strong>ยังไม่มีประวัติการจ่ายเงินช่าง</strong><p>เมื่อกดยืนยันจ่ายในหน้าจ่ายเงินช่าง รายการจะมาแสดงที่นี่</p></section>
+        <section className="payout-history-empty-state"><div className="payout-history-empty-icon"><i className="fa-solid fa-money-bill-transfer" aria-hidden="true" /></div><strong>ยังไม่มีประวัติการจ่ายเงินช่าง</strong><p>เมื่อกดยืนยันจ่ายในหน้าจ่ายเงินช่าง รายการจะมาแสดงที่นี่</p></section>
       ) : null}
       {!error && filteredRecords.length > 0 ? (
         <section>
