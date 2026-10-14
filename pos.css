@@ -4087,3 +4087,14 @@ svg {
   width: 100%;
 }
 .pos-workspace-loading > * { margin-inline: auto; }
+
+/* Equal-height history date and barber controls on phones. */
+@media (max-width: 600px) {
+  .app .history-controls .history-date-picker,
+  .app .history-controls .history-custom-select-button {
+    height: 48px !important;
+    min-height: 48px !important;
+    box-sizing: border-box !important;
+  }
+  .app .history-controls .history-custom-select { align-self: end; }
+}
