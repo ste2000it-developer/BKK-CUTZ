@@ -1,9 +1,13 @@
 import { collection, doc, getDocs, onSnapshot, query, runTransaction, serverTimestamp, setDoc, where } from "firebase/firestore";
-import { db } from "../client";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { app, db } from "../client";
 import { attendanceId, type Barber, type PosBranch, type Presence, type ReaderResult, type ReaderScan } from "../../domain/pos-attendance";
 import { bangkokBusinessDate, cashDifference, type CashClosingInput } from "../../domain/cash-closing";
 import { loadCashClosingSummary } from "./cash-closing";
 export { loadCashClosingSummary } from "./cash-closing";
+
+const pushFunctions = getFunctions(app, "asia-southeast1");
+const requestAdminAttendancePush = httpsCallable<{ notificationId: string }>(pushFunctions, "pushAdminAttendance");
 
 export async function listActiveBarbers(): Promise<Barber[]> {
   const result = await getDocs(query(collection(db, "barbers"), where("active", "==", true)));
@@ -28,7 +32,7 @@ export function watchReaderScans(branchId: string, next: (rows: ReaderScan[], ch
 
 export async function saveCheckIn(branch: PosBranch, barber: Barber, checkInMethod: "pin" | "rfid", dateKey: string) {
   const id = attendanceId(branch.id, barber.id, dateKey);
-  await runTransaction(db, async (batch) => {
+  const notificationId = await runTransaction(db, async (batch) => {
     const attendanceRef = doc(db, "barber_attendance", id);
     const previous = await batch.get(attendanceRef);
     const data = { barberId: barber.id, barberName: barber.name || "", branchId: branch.id, branchName: branch.name || "", dateKey,
@@ -37,14 +41,27 @@ export async function saveCheckIn(branch: PosBranch, barber: Barber, checkInMeth
     batch.set(attendanceRef, { ...data, attended: true }, { merge: true });
     // Concurrent transactions retry; only the first attendance creates an event.
     if (!previous.exists()) {
-      const notificationId = `attendance-checkin_${id}`;
-      batch.set(doc(db, "admin_notifications", notificationId), {
-        id: notificationId, type: "attendance_checkin", attendanceId: id,
+      const createdNotificationId = `attendance-checkin_${id}`;
+      batch.set(doc(db, "admin_notifications", createdNotificationId), {
+        id: createdNotificationId, type: "attendance_checkin", attendanceId: id,
         barberId: data.barberId, barberName: data.barberName, branchId: data.branchId, branchName: data.branchName,
         eventAt: data.checkInAt, createdAt: serverTimestamp(), read: false, message: `${data.barberName} เข้างานแล้ว`,
       });
+      return createdNotificationId;
     }
+    return "";
   });
+
+  // Firestore is in Bangkok (asia-southeast3), where Firestore Eventarc triggers
+  // for Cloud Functions are not available yet. Call the authenticated HTTPS
+  // function after the transaction commits instead.
+  if (notificationId) {
+    try {
+      await requestAdminAttendancePush({ notificationId });
+    } catch (issue) {
+      console.error("Admin attendance push failed:", issue);
+    }
+  }
 }
 
 export async function saveReaderResult(branchId: string, scan: ReaderScan, result: ReaderResult) {
