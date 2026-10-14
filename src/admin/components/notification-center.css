@@ -17,6 +17,8 @@
 .notification-copy > span { color: #666; font-size: 12px; margin-top: 4px; }
 .notification-icon { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--soft); color: #555; flex-shrink: 0; }
 .notification-icon svg { display: block; width: 22px; height: 22px; }
+.notification-icon i { font-size: 18px; }
+.notification-bell > i { font-size: 20px; }
 .notification-item.is-unread .notification-icon { background: #fff3c4; border-color: #eddfad; color: #725b1d; }
 .notification-dot { width: 7px; height: 7px; border-radius: 50%; background: #ad8500; flex-shrink: 0; }
 .notification-status, .notification-footer { margin: 0; padding: 14px 16px; }
