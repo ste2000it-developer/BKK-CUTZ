@@ -33,6 +33,7 @@ export function BarbersPage() {
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
   const [editorOpen, setEditorOpen] = useState(false);
+  const [pendingToggle, setPendingToggle] = useState<BarberRecord | null>(null);
   const [editing, setEditing] = useState<BarberRecord | null>(null);
   const [form, setForm] = useState<BarberForm>(emptyForm);
 
@@ -170,7 +171,7 @@ export function BarbersPage() {
   async function toggleActive(barber: BarberRecord) {
     const nextActive = !barber.active;
     const verb = nextActive ? "เปิดใช้งาน" : "ปิดใช้งาน";
-    if (!window.confirm(`${verb} ${barber.name} ใช่ไหม?`)) return;
+    setPendingToggle(null);
 
     setError("");
     setStatus(`${verb} ${barber.name}...`);
@@ -234,7 +235,7 @@ export function BarbersPage() {
                   <div><span className={`service-status ${barber.active ? "is-active" : "is-off"}`}>{barber.active ? "เปิดใช้งาน" : "ปิดใช้งาน"}</span></div>
                   <div className="barber-actions">
                     <button className="edit-button" type="button" onClick={() => startEdit(barber)}>แก้ไข</button>
-                    <button className="barber-toggle-button" type="button" onClick={() => void toggleActive(barber)}>{barber.active ? "ปิดใช้งาน" : "เปิดใช้งาน"}</button>
+                    <button className="barber-toggle-button" type="button" onClick={() => setPendingToggle(barber)}>{barber.active ? "ปิดใช้งาน" : "เปิดใช้งาน"}</button>
                   </div>
                 </div>
               ))}
@@ -242,6 +243,26 @@ export function BarbersPage() {
           )}
         </div>
       </section>
+
+      {pendingToggle && (
+        <div className="admin-modal-overlay">
+          <button className="admin-modal-backdrop" type="button" aria-label="ยกเลิก" disabled={saving} onClick={() => setPendingToggle(null)} />
+          <div className="admin-modal-card barber-editor-modal" role="dialog" aria-modal="true" aria-labelledby="barberToggleTitle">
+            <div className="admin-modal-head">
+              <div>
+                <div className="section-kicker">CONFIRM ACTION</div>
+                <h2 id="barberToggleTitle">{pendingToggle.active ? "ปิดใช้งานช่าง" : "เปิดใช้งานช่าง"}</h2>
+                <p>ต้องการ{pendingToggle.active ? "ปิดใช้งาน" : "เปิดใช้งาน"} {pendingToggle.name} ใช่ไหม?</p>
+              </div>
+              <button className="secondary-button admin-modal-close" type="button" aria-label="ปิด" disabled={saving} onClick={() => setPendingToggle(null)}><i className="fa-solid fa-xmark" aria-hidden="true" /></button>
+            </div>
+            <div className="barber-editor-actions">
+              <button className="cancel-button" type="button" disabled={saving} onClick={() => setPendingToggle(null)}>ยกเลิก</button>
+              <button className="save-button" type="button" disabled={saving} onClick={() => void toggleActive(pendingToggle)}>ยืนยัน</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {editorOpen && (
         <div className="admin-modal-overlay">
