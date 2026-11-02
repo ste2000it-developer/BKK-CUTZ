@@ -1,4 +1,5 @@
 import { AppSelect } from "../../components/AppSelect";
+import { AdminConfirmDialog } from "../../components/AdminConfirmDialog";
 import { useEffect, useState } from "react";
 import {
   buildPayoutRows,
@@ -87,6 +88,7 @@ export function PayoutPage() {
   const [status, setStatus] = useState("");
   const [exporting, setExporting] = useState(false);
   const [selectedRow, setSelectedRow] = useState<PayoutRow | null>(null);
+  const [confirmPayout, setConfirmPayout] = useState<PayoutRow | null>(null);
 
   async function loadCycle(cycle: PayoutCycle) {
     setLoading(true);
@@ -184,14 +186,6 @@ export function PayoutPage() {
     const cycle = cycles[selectedCycleIndex];
     if (!cycle || paidRecords.has(row.barberId) || savingBarberId) return;
 
-    const carryoverText = row.advanceCarryoverAmount > 0
-      ? `\nยอดเบิกล่วงหน้าคงค้าง ${formatMoney(row.advanceCarryoverAmount)} บาท จะยกไปหักรอบถัดไป`
-      : "";
-    const confirmed = window.confirm(
-      `ยืนยันรอบจ่าย ${row.barberName} จำนวน ${formatMoney(row.totalAmount)} บาทใช่ไหม?${carryoverText}`,
-    );
-    if (!confirmed) return;
-
     setSavingBarberId(row.barberId);
     setError("");
 
@@ -217,6 +211,7 @@ export function PayoutPage() {
       }
     } finally {
       setSavingBarberId(null);
+      setConfirmPayout(null);
     }
   }
 
@@ -364,7 +359,7 @@ export function PayoutPage() {
                         <div><span className={`payout-badge ${paid ? "paid" : "unpaid"}`}>{paid ? "จ่ายแล้ว" : "ยังไม่จ่าย"}</span></div>
                         <div className="payout-actions">
                           <button className="payout-detail-button" type="button" onClick={() => setSelectedRow(row)}>รายละเอียด</button>
-                          <button className="payout-paid-button" type="button" disabled={paid || savingBarberId !== null} onClick={() => void markPaid(row)}>
+                          <button className="payout-paid-button" type="button" disabled={paid || savingBarberId !== null} onClick={() => setConfirmPayout(row)}>
                             {savingBarberId === row.barberId ? "กำลังบันทึก..." : paid ? "จ่ายแล้ว" : row.totalAmount === 0 && row.advanceCarryoverAmount > 0 ? "ยืนยันรอบ" : "ยืนยันจ่าย"}
                           </button>
                         </div>
@@ -375,6 +370,14 @@ export function PayoutPage() {
               )}
             </div>
           </section>
+          {confirmPayout && <AdminConfirmDialog
+            title="ยืนยันจ่ายเงินช่าง"
+            message={`ยืนยันรอบจ่าย ${confirmPayout.barberName} จำนวน ${formatMoney(confirmPayout.totalAmount)} บาทใช่ไหม?${confirmPayout.advanceCarryoverAmount > 0 ? `\nยอดค้าง ${formatMoney(confirmPayout.advanceCarryoverAmount)} บาท จะยกไปหักรอบถัดไป` : ""}`}
+            confirmLabel="ยืนยันจ่าย"
+            busy={savingBarberId !== null}
+            onCancel={() => setConfirmPayout(null)}
+            onConfirm={() => void markPaid(confirmPayout)}
+          />}
           {selectedRow && (
             <div className="payout-detail-modal">
               <button
