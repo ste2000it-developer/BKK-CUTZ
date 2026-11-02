@@ -1,6 +1,6 @@
-/* Temporary blank starting point for the Admin UI/UX redesign.
-   Do not style POS or the existing Admin feature modules. */
-
+/* Temporary blank Admin redesign.
+   Keep the complete original header; do not mount old feature pages.
+   Scoped classes prevent changes to the production POS. */
 .admin-reset-shell {
   min-height: 100vh;
   min-height: 100dvh;
@@ -8,63 +8,89 @@
   color: #171717;
 }
 
+.admin-reset-mobile-header { display: none; }
+
 .admin-reset-topbar {
-  position: relative;
   display: flex;
-  align-items: center;
-  height: 68px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
   width: 100%;
-  padding: 0 18px;
+  padding: 28px 30px 24px;
   border-bottom: 1px solid #e7e7e7;
   background: #fff;
 }
 
 .admin-reset-hamburger {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
+  flex: 0 0 48px;
   width: 48px;
   height: 48px;
-  border: none;
+  padding: 0;
+  border: 1px solid #dedede;
   border-radius: 12px;
-  background: transparent;
+  background: #fff;
   color: #171717;
   cursor: pointer;
 }
-
-.admin-reset-hamburger:hover {
-  background: #f3f3f3;
+.admin-reset-hamburger:hover { background: #f3f3f3; }
+.admin-reset-hamburger-lines { display: flex; flex-direction: column; gap: 5px; width: 24px; }
+.admin-reset-hamburger-lines > span {
+  display: block; width: 24px; height: 2.5px;
+  border-radius: 999px; background: currentColor;
 }
+.admin-reset-headline { flex: 1 1 auto; min-width: 0; }
+.admin-reset-kicker {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.9px;
+  color: #888;
+}
+.admin-reset-headline h1 {
+  margin: 3px 0 1px;
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: -.5px;
+  line-height: 1.25;
+}
+.admin-reset-email { color: #7d7d7d; font-size: 13px; overflow-wrap: anywhere; }
 
+.admin-reset-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+}
+.admin-reset-header-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid #f0b4af;
+  border-radius: 10px;
+  background: #fff1f0;
+  color: #b42318;
+  font-weight: 700;
+  cursor: pointer;
+}
+.admin-reset-header-logout:hover { border-color: #b42318; background: #ffe0dc; }
 .admin-reset-hamburger:focus-visible,
+.admin-reset-header-logout:focus-visible,
 .admin-reset-menu-dialog button:focus-visible {
   outline: 3px solid #333;
   outline-offset: 3px;
 }
 
-.admin-reset-hamburger-lines {
-  width: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.admin-reset-hamburger-lines > span {
-  display: block;
-  height: 2.5px;
-  width: 100%;
-  background: currentColor;
-  border-radius: 999px;
-}
-
 .admin-reset-canvas {
-  min-height: calc(100dvh - 68px);
+  min-height: calc(100dvh - 150px);
   background: #fff;
 }
 
-/* The menu is intentionally empty while the Admin is redesigned,
-   apart from the essential sign-out control. Native dialog blocks
-   interaction with the page behind it and traps focus. */
+/* Side drawer remains empty until menu redesign, except for sign-out.
+   Native modal dialog prevents interaction with the page behind it. */
 .admin-reset-menu-dialog {
   position: fixed;
   inset: 0 auto 0 0;
@@ -79,64 +105,84 @@
   border-radius: 0 18px 18px 0;
   background: #fff;
   color: #171717;
-  box-shadow: 14px 0 45px rgba(0, 0, 0, .16);
+  box-shadow: 14px 0 45px rgba(0,0,0,.16);
 }
-
-.admin-reset-menu-dialog::backdrop {
-  background: rgba(0, 0, 0, .44);
-}
-
-.admin-reset-menu-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 12px;
-}
-
+.admin-reset-menu-dialog::backdrop { background: rgba(0,0,0,.44); }
+.admin-reset-menu-content { display: flex; flex-direction: column; height: 100%; padding: 12px; }
 .admin-reset-menu-close {
   align-self: flex-end;
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  border: none;
-  border-radius: 12px;
-  background: transparent;
-  color: #171717;
-  font-size: 29px;
-  cursor: pointer;
+  width: 48px; height: 48px;
+  border: none; border-radius: 12px; background: transparent;
+  color: #171717; font-size: 29px; cursor: pointer;
 }
-
-.admin-reset-menu-close:hover,
-.admin-reset-logout:hover {
-  background: #f3f3f3;
-}
-
+.admin-reset-menu-close:hover, .admin-reset-logout:hover { background: #f3f3f3; }
 .admin-reset-logout {
   margin-top: auto;
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 100%;
-  min-height: 50px;
+  width: 100%; min-height: 50px;
   padding: 0 16px;
-  border: 1px solid #e4e4e4;
-  border-radius: 12px;
-  background: #fff;
-  color: #171717;
-  text-align: left;
-  font-size: 15px;
-  font-weight: 700;
-  cursor: pointer;
+  border: 1px solid #e4e4e4; border-radius: 12px;
+  background: #fff; color: #171717;
+  text-align: left; font-size: 15px; font-weight: 700; cursor: pointer;
 }
 
-@media (max-width: 640px) {
-  .admin-reset-topbar {
-    height: 60px;
-    padding: 0 10px;
-  }
+@media (max-width: 900px) {
+  .admin-reset-topbar { padding: 20px; gap: 12px; }
+  .admin-reset-headline h1 { font-size: 30px; }
+  .admin-reset-header-actions { gap: 8px; }
+}
 
-  .admin-reset-canvas {
-    min-height: calc(100dvh - 60px);
+@media (max-width: 600px) {
+  .admin-reset-mobile-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 52px;
+    padding: 0 12px;
+    background: #171717;
+    border-bottom: 1px solid #292929;
+    color: #fff;
+  }
+  .admin-reset-mobile-header strong { font-size: 16px; letter-spacing: .25px; white-space: nowrap; }
+  .admin-reset-mobile-header > span { margin-left: auto; color: #fdc717; font-size: 10px; letter-spacing: 1.1px; }
+  .admin-reset-mobile-hamburger {
+    flex: 0 0 44px;
+    width: 44px; height: 44px;
+    border: none; border-radius: 9px;
+    color: white; background: transparent;
+  }
+  .admin-reset-desktop-hamburger { display: none; }
+  .admin-reset-topbar {
+    align-items: center;
+    flex-wrap: nowrap;
+    padding: 10px 12px;
+    gap: 8px;
+  }
+  .admin-reset-headline { flex: 1; }
+  .admin-reset-kicker, .admin-reset-email { display: none; }
+  .admin-reset-headline h1 { margin: 0; font-size: 20px; line-height: 1.2; }
+  .admin-reset-header-actions { gap: 6px; }
+  .admin-reset-header-actions .notification-bell,
+  .admin-reset-header-logout {
+    flex: 0 0 40px;
+    width: 40px; height: 40px; min-height: 40px; padding: 0;
+  }
+  .admin-reset-header-logout span { display: none; }
+  .admin-reset-header-logout i { color: #b42318; }
+  .admin-reset-canvas { min-height: calc(100dvh - 112px); }
+  .admin-reset-header-actions .notification-panel {
+    position: fixed;
+    top: calc(8px + env(safe-area-inset-top, 0px));
+    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    left: 8px;
+    right: 8px;
+    width: auto;
+    max-height: calc(100dvh - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
   }
 }
