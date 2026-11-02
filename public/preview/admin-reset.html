@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<meta name="theme-color" content="#fff"/>
+<meta name="theme-color" content="#171717"/>
 <title>BKK-CUTZ Admin — Design Preview</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
@@ -256,6 +256,31 @@ button{font:inherit}
 .preview-dialog-content{padding:24px 18px;font-size:14px;color:#666;text-align:center;line-height:1.8}
 .preview-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);max-width:calc(100vw - 32px);padding:12px 16px;color:white;background:#171717;border-radius:10px;text-align:center;font-size:13px;box-shadow:0 8px 24px #0003}
 .preview-toast[hidden]{display:none}
+
+/* Shared black top bar: identical visual identity at every breakpoint. */
+.admin-reset-shell .admin-reset-topbar {
+  background: #171717;
+  color: #fff;
+  border-bottom: 1px solid #303030;
+}
+.admin-reset-shell .admin-reset-kicker { color: #bbb; }
+.admin-reset-shell .admin-reset-headline h1 { color: #fff; }
+.admin-reset-shell .admin-reset-email { color: #c2c2c2; }
+.admin-reset-shell .admin-reset-hamburger,
+.admin-reset-shell .admin-reset-header-actions .notification-bell,
+.admin-reset-shell .admin-reset-header-logout {
+  background: #242424;
+  color: #fff;
+  border: 1px solid #454545;
+}
+.admin-reset-shell .admin-reset-hamburger:hover,
+.admin-reset-shell .admin-reset-header-actions .notification-bell:hover,
+.admin-reset-shell .admin-reset-header-logout:hover { background: #333; border-color: #666; }
+.admin-reset-shell .admin-reset-header-logout i { color: #fff; }
+.admin-reset-shell .admin-reset-hamburger:focus-visible,
+.admin-reset-shell .admin-reset-header-actions .notification-bell:focus-visible,
+.admin-reset-shell .admin-reset-header-logout:focus-visible { outline: 2px solid #fdc717; outline-offset: 2px; }
+
 </style>
 </head>
 <body>
