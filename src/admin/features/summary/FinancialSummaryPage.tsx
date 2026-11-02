@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AppSelect } from "../../components/AppSelect";
 import { localDateKey } from "../../../shared/domain/pos-attendance";
 import { listBranches, type BranchRecord } from "../../../shared/firebase/repositories/branches";
@@ -52,6 +52,7 @@ export function FinancialSummaryPage() {
   const [advances, setAdvances] = useState<BarberAdvanceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const loadRequest = useRef(0);
 
   // Filters
   const [branchFilter, setBranchFilter] = useState("all");
@@ -86,67 +87,47 @@ export function FinancialSummaryPage() {
   }
 
   async function loadFinancialData(start: string, end: string) {
+    const request = ++loadRequest.current;
     setLoading(true);
     setError("");
+    if (!start || !end || start > end) {
+      setError("กรุณาระบุช่วงวันที่ให้ถูกต้อง (วันเริ่มต้องไม่เกินวันสิ้นสุด)");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const [branchRes, txRes, payoutRes, expRes, advRes] = await Promise.allSettled([
-        branches.length > 0 ? Promise.resolve(branches) : listBranches(),
+      // These values make up one financial statement. Never show a partial total
+      // or retain amounts from an earlier period when a source fails.
+      const [branchRecords, transactionsResult, payoutRecords, expensesResult, advancesResult] = await Promise.all([
+        listBranches(),
         listTransactionsByDateRange(start, end),
         listPayoutHistory(),
         listShopExpensesByDateRange(start, end),
         listBarberAdvances(start, end),
       ]);
+      if (request !== loadRequest.current) return;
 
-      const permissionWarnings: string[] = [];
-
-      if (branchRes.status === "fulfilled") setBranches(branchRes.value);
-      if (txRes.status === "fulfilled") {
-        setTransactions(txRes.value);
-      } else {
-        console.error("Transactions failed:", txRes.reason);
-        permissionWarnings.push("ไม่สามารถโหลด transactions ได้");
-      }
-
-      if (payoutRes.status === "fulfilled") {
-        const periodPayouts = payoutRes.value.filter((p) => {
-          const pDate = String(p.payoutDate || p.payoutCycleId || "");
-          return pDate >= start && pDate <= end;
-        });
-        setPayouts(periodPayouts);
-      } else {
-        console.warn("Payouts failed:", payoutRes.reason);
-      }
-
-      if (expRes.status === "fulfilled") {
-        setShopExpenses(expRes.value);
-      } else {
-        console.warn("Shop expenses failed:", expRes.reason);
-        setShopExpenses([]);
-        const msg = expRes.reason instanceof Error ? expRes.reason.message : String(expRes.reason);
-        if (msg.toLowerCase().includes("permission")) {
-          permissionWarnings.push("ยังไม่ได้ตั้ง Firestore Rules สำหรับ shop_expenses");
-        }
-      }
-
-      if (advRes.status === "fulfilled") {
-        setAdvances(advRes.value);
-      } else {
-        console.warn("Advances failed:", advRes.reason);
-        setAdvances([]);
-        const msg = advRes.reason instanceof Error ? advRes.reason.message : String(advRes.reason);
-        if (msg.toLowerCase().includes("permission")) {
-          permissionWarnings.push("ยังไม่ได้ตั้ง Firestore Rules สำหรับ barber_advances");
-        }
-      }
-
-      if (permissionWarnings.length > 0) {
-        setError(permissionWarnings.join(" · ") + " (กรุณาอัปเดต Security Rules ใน Firestore)");
-      }
+      setBranches(branchRecords);
+      setTransactions(transactionsResult);
+      setPayouts(payoutRecords.filter((payout) => {
+        if (payout.status && payout.status !== "paid") return false;
+        const payoutDate = String(payout.payoutDate || payout.payoutCycleId || "");
+        return payoutDate >= start && payoutDate <= end;
+      }));
+      setShopExpenses(expensesResult);
+      setAdvances(advancesResult);
     } catch (loadErr) {
-      console.error("Failed to load financial summary:", loadErr);
-      setError(loadErr instanceof Error ? loadErr.message : "โหลดข้อมูลสรุปการเงินไม่สำเร็จ");
+      if (request !== loadRequest.current) return;
+      console.error("Failed to load complete financial summary:", loadErr);
+      setBranches([]);
+      setTransactions([]);
+      setPayouts([]);
+      setShopExpenses([]);
+      setAdvances([]);
+      setError("ข้อมูลการเงินไม่ครบ จึงไม่แสดงยอดสรุปเพื่อป้องกันยอดคลาดเคลื่อน กรุณาตรวจสอบการเชื่อมต่อ/สิทธิ์ Firestore แล้วกดลองใหม่");
     } finally {
-      setLoading(false);
+      if (request === loadRequest.current) setLoading(false);
     }
   }
 
@@ -274,7 +255,8 @@ export function FinancialSummaryPage() {
       </section>
 
       {/* Main KPI Cards: Revenue - Expenses = Net Profit */}
-      <section className="financial-kpi-grid">
+      {loading && <div className="financial-loading" role="status">กำลังโหลดข้อมูลการเงินทุกหมวด...</div>}
+      {!loading && !error && <section className="financial-kpi-grid">
         {/* Card 1: Revenue */}
         <div className="financial-kpi-card revenue-card">
           <div className="kpi-title">รายรับรวม (ยอดขาย)</div>
@@ -343,12 +325,12 @@ export function FinancialSummaryPage() {
             <span>{formatThaiDate(startDateKey)} – {formatThaiDate(endDateKey)}</span>
           </div>
         </div>
-      </section>
+      </section>}
 
-      {error && <div className="error-box" role="alert">{error}</div>}
+      {error && <div className="error-box" role="alert">{error} <button type="button" className="secondary-button" onClick={() => void loadFinancialData(startDateKey, endDateKey)}>ลองโหลดใหม่</button></div>}
 
       {/* Detail Tabs */}
-      <section className="financial-details-card">
+      {!loading && !error && <section className="financial-details-card">
         <div className="financial-tabs">
           <button
             className={`financial-tab-btn${activeTab === "overview" ? " active" : ""}`}
@@ -573,7 +555,7 @@ export function FinancialSummaryPage() {
             )}
           </div>
         )}
-      </section>
+      </section>}
     </div>
   );
 }
