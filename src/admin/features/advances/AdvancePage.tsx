@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { AppSelect } from "../../components/AppSelect";
+import { AdminConfirmDialog } from "../../components/AdminConfirmDialog";
+import { getPayoutCycleForWorkDate } from "../../../shared/domain/payout";
+import { listPayoutHistory } from "../../../shared/firebase/repositories/payouts";
+import { listBranches, type BranchRecord } from "../../../shared/firebase/repositories/branches";
 import { localDateKey, type Barber } from "../../../shared/domain/pos-attendance";
 import { listActiveBarbers } from "../../../shared/firebase/repositories/attendance";
 import {
-  deleteBarberAdvance,
+  cancelBarberAdvance,
   listBarberAdvances,
   saveBarberAdvance,
   type BarberAdvanceRecord,
@@ -42,6 +46,7 @@ const ADVANCE_REASONS = [
 export function AdvancePage() {
   const [advances, setAdvances] = useState<BarberAdvanceRecord[]>([]);
   const [barbers, setBarbers] = useState<Barber[]>([]);
+  const [branches, setBranches] = useState<BranchRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -61,6 +66,9 @@ export function AdvancePage() {
   };
   const [showModal, setShowModal] = useState(false);
   const [selectedBarberId, setSelectedBarberId] = useState("");
+  const [selectedBranchId, setSelectedBranchId] = useState("");
+  const [deletingBusy, setDeletingBusy] = useState(false);
+  const [status, setStatus] = useState("");
   const [advanceDate, setAdvanceDate] = useState(() => localDateKey(new Date()));
   const [amount, setAmount] = useState("");
   const [reason, setReason] = useState("");
@@ -74,12 +82,14 @@ export function AdvancePage() {
     setLoading(true);
     setError("");
     try {
-      const [barberList, advanceList] = await Promise.all([
+      const [barberList, advanceList, branchList] = await Promise.all([
         listActiveBarbers(),
         listBarberAdvances(),
+        listBranches(),
       ]);
       setBarbers(barberList);
       setAdvances(advanceList);
+      setBranches(branchList);
     } catch (loadErr) {
       console.error("Failed to load advance data:", loadErr);
       const msg = loadErr instanceof Error ? loadErr.message : "โหลดข้อมูลไม่สำเร็จ";
@@ -95,6 +105,9 @@ export function AdvancePage() {
 
   useEffect(() => {
     void loadData();
+    const reload = () => void loadData();
+    window.addEventListener("bkk:admin:advances:activate", reload);
+    return () => window.removeEventListener("bkk:admin:advances:activate", reload);
   }, []);
 
   const filteredAdvances = useMemo(() => {
@@ -105,16 +118,19 @@ export function AdvancePage() {
     });
   }, [advances, barberFilter, monthFilter]);
 
+  const activeAdvances = useMemo(() => filteredAdvances.filter((item) => item.status !== "cancelled"), [filteredAdvances]);
   const totalAmount = useMemo(() => {
-    return filteredAdvances.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-  }, [filteredAdvances]);
+    return activeAdvances.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+  }, [activeAdvances]);
 
   const uniqueBarbersCount = useMemo(() => {
-    return new Set(filteredAdvances.map((item) => item.barberId)).size;
-  }, [filteredAdvances]);
+    return new Set(activeAdvances.map((item) => item.barberId)).size;
+  }, [activeAdvances]);
 
   function openCreateModal() {
     setSelectedBarberId(barbers.length > 0 ? barbers[0].id : "");
+    setSelectedBranchId("");
+    setStatus("");
     setAdvanceDate(localDateKey(new Date()));
     setAmount("");
     setReason("");
@@ -136,13 +152,20 @@ export function AdvancePage() {
       return;
     }
 
+    if (!selectedBranchId) {
+      setFormError("กรุณาเลือกสาขาที่จ่ายเงินเบิกล่วงหน้า");
+      return;
+    }
     const barberObj = barbers.find((b) => b.id === selectedBarberId);
+    const branchObj = branches.find((item) => item.id === selectedBranchId);
 
     setSaving(true);
     try {
       const newRecord = await saveBarberAdvance({
         barberId: selectedBarberId,
         barberName: barberObj?.name || selectedBarberId,
+        branchId: selectedBranchId,
+        branchName: branchObj?.name || selectedBranchId,
         dateKey: advanceDate,
         amount: numericAmount,
         type: "advance",
@@ -151,6 +174,7 @@ export function AdvancePage() {
       });
       setAdvances((prev) => [newRecord, ...prev]);
       setShowModal(false);
+      setStatus("บันทึกเบิกล่วงหน้าเรียบร้อย");
     } catch (saveErr) {
       console.error("Save advance failed:", saveErr);
       setFormError(saveErr instanceof Error ? saveErr.message : "บันทึกไม่สำเร็จ");
@@ -160,13 +184,36 @@ export function AdvancePage() {
   }
 
   async function handleDelete(id: string) {
+    if (deletingBusy) return;
+    const advance = advances.find((item) => item.id === id);
+    if (!advance || advance.status === "cancelled") return;
+    setDeletingBusy(true);
+    setError("");
+    setStatus("");
     try {
-      await deleteBarberAdvance(id);
-      setAdvances((prev) => prev.filter((item) => item.id !== id));
-      setDeletingId(null);
+      if (advance.status === "deducted") {
+        throw new Error("รายการนี้ถูกหักในรอบจ่ายแล้ว ไม่สามารถยกเลิกได้");
+      }
+      const payoutRecords = await listPayoutHistory();
+      const cycle = getPayoutCycleForWorkDate(advance.dateKey);
+      const linkedPayout = payoutRecords.some((payout) => {
+        if (payout.barberId !== advance.barberId || (payout.status && payout.status !== "paid")) return false;
+        const sourceIds = (payout as { advanceIds?: unknown }).advanceIds;
+        if (Array.isArray(sourceIds) && sourceIds.includes(id)) return true;
+        return cycle != null && String(payout.payoutCycleId || payout.payoutDate || "") === cycle.payoutDateKey;
+      });
+      if (linkedPayout) {
+        throw new Error("รายการนี้เกี่ยวข้องกับรอบจ่ายที่ยืนยันแล้ว จึงไม่สามารถยกเลิกย้อนหลังได้");
+      }
+      await cancelBarberAdvance(id);
+      setAdvances((previous) => previous.map((item) => item.id === id ? { ...item, status: "cancelled" } : item));
+      setStatus("ยกเลิกรายการเบิกล่วงหน้าแล้ว โดยเก็บประวัติไว้ตรวจสอบ");
     } catch (delErr) {
-      console.error("Delete advance failed:", delErr);
-      alert("ลบรายการไม่สำเร็จ กรุณาลองใหม่");
+      console.error("Cancel advance failed:", delErr);
+      setError(delErr instanceof Error ? delErr.message : "ยกเลิกไม่สำเร็จ กรุณาลองใหม่");
+    } finally {
+      setDeletingBusy(false);
+      setDeletingId(null);
     }
   }
 
@@ -187,6 +234,7 @@ export function AdvancePage() {
         </div>
 
         {error && <div className="error-box" role="alert">{error}</div>}
+        {status && <div className="status-box" role="status">{status}</div>}
 
         {/* Filter Bar */}
         <div className="advances-filter-bar">
@@ -287,37 +335,12 @@ export function AdvancePage() {
                       </div>
                     </td>
                     <td className="advances-amount-col">
-                      <strong>{formatMoney(adv.amount)} บาท</strong>
+                      <strong>{formatMoney(adv.amount)} บาท</strong>{adv.status === "cancelled" && <small> · ยกเลิกแล้ว</small>}
                     </td>
                     <td>{adv.reason || adv.note || "-"}</td>
                     <td style={{ textAlign: "right" }}>
-                      {deletingId === adv.id ? (
-                        <div className="advances-delete-confirm">
-                          <span>ลบรายการนี้?</span>
-                          <button
-                            className="advances-del-yes"
-                            type="button"
-                            onClick={() => void handleDelete(adv.id)}
-                          >
-                            ใช่
-                          </button>
-                          <button
-                            className="advances-del-no"
-                            type="button"
-                            onClick={() => setDeletingId(null)}
-                          >
-                            ยกเลิก
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          className="advances-delete-btn"
-                          type="button"
-                          aria-label="ลบรายการ"
-                          onClick={() => setDeletingId(adv.id)}
-                        >
-                          ลบ
-                        </button>
+                      {adv.status === "cancelled" ? <span className="advances-subtext">เก็บประวัติ</span> : (
+                        <button className="advances-delete-btn" type="button" aria-label={`ยกเลิกเบิกล่วงหน้าของ ${adv.barberName}`} onClick={() => setDeletingId(adv.id)}>ยกเลิก</button>
                       )}
                     </td>
                   </tr>
@@ -328,6 +351,15 @@ export function AdvancePage() {
         )}
       </section>
 
+      {deletingId && <AdminConfirmDialog
+        title="ยืนยันยกเลิกเบิกล่วงหน้า"
+        message={`รายการ ${advances.find((item) => item.id === deletingId)?.barberName || ""} จำนวน ${formatMoney(advances.find((item) => item.id === deletingId)?.amount)} บาท จะถูกยกเลิกและเก็บประวัติไว้`}
+        confirmLabel="ยืนยันยกเลิก"
+        danger
+        busy={deletingBusy}
+        onCancel={() => setDeletingId(null)}
+        onConfirm={() => void handleDelete(deletingId)}
+      />}
       {/* Modal create */}
       {showModal && (
         <div className="advances-modal-overlay">
@@ -376,6 +408,13 @@ export function AdvancePage() {
                 </AppSelect>
               </div>
 
+              <div className="advances-form-row">
+                <label htmlFor="modalAdvanceBranch">สาขาที่จ่ายเงิน</label>
+                <AppSelect id="modalAdvanceBranch" aria-label="สาขาที่จ่ายเงิน" placeholder="เลือกสาขา" value={selectedBranchId} onChange={setSelectedBranchId}>
+                  <option value="">เลือกสาขา</option>
+                  {branches.filter((branch) => branch.active).map((branch) => <option key={branch.id} value={branch.id}>{branch.name || branch.id}</option>)}
+                </AppSelect>
+              </div>
               <div className="advances-form-row">
                 <label htmlFor="modalAdvanceDate">วันที่เบิก</label>
                 <input
@@ -446,7 +485,7 @@ export function AdvancePage() {
               <button
                 className="advances-submit-btn"
                 type="submit"
-                disabled={saving || !selectedBarberId}
+                disabled={saving || !selectedBarberId || !selectedBranchId}
               >
                 {saving
                   ? "กำลังบันทึก..."
