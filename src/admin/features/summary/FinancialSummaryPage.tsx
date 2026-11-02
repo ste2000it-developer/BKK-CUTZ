@@ -133,6 +133,9 @@ export function FinancialSummaryPage() {
 
   useEffect(() => {
     void loadFinancialData(startDateKey, endDateKey);
+    const reload = () => void loadFinancialData(startDateKey, endDateKey);
+    window.addEventListener("bkk:admin:summary:activate", reload);
+    return () => window.removeEventListener("bkk:admin:summary:activate", reload);
   }, [startDateKey, endDateKey]);
 
   const summary: FinancialSummary = useMemo(() => {
