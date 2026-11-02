@@ -5,6 +5,7 @@ import {
   getDocs,
   query,
   setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { db } from "../client";
@@ -118,6 +119,11 @@ export async function listBarberAdvancesByBarber(barberId: string): Promise<Barb
   return snap.docs
     .map((docSnap) => ({ id: docSnap.id, ...docSnap.data() } as BarberAdvanceRecord))
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+}
+
+/** Preserve an audit trail instead of erasing a financial transaction. */
+export async function cancelBarberAdvance(id: string): Promise<void> {
+  await updateDoc(doc(db, "barber_advances", id), { status: "cancelled" });
 }
 
 export async function deleteBarberAdvance(id: string): Promise<void> {
