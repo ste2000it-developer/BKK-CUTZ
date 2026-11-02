@@ -170,6 +170,11 @@ export function FinancialSummaryPage() {
       .filter((item) => item.allocation.matched);
   }, [payouts, branchFilter, branches]);
 
+  const hasEstimatedBranchPayout = branchFilter !== "all" && payouts.some((payout) => {
+    const days = payout.dailyBreakdown;
+    return Array.isArray(days) && days.some((day) => Array.isArray(day.branches) && day.branches.length > 1);
+  });
+
   return (
     <div className="financial-summary-react-page">
       <section className="financial-summary-filter-card">
@@ -257,6 +262,12 @@ export function FinancialSummaryPage() {
         </div>
       </section>
 
+      {!loading && !error && hasEstimatedBranchPayout && (
+        <div className="error-box" role="note">
+          หมายเหตุ: ช่างบางคนทำงานหลายสาขาในวันเดียว และข้อมูลรอบจ่ายเดิมไม่มีค่ามือแยกสาขา
+          ยอดจ่ายช่างของสาขาที่เลือกเป็นการเฉลี่ยตามจำนวนสาขา จึงเป็นเพียงยอดประมาณการ ไม่ใช่ยอดจริงรายสาขา
+        </div>
+      )}
       {/* Main KPI Cards: Revenue - Expenses = Net Profit */}
       {loading && <div className="financial-loading" role="status">กำลังโหลดข้อมูลการเงินทุกหมวด...</div>}
       {!loading && !error && <section className="financial-kpi-grid">
