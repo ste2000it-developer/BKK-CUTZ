@@ -8,11 +8,9 @@
   color: #171717;
 }
 
-.admin-reset-mobile-header { display: none; }
-
 .admin-reset-topbar {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 20px;
   width: 100%;
@@ -130,57 +128,67 @@
   text-align: left; font-size: 15px; font-weight: 700; cursor: pointer;
 }
 
+/* One white header on all screens. Only spacing and scale change. */
 @media (max-width: 900px) {
-  .admin-reset-topbar { padding: 20px; gap: 12px; }
+  .admin-reset-topbar { padding: 18px 20px; gap: 12px; }
   .admin-reset-headline h1 { font-size: 30px; }
   .admin-reset-header-actions { gap: 8px; }
 }
-
 @media (max-width: 600px) {
-  .admin-reset-mobile-header {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    height: 52px;
-    padding: 0 12px;
-    background: #171717;
-    border-bottom: 1px solid #292929;
-    color: #fff;
-  }
-  .admin-reset-mobile-header strong { font-size: 16px; letter-spacing: .25px; white-space: nowrap; }
-  .admin-reset-mobile-header > span { margin-left: auto; color: #fdc717; font-size: 10px; letter-spacing: 1.1px; }
-  .admin-reset-mobile-hamburger {
-    flex: 0 0 44px;
-    width: 44px; height: 44px;
-    border: none; border-radius: 9px;
-    color: white; background: transparent;
-  }
-  .admin-reset-desktop-hamburger { display: none; }
   .admin-reset-topbar {
-    align-items: center;
-    flex-wrap: nowrap;
     padding: 10px 12px;
     gap: 8px;
   }
-  .admin-reset-headline { flex: 1; }
-  .admin-reset-kicker, .admin-reset-email { display: none; }
-  .admin-reset-headline h1 { margin: 0; font-size: 20px; line-height: 1.2; }
+  .admin-reset-hamburger {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+  }
+  .admin-reset-hamburger-lines { width: 22px; }
+  .admin-reset-hamburger-lines > span { width: 22px; }
+  .admin-reset-headline { flex: 1 1 0; min-width: 0; }
+  .admin-reset-kicker {
+    display: block;
+    font-size: 8px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .admin-reset-headline h1 {
+    margin: 2px 0;
+    font-size: clamp(17px, 5vw, 20px);
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .admin-reset-email {
+    display: block;
+    font-size: 10px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .admin-reset-header-actions { gap: 6px; }
   .admin-reset-header-actions .notification-bell,
   .admin-reset-header-logout {
     flex: 0 0 40px;
-    width: 40px; height: 40px; min-height: 40px; padding: 0;
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    padding: 0;
   }
   .admin-reset-header-logout span { display: none; }
   .admin-reset-header-logout i { color: #b42318; }
-  .admin-reset-canvas { min-height: calc(100dvh - 112px); }
+  .admin-reset-canvas { min-height: calc(100dvh - 76px); }
   .admin-reset-header-actions .notification-panel {
     position: fixed;
     top: calc(8px + env(safe-area-inset-top, 0px));
     bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-    left: 8px;
-    right: 8px;
+    left: 8px; right: 8px;
     width: auto;
     max-height: calc(100dvh - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
