@@ -170,6 +170,7 @@ export function FinancialSummaryPage() {
       .filter((item) => item.allocation.matched);
   }, [payouts, branchFilter, branches]);
 
+  const hasUnassignedAdvances = branchFilter !== "all" && advances.some((item) => item.status !== "cancelled" && !item.branchId);
   const hasEstimatedBranchPayout = branchFilter !== "all" && payouts.some((payout) => {
     const days = payout.dailyBreakdown;
     return Array.isArray(days) && days.some((day) => Array.isArray(day.branches) && day.branches.length > 1);
@@ -262,6 +263,12 @@ export function FinancialSummaryPage() {
         </div>
       </section>
 
+      {!loading && !error && hasUnassignedAdvances && (
+        <div className="error-box" role="note">
+          มีรายการเบิกล่วงหน้าเก่าที่ไม่ได้ระบุสาขา จึงไม่สามารถนำมาแยกยอดรายสาขาได้ครบถ้วน
+          กรุณาตรวจสอบก่อนใช้ยอดสุทธิรายสาขาตัดสินใจ
+        </div>
+      )}
       {!loading && !error && hasEstimatedBranchPayout && (
         <div className="error-box" role="note">
           หมายเหตุ: ช่างบางคนทำงานหลายสาขาในวันเดียว และข้อมูลรอบจ่ายเดิมไม่มีค่ามือแยกสาขา
