@@ -116,8 +116,8 @@ export function AdminApp() {
           <span className="admin-reset-hamburger-lines" aria-hidden="true"><span /><span /><span /></span>
         </button>
         <div className="admin-reset-headline">
-          <div className="admin-reset-kicker">BKK-CUTZ CONTROL</div>
-          <h1>จัดการสาขา</h1>
+          
+          <h1>BKK-CUTZ</h1>
           <div className="admin-reset-email">{user.email || "Admin"}</div>
         </div>
         <div className="admin-reset-header-actions">
