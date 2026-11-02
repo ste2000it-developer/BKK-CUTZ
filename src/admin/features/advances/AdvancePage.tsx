@@ -412,7 +412,7 @@ export function AdvancePage() {
                 <label htmlFor="modalAdvanceBranch">สาขาที่จ่ายเงิน</label>
                 <AppSelect id="modalAdvanceBranch" aria-label="สาขาที่จ่ายเงิน" placeholder="เลือกสาขา" value={selectedBranchId} onChange={setSelectedBranchId}>
                   <option value="">เลือกสาขา</option>
-                  {branches.filter((branch) => branch.active).map((branch) => <option key={branch.id} value={branch.id}>{branch.name || branch.id}</option>)}
+                  {branches.filter((branch) => branch.active !== false).map((branch) => <option key={branch.id} value={branch.id}>{branch.name || branch.id}</option>)}
                 </AppSelect>
               </div>
               <div className="advances-form-row">
