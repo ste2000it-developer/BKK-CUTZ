@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { User } from "firebase/auth";
+import { NotificationCenter } from "./components/NotificationCenter";
 import { LoadingScreen } from "../shared/components/LoadingScreen";
 import { login, logout, watchAuth } from "../shared/firebase/auth";
 import { getUserProfile } from "../shared/firebase/repositories/identity";
 import "./admin-reset.css";
 
 /**
- * First step of the Admin redesign: only the top bar and hamburger remain.
- * The former feature pages and repositories are preserved in the project,
- * but none of them are mounted or queried by this temporary blank shell.
+ * First step of the Admin redesign: restore the complete old top bar,
+ * but leave the body empty. Feature modules remain in the project and are
+ * not mounted or queried by this temporary redesign shell.
  */
 export function AdminApp() {
   const [user, setUser] = useState<User | null>(null);
@@ -20,7 +21,8 @@ export function AdminApp() {
   const [loginError, setLoginError] = useState("");
   const [loginPending, setLoginPending] = useState(false);
   const menu = useRef<HTMLDialogElement>(null);
-  const hamburger = useRef<HTMLButtonElement>(null);
+  const desktopHamburger = useRef<HTMLButtonElement>(null);
+  const mobileHamburger = useRef<HTMLButtonElement>(null);
 
   useEffect(() => watchAuth(async (nextUser) => {
     if (!nextUser) {
@@ -55,7 +57,8 @@ export function AdminApp() {
       dialog.showModal();
     } else if (!menuOpen && dialog.open) {
       dialog.close();
-      hamburger.current?.focus();
+      const isPhone = window.matchMedia("(max-width: 600px)").matches;
+      (isPhone ? mobileHamburger : desktopHamburger).current?.focus();
     }
   }, [menuOpen, user]);
 
@@ -100,11 +103,11 @@ export function AdminApp() {
 
   return (
     <div className="admin-reset-shell">
-      <header className="admin-reset-topbar">
+      <div className="admin-reset-mobile-header">
         <button
-          ref={hamburger}
+          ref={mobileHamburger}
           type="button"
-          className="admin-reset-hamburger"
+          className="admin-reset-hamburger admin-reset-mobile-hamburger"
           aria-label="เปิดเมนู"
           aria-haspopup="dialog"
           aria-controls="admin-reset-navigation"
@@ -113,6 +116,39 @@ export function AdminApp() {
         >
           <span className="admin-reset-hamburger-lines" aria-hidden="true"><span /><span /><span /></span>
         </button>
+        <strong>BKK-CUTZ</strong><span>ADMIN</span>
+      </div>
+
+      <header className="admin-reset-topbar">
+        <button
+          ref={desktopHamburger}
+          type="button"
+          className="admin-reset-hamburger admin-reset-desktop-hamburger"
+          aria-label="เปิดเมนู"
+          aria-haspopup="dialog"
+          aria-controls="admin-reset-navigation"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen(true)}
+        >
+          <span className="admin-reset-hamburger-lines" aria-hidden="true"><span /><span /><span /></span>
+        </button>
+        <div className="admin-reset-headline">
+          <div className="admin-reset-kicker">BKK-CUTZ CONTROL</div>
+          <h1>จัดการสาขา</h1>
+          <div className="admin-reset-email">{user.email || "Admin"}</div>
+        </div>
+        <div className="admin-reset-header-actions">
+          <NotificationCenter key={user.uid} userId={user.uid} />
+          <button
+            className="admin-reset-header-logout"
+            type="button"
+            onClick={() => void logout()}
+            aria-label="ออกจากระบบ"
+          >
+            <i className="fa-solid fa-right-from-bracket" aria-hidden="true" />
+            <span>ออกจากระบบ</span>
+          </button>
+        </div>
       </header>
 
       <main className="admin-reset-canvas" aria-label="พื้นที่ Admin สำหรับออกแบบใหม่" />
