@@ -152,9 +152,14 @@ service cloud.firestore {
       allow create: if (isAdmin() || (isBranch() && request.resource.data.branchId == myBranchId()))
         && ((request.resource.data.type == "attendance_checkin" && validCheckIn())
           || (request.resource.data.type == "store_closed" && validStoreClosing()));
+      // Read receipts belong to each Admin account; a read must not clear
+      // another Admin's badge. Legacy read remains unchanged for old records.
       allow update: if isAdmin()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["read"])
-        && request.resource.data.read == true;
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["readBy"])
+        && request.resource.data.readBy is map
+        && request.resource.data.readBy.get(request.auth.uid, false) == true
+        && request.resource.data.readBy.diff(resource.data.get("readBy", {}))
+          .affectedKeys().hasOnly([request.auth.uid]);
       allow delete: if false;
     }
 
