@@ -1,0 +1,142 @@
+/* Temporary blank starting point for the Admin UI/UX redesign.
+   Do not style POS or the existing Admin feature modules. */
+
+.admin-reset-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #fff;
+  color: #171717;
+}
+
+.admin-reset-topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 68px;
+  width: 100%;
+  padding: 0 18px;
+  border-bottom: 1px solid #e7e7e7;
+  background: #fff;
+}
+
+.admin-reset-hamburger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: #171717;
+  cursor: pointer;
+}
+
+.admin-reset-hamburger:hover {
+  background: #f3f3f3;
+}
+
+.admin-reset-hamburger:focus-visible,
+.admin-reset-menu-dialog button:focus-visible {
+  outline: 3px solid #333;
+  outline-offset: 3px;
+}
+
+.admin-reset-hamburger-lines {
+  width: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.admin-reset-hamburger-lines > span {
+  display: block;
+  height: 2.5px;
+  width: 100%;
+  background: currentColor;
+  border-radius: 999px;
+}
+
+.admin-reset-canvas {
+  min-height: calc(100dvh - 68px);
+  background: #fff;
+}
+
+/* The menu is intentionally empty while the Admin is redesigned,
+   apart from the essential sign-out control. Native dialog blocks
+   interaction with the page behind it and traps focus. */
+.admin-reset-menu-dialog {
+  position: fixed;
+  inset: 0 auto 0 0;
+  margin: 0;
+  padding: 0;
+  width: min(320px, 86vw);
+  height: 100vh;
+  height: 100dvh;
+  max-width: 86vw;
+  max-height: 100dvh;
+  border: 0;
+  border-radius: 0 18px 18px 0;
+  background: #fff;
+  color: #171717;
+  box-shadow: 14px 0 45px rgba(0, 0, 0, .16);
+}
+
+.admin-reset-menu-dialog::backdrop {
+  background: rgba(0, 0, 0, .44);
+}
+
+.admin-reset-menu-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 12px;
+}
+
+.admin-reset-menu-close {
+  align-self: flex-end;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: #171717;
+  font-size: 29px;
+  cursor: pointer;
+}
+
+.admin-reset-menu-close:hover,
+.admin-reset-logout:hover {
+  background: #f3f3f3;
+}
+
+.admin-reset-logout {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 50px;
+  padding: 0 16px;
+  border: 1px solid #e4e4e4;
+  border-radius: 12px;
+  background: #fff;
+  color: #171717;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .admin-reset-topbar {
+    height: 60px;
+    padding: 0 10px;
+  }
+
+  .admin-reset-canvas {
+    min-height: calc(100dvh - 60px);
+  }
+}
