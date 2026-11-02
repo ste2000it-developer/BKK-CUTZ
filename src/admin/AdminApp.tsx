@@ -21,8 +21,7 @@ export function AdminApp() {
   const [loginError, setLoginError] = useState("");
   const [loginPending, setLoginPending] = useState(false);
   const menu = useRef<HTMLDialogElement>(null);
-  const desktopHamburger = useRef<HTMLButtonElement>(null);
-  const mobileHamburger = useRef<HTMLButtonElement>(null);
+  const hamburger = useRef<HTMLButtonElement>(null);
 
   useEffect(() => watchAuth(async (nextUser) => {
     if (!nextUser) {
@@ -57,8 +56,7 @@ export function AdminApp() {
       dialog.showModal();
     } else if (!menuOpen && dialog.open) {
       dialog.close();
-      const isPhone = window.matchMedia("(max-width: 600px)").matches;
-      (isPhone ? mobileHamburger : desktopHamburger).current?.focus();
+      hamburger.current?.focus();
     }
   }, [menuOpen, user]);
 
@@ -103,27 +101,12 @@ export function AdminApp() {
 
   return (
     <div className="admin-reset-shell">
-      <div className="admin-reset-mobile-header">
-        <button
-          ref={mobileHamburger}
-          type="button"
-          className="admin-reset-hamburger admin-reset-mobile-hamburger"
-          aria-label="เปิดเมนู"
-          aria-haspopup="dialog"
-          aria-controls="admin-reset-navigation"
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen(true)}
-        >
-          <span className="admin-reset-hamburger-lines" aria-hidden="true"><span /><span /><span /></span>
-        </button>
-        <strong>BKK-CUTZ</strong><span>ADMIN</span>
-      </div>
 
       <header className="admin-reset-topbar">
         <button
-          ref={desktopHamburger}
+          ref={hamburger}
           type="button"
-          className="admin-reset-hamburger admin-reset-desktop-hamburger"
+          className="admin-reset-hamburger"
           aria-label="เปิดเมนู"
           aria-haspopup="dialog"
           aria-controls="admin-reset-navigation"
