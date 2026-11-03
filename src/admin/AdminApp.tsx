@@ -1,5 +1,5 @@
 import { NotificationCenter } from "./components/NotificationCenter";
-import { useEffect, useRef, useState, type ComponentType, type FormEvent } from "react";
+import { Component, useEffect, useRef, useState, type ComponentType, type FormEvent, type ReactNode } from "react";
 import type { User } from "firebase/auth";
 import { LoadingScreen } from "../shared/components/LoadingScreen";
 import { login, logout, watchAuth } from "../shared/firebase/auth";
@@ -29,6 +29,31 @@ const navigation: Array<{ id: AdminPage; icon: string; label: string; title: str
   { id: "advances", icon: "fa-hand-holding-dollar", label: "เบิกล่วงหน้า", title: "เบิกล่วงหน้า" },
   { id: "summary", icon: "fa-chart-pie", label: "สรุปยอด", title: "สรุปยอด" },
 ];
+
+class AdminPageBoundary extends Component<{ name: string; children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error("Admin page render failed:", this.props.name, error);
+  }
+
+  render() {
+    if (this.state.failed) {
+      return (
+        <section className="error-box" role="alert">
+          <strong>แสดงหน้า {this.props.name} ไม่สำเร็จ</strong>
+          <p>เกิดข้อผิดพลาดในหน้านี้ กรุณาลองเปิดอีกครั้ง</p>
+          <button type="button" className="secondary-button" onClick={() => this.setState({ failed: false })}>ลองใหม่</button>
+        </section>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export function AdminApp() {
   const [user, setUser] = useState<User | null>(null);
@@ -77,6 +102,9 @@ export function AdminApp() {
     if (page === "payouts") window.dispatchEvent(new CustomEvent("bkk:payout:activate", { detail }));
     if (page === "payout-history") window.dispatchEvent(new CustomEvent("bkk:payout-history:activate", { detail }));
     if (page === "daily-history") window.dispatchEvent(new CustomEvent("bkk:daily-history:activate", { detail }));
+    if (page === "barbers") window.dispatchEvent(new CustomEvent("bkk:admin:barbers:activate", { detail }));
+    if (page === "advances") window.dispatchEvent(new CustomEvent("bkk:admin:advances:activate", { detail }));
+    if (page === "summary") window.dispatchEvent(new CustomEvent("bkk:admin:summary:activate", { detail }));
   }, [page, user]);
 
   useEffect(() => {
@@ -85,6 +113,7 @@ export function AdminApp() {
       setLoadedPages((loaded) => loaded.has("network") ? loaded : new Map(loaded).set("network", Page));
     }).catch((error) => {
       console.error("Admin network page preload failed:", error);
+      setPageLoadError("โหลดหน้าจัดการสาขาไม่สำเร็จ กรุณาลองใหม่");
     });
   }, [user, loadedPages]);
 
@@ -177,15 +206,15 @@ export function AdminApp() {
       <main className="admin-main">
         <div className="admin-main-inner">
           <header className="admin-topbar"><div><div className="admin-kicker">BKK-CUTZ CONTROL</div><h1>{navigation.find((item) => item.id === page)?.title}</h1><div className="admin-email">{user.email || "Admin"}</div></div><div className="admin-header-actions"><NotificationCenter key={user.uid} userId={user.uid} /><button className="logout-button" type="button" onClick={() => void logout()} aria-label="ออกจากระบบ"><i className="fa-solid fa-right-from-bracket" aria-hidden="true" /><span>ออกจากระบบ</span></button></div></header>
-          {pageLoadError && <div className="error-box" role="alert">{pageLoadError}</div>}
-          {BranchNetworkPage && <section className={page === "network" ? "" : "hidden"}><BranchNetworkPage /></section>}
-          <section className={page === "services" ? "" : "hidden"}><ServicesPage /></section>
-          {BarbersPage && <section className={page === "barbers" ? "" : "hidden"}><BarbersPage /></section>}
-          {PayoutPage && <section className={page === "payouts" ? "" : "hidden"}><PayoutPage /></section>}
-          {PayoutHistoryPage && <section className={page === "payout-history" ? "" : "hidden"}><PayoutHistoryPage /></section>}
-          {DailyHistoryPage && <section className={page === "daily-history" ? "" : "hidden"}><DailyHistoryPage /></section>}
-          {AdvancePage && <section className={page === "advances" ? "" : "hidden"}><AdvancePage /></section>}
-          {FinancialSummaryPage && <section className={page === "summary" ? "" : "hidden"}><FinancialSummaryPage /></section>}
+          {pageLoadError && <div className="error-box" role="alert">{pageLoadError} <button type="button" className="secondary-button" onClick={() => void navigateToPage(page)}>ลองใหม่</button></div>}
+          {BranchNetworkPage && <section className={page === "network" ? "" : "hidden"}><AdminPageBoundary name="จัดการสาขา"><BranchNetworkPage /></AdminPageBoundary></section>}
+          <section className={page === "services" ? "" : "hidden"}><AdminPageBoundary name="เมนูบริการ"><ServicesPage /></AdminPageBoundary></section>
+          {BarbersPage && <section className={page === "barbers" ? "" : "hidden"}><AdminPageBoundary name="จัดการช่าง"><BarbersPage /></AdminPageBoundary></section>}
+          {PayoutPage && <section className={page === "payouts" ? "" : "hidden"}><AdminPageBoundary name="จ่ายเงินช่าง"><PayoutPage /></AdminPageBoundary></section>}
+          {PayoutHistoryPage && <section className={page === "payout-history" ? "" : "hidden"}><AdminPageBoundary name="ประวัติจ่ายเงินช่าง"><PayoutHistoryPage /></AdminPageBoundary></section>}
+          {DailyHistoryPage && <section className={page === "daily-history" ? "" : "hidden"}><AdminPageBoundary name="ประวัติรายวัน"><DailyHistoryPage /></AdminPageBoundary></section>}
+          {AdvancePage && <section className={page === "advances" ? "" : "hidden"}><AdminPageBoundary name="เบิกล่วงหน้า"><AdvancePage /></AdminPageBoundary></section>}
+          {FinancialSummaryPage && <section className={page === "summary" ? "" : "hidden"}><AdminPageBoundary name="สรุปยอด"><FinancialSummaryPage /></AdminPageBoundary></section>}
         </div>
       </main>
     </div>

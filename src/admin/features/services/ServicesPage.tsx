@@ -1,4 +1,5 @@
 import { AppSelect } from "../../components/AppSelect";
+import { AdminConfirmDialog } from "../../components/AdminConfirmDialog";
 import { useEffect, useState } from "react";
 import {
   listBranches,
@@ -58,6 +59,7 @@ export function ServicesPage() {
   const [services, setServices] = useState<ServiceRecord[]>([]);
   const [editingService, setEditingService] = useState<ServiceRecord | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<ServiceRecord | null>(null);
   const [form, setForm] = useState<ServiceForm>(emptyForm);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -105,7 +107,7 @@ export function ServicesPage() {
   useEffect(() => {
     if (!editorOpen) return;
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === "Escape" && !saving) {
         setEditingService(null);
         setEditorOpen(false);
         setStatus("");
@@ -114,7 +116,7 @@ export function ServicesPage() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [editorOpen]);
+  }, [editorOpen, saving]);
 
   function startAdd() {
     setEditingService(null);
@@ -199,11 +201,13 @@ export function ServicesPage() {
   }
 
   async function deleteService(service: ServiceRecord) {
-    if (!window.confirm(`ต้องการลบ "${service.name}" จากกลุ่ม ${groupId} ใช่ไหม?`)) return;
+    if (saving) return;
+    setSaving(true);
     setError("");
     try {
       await removeService(service.id);
       await loadServices(groupId);
+      setStatus(`ลบเมนู ${service.name} เรียบร้อย`);
       if (editingService?.id === service.id) {
         setEditingService(null);
         setEditorOpen(false);
@@ -211,6 +215,9 @@ export function ServicesPage() {
     } catch (deleteError) {
       console.error(deleteError);
       setError(deleteError instanceof Error ? deleteError.message : "ลบไม่สำเร็จ");
+    } finally {
+      setSaving(false);
+      setPendingDelete(null);
     }
   }
 
@@ -257,19 +264,29 @@ export function ServicesPage() {
                   <div className="service-type">{typeLabels[service.type as ServiceType] || service.type}</div>
                   <div className="service-price">{getServicePriceText(service)}</div>
                   <div className="service-status-cell"><span className={`service-status ${service.active === true ? "is-active" : "is-off"}`}>{service.active === true ? "เปิดใช้งาน" : "ปิดใช้งาน"}</span></div>
-                  <div className="service-actions"><button className="edit-button" type="button" aria-label={`แก้ไข ${service.name}`} onClick={() => startEdit(service)}>แก้ไข</button><button className="delete-button" type="button" aria-label={`ลบ ${service.name}`} onClick={() => void deleteService(service)}>ลบ</button></div>
+                  <div className="service-actions"><button className="edit-button" type="button" aria-label={`แก้ไข ${service.name}`} onClick={() => startEdit(service)}>แก้ไข</button><button className="delete-button" type="button" aria-label={`ลบ ${service.name}`} disabled={saving} onClick={() => setPendingDelete(service)}>ลบ</button></div>
                 </div>
               ))}
             </>}
           </div>
         </section>
 
+        {pendingDelete && <AdminConfirmDialog
+          title="ยืนยันลบเมนูบริการ"
+          message={`ต้องการลบ "${pendingDelete.name}" จากกลุ่ม ${groupId} ใช่ไหม?`}
+          confirmLabel="ลบเมนู"
+          danger
+          busy={saving}
+          onCancel={() => setPendingDelete(null)}
+          onConfirm={() => void deleteService(pendingDelete)}
+        />}
         {editorOpen ? (
           <div className="admin-modal-overlay">
             <button
               className="admin-modal-backdrop"
               type="button"
               aria-label="ปิด"
+              disabled={saving}
               onClick={() => {
                 setEditingService(null);
                 setEditorOpen(false);
@@ -296,6 +313,7 @@ export function ServicesPage() {
                   className="secondary-button admin-modal-close"
                   type="button"
                   aria-label="ปิด"
+                  disabled={saving}
                   onClick={() => {
                     setEditingService(null);
                     setEditorOpen(false);
@@ -393,6 +411,7 @@ export function ServicesPage() {
                 <button
                   className="cancel-button"
                   type="button"
+                  disabled={saving}
                   onClick={() => {
                     setEditingService(null);
                     setEditorOpen(false);

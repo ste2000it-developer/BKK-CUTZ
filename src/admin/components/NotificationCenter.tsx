@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { adminPushAvailability, disableAdminPush, enableAdminPush, refreshAdminPush, showForegroundAdminPush, watchForegroundAdminPush, type AdminPushState } from "../../shared/firebase/admin-push";
-import { markAllAdminNotificationsRead, watchAdminNotifications, watchAdminUnread, type AdminNotification } from "../../shared/firebase/repositories/admin-notifications";
+import { markAdminNotificationRead, markAllAdminNotificationsRead, watchAdminNotifications, watchAdminUnread, type AdminNotification } from "../../shared/firebase/repositories/admin-notifications";
 import { notificationTime, unreadLabel } from "../../shared/domain/admin-notifications";
 import "./notification-center.css";
 
@@ -11,7 +11,7 @@ export function NotificationCenter({ userId }: { userId: string }) {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState("");
   const [saveError, setSaveError] = useState("");
-  const [readAttempt, setReadAttempt] = useState(0);
+  const [markingAll, setMarkingAll] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const [pushState, setPushState] = useState<AdminPushState>("available");
   const [pushError, setPushError] = useState("");
@@ -22,10 +22,10 @@ export function NotificationCenter({ userId }: { userId: string }) {
   useEffect(() => {
     setError(""); setReady(false); setCount(null);
     const fail = () => setError("โหลดการแจ้งเตือนไม่สำเร็จ กรุณาลองใหม่");
-    const stopHistory = watchAdminNotifications((next) => { setRows(next); setReady(true); }, fail);
-    const stopUnread = watchAdminUnread(setCount, fail);
+    const stopHistory = watchAdminNotifications(userId, (next) => { setRows(next); setReady(true); }, fail);
+    const stopUnread = watchAdminUnread(userId, setCount, fail);
     return () => { stopHistory(); stopUnread(); };
-  }, [attempt]);
+  }, [attempt, userId]);
 
   useEffect(() => {
     let live = true;
@@ -55,15 +55,29 @@ export function NotificationCenter({ userId }: { userId: string }) {
     return () => { document.removeEventListener("pointerdown", outside); document.removeEventListener("keydown", escape); };
   }, [open]);
 
-  useEffect(() => {
-    if (!open) return;
-    let live = true;
+  async function markOneRead(id: string) {
     setSaveError("");
-    void markAllAdminNotificationsRead().catch(() => {
-      if (live) setSaveError("บันทึกสถานะอ่านไม่สำเร็จ กรุณาลองใหม่");
-    });
-    return () => { live = false; };
-  }, [open, readAttempt]);
+    try {
+      await markAdminNotificationRead(userId, id);
+    } catch (issue) {
+      console.error("Mark notification read failed:", issue);
+      setSaveError("บันทึกสถานะอ่านไม่สำเร็จ กรุณาลองใหม่");
+    }
+  }
+
+  async function markAllRead() {
+    if (markingAll) return;
+    setSaveError("");
+    setMarkingAll(true);
+    try {
+      await markAllAdminNotificationsRead(userId);
+    } catch (issue) {
+      console.error("Mark all notifications read failed:", issue);
+      setSaveError("บันทึกสถานะอ่านทั้งหมดไม่สำเร็จ กรุณาลองใหม่");
+    } finally {
+      setMarkingAll(false);
+    }
+  }
 
   async function togglePush() {
     setPushError("");
@@ -109,15 +123,16 @@ export function NotificationCenter({ userId }: { userId: string }) {
       {pushState === "blocked" && <div className="notification-status">อนุญาต Notification จากการตั้งค่าเว็บไซต์ของเบราว์เซอร์ แล้วโหลดหน้าใหม่</div>}
       {pushState === "unsupported" && <div className="notification-status">เปิดหน้า Admin ผ่าน HTTPS บนมือถือเพื่อใช้ Push Notification</div>}
       {error && <div className="notification-status" role="alert">{error} <button type="button" onClick={() => setAttempt(attempt + 1)}>ลองใหม่</button></div>}
-      {saveError && <div className="notification-status" role="alert">{saveError} <button type="button" onClick={() => setReadAttempt((value) => value + 1)}>ลองบันทึกอีกครั้ง</button></div>}
+      {saveError && <div className="notification-status" role="alert">{saveError}</div>}
+      {count !== null && count > 0 && <div className="notification-read-tools"><span>ยังไม่อ่าน {unreadLabel(count)} รายการ</span><button type="button" disabled={markingAll} onClick={() => void markAllRead()}>{markingAll ? "กำลังบันทึก..." : "อ่านทั้งหมด"}</button></div>}
       {!ready && !error && <p className="notification-status" role="status">กำลังโหลด...</p>}
       {ready && !rows.length && <p className="notification-status">ยังไม่มีการแจ้งเตือน</p>}
       <div className="notification-list" role="list">{rows.map((row) => <div key={row.id} role="listitem" className={"notification-item" + (row.read ? "" : " is-unread")} aria-label={row.message + " " + row.branchName + (row.read ? " อ่านแล้ว" : " ยังไม่อ่าน")}>
         <span className="notification-icon" aria-hidden="true">
           <i className={`fa-solid ${row.type === "store_closed" ? "fa-store" : "fa-user-check"}`} />
-        </span><span className="notification-copy"><strong>{row.message}</strong><span>{row.branchName || row.branchId} · {notificationTime(row.eventAt)}</span></span>{!row.read && <span className="notification-dot" aria-hidden="true" />}
+        </span><span className="notification-copy"><strong>{row.message}</strong><span>{row.branchName || row.branchId} · {notificationTime(row.eventAt)}</span></span>{!row.read && <button className="notification-read-button" type="button" onClick={() => void markOneRead(row.id)} aria-label={`ทำเครื่องหมายว่าอ่านแล้ว: ${row.message}`}>อ่านแล้ว</button>}
       </div>)}</div>
-      <p className="notification-footer">เปิดกระดิ่งเพื่อทำเครื่องหมายว่าอ่านทั้งหมดแล้ว</p>
+      <p className="notification-footer">เลือก “อ่านแล้ว” ในแต่ละรายการ หรือกด “อ่านทั้งหมด” เมื่อตรวจสอบครบแล้ว</p>
     </section>}
   </div>;
 }

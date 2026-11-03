@@ -52,6 +52,9 @@ export function BarbersPage() {
 
   useEffect(() => {
     void loadBarbers();
+    const reload = () => void loadBarbers();
+    window.addEventListener("bkk:admin:barbers:activate", reload);
+    return () => window.removeEventListener("bkk:admin:barbers:activate", reload);
   }, []);
 
   useEffect(() => {

@@ -35,3 +35,8 @@
 .notification-push button.is-enabled { border-color: #badfc9; background: #eaf8ef; color: #16723b; }
 .notification-push button:disabled { opacity: .6; cursor: default; }
 @media (max-width: 480px) { .notification-push { align-items: stretch; flex-direction: column; } .notification-push button { width: 100%; } }
+
+.notification-read-tools { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line-2); padding: 10px 16px; background: var(--soft); font-size: 13px; }
+.notification-read-tools button, .notification-read-button { cursor: pointer; border: 1px solid var(--line); background: var(--white); color: var(--text); border-radius: 8px; padding: 7px 10px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.notification-read-tools button:disabled { opacity: .6; cursor: wait; }
+.notification-read-button { flex-shrink: 0; }
