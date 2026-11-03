@@ -184,15 +184,6 @@
   .admin-reset-header-logout span { display: none; }
   .admin-reset-header-logout i { color: #b42318; }
   .admin-reset-canvas { min-height: calc(100dvh - 76px); }
-  .admin-reset-header-actions .notification-panel {
-    position: fixed;
-    top: calc(8px + env(safe-area-inset-top, 0px));
-    bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-    left: 8px; right: 8px;
-    width: auto;
-    max-height: calc(100dvh - 16px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-    overflow-y: auto;
-  }
 }
 
 /* Shared black top bar: identical visual identity at every breakpoint. */
