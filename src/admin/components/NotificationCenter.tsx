@@ -15,7 +15,7 @@ export function NotificationCenter({ userId }: { userId: string }) {
   const [attempt, setAttempt] = useState(0);
   const [pushState, setPushState] = useState<AdminPushState>("available");
   const [pushError, setPushError] = useState("");
-  const container = useRef<HTMLDivElement>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
   const bell = useRef<HTMLButtonElement>(null);
   const close = useRef<HTMLButtonElement>(null);
 
@@ -47,12 +47,16 @@ export function NotificationCenter({ userId }: { userId: string }) {
 
   useEffect(() => {
     if (!open) return;
+    const modal = dialog.current;
+    if (!modal) return;
+    const previousOverflow = document.body.style.overflow;
+    modal.showModal();
+    document.body.style.overflow = "hidden";
     close.current?.focus();
-    const outside = (event: PointerEvent) => { if (!container.current?.contains(event.target as Node)) setOpen(false); };
-    const escape = (event: KeyboardEvent) => { if (event.key === "Escape") { setOpen(false); bell.current?.focus(); } };
-    document.addEventListener("pointerdown", outside);
-    document.addEventListener("keydown", escape);
-    return () => { document.removeEventListener("pointerdown", outside); document.removeEventListener("keydown", escape); };
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      if (modal.open) modal.close();
+    };
   }, [open]);
 
   useEffect(() => {
@@ -95,15 +99,26 @@ export function NotificationCenter({ userId }: { userId: string }) {
     : pushState === "unsupported" ? "Push ต้องใช้ HTTPS"
     : "เปิดแจ้งเตือนบนเครื่องนี้";
 
-  return <div className="notification-center" ref={container} onBlur={(event) => {
-    if (event.relatedTarget && !event.currentTarget.contains(event.relatedTarget as Node)) setOpen(false);
-  }}>
-    <button ref={bell} type="button" className="notification-bell" aria-label={"การแจ้งเตือน" + (count ? " ยังไม่อ่าน " + unreadLabel(count) + " รายการ" : "")} aria-expanded={open} aria-controls="admin-notifications" onClick={() => setOpen(!open)}>
+  return <div className="notification-center">
+    <button ref={bell} type="button" className="notification-bell" aria-label={"การแจ้งเตือน" + (count ? " ยังไม่อ่าน " + unreadLabel(count) + " รายการ" : "")} aria-haspopup="dialog" aria-expanded={open} aria-controls="admin-notifications" onClick={() => setOpen(true)}>
       <i className="fa-regular fa-bell" aria-hidden="true" />
       {error ? <span className="notification-badge">!</span> : count !== null && count > 0 && <span className="notification-badge">{unreadLabel(count)}</span>}
     </button>
-    {open && <section id="admin-notifications" className="notification-panel" aria-label="การแจ้งเตือน">
-      <div className="notification-heading"><div><h2>การแจ้งเตือน</h2><small>ทุกสาขา · 50 รายการล่าสุด</small></div><button ref={close} type="button" aria-label="ปิดการแจ้งเตือน" onClick={() => { setOpen(false); bell.current?.focus(); }}><i className="fa-solid fa-xmark" aria-hidden="true" /></button></div>
+    {open && <dialog
+      ref={dialog}
+      id="admin-notifications"
+      className="notification-panel"
+      aria-labelledby="admin-notification-title"
+      aria-modal="true"
+      onClose={() => { setOpen(false); bell.current?.focus(); }}
+      onClick={(event) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) {
+          event.currentTarget.close();
+        }
+      }}
+    >
+      <div className="notification-heading"><div><h2 id="admin-notification-title">การแจ้งเตือน</h2><small>ทุกสาขา · 50 รายการล่าสุด</small></div><button ref={close} type="button" aria-label="ปิดการแจ้งเตือน" onClick={() => dialog.current?.close()}><i className="fa-solid fa-xmark" aria-hidden="true" /></button></div>
       <div className="notification-push"><div><strong>แจ้งเตือนเข้าโทรศัพท์</strong><span>{pushState === "enabled" ? "เครื่องนี้จะได้รับ Push เมื่อช่างเข้างานหรือปิดร้าน" : "เปิดครั้งเดียวบนมือถือ Admin เครื่องนี้"}</span></div><button type="button" className={pushState === "enabled" ? "is-enabled" : ""} disabled={pushState === "enabling" || pushState === "unsupported" || pushState === "blocked"} onClick={() => void togglePush()}>{pushLabel}</button></div>
       {pushError && <div className="notification-status" role="alert">{pushError}</div>}
       {pushState === "blocked" && <div className="notification-status">อนุญาต Notification จากการตั้งค่าเว็บไซต์ของเบราว์เซอร์ แล้วโหลดหน้าใหม่</div>}
@@ -118,6 +133,6 @@ export function NotificationCenter({ userId }: { userId: string }) {
         </span><span className="notification-copy"><strong>{row.message}</strong><span>{row.branchName || row.branchId} · {notificationTime(row.eventAt)}</span></span>{!row.read && <span className="notification-dot" aria-hidden="true" />}
       </div>)}</div>
       <p className="notification-footer">เปิดกระดิ่งเพื่อทำเครื่องหมายว่าอ่านทั้งหมดแล้ว</p>
-    </section>}
+    </dialog>}
   </div>;
 }
