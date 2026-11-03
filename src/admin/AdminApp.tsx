@@ -1,48 +1,27 @@
-import { NotificationCenter } from "./components/NotificationCenter";
-import { useEffect, useRef, useState, type ComponentType, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { User } from "firebase/auth";
+import { NotificationCenter } from "./components/NotificationCenter";
 import { LoadingScreen } from "../shared/components/LoadingScreen";
 import { login, logout, watchAuth } from "../shared/firebase/auth";
 import { getUserProfile } from "../shared/firebase/repositories/identity";
-import { ServicesPage } from "./features/services/ServicesPage";
+import "./admin-reset.css";
 
-type AdminPage = "network" | "services" | "barbers" | "payouts" | "payout-history" | "daily-history" | "advances" | "summary";
-
-const adminPageLoaders = {
-  network: () => import("./features/network/BranchNetworkPage").then(({ BranchNetworkPage }) => BranchNetworkPage),
-  services: async () => ServicesPage,
-  barbers: () => import("./features/barbers/BarbersPage").then(({ BarbersPage }) => BarbersPage),
-  payouts: () => import("./features/payouts/PayoutPage").then(({ PayoutPage }) => PayoutPage),
-  "payout-history": () => import("./features/payouts/PayoutHistoryPage").then(({ PayoutHistoryPage }) => PayoutHistoryPage),
-  "daily-history": () => import("./features/daily-history/DailyHistoryPage").then(({ DailyHistoryPage }) => DailyHistoryPage),
-  advances: () => import("./features/advances/AdvancePage").then(({ AdvancePage }) => AdvancePage),
-  summary: () => import("./features/summary/FinancialSummaryPage").then(({ FinancialSummaryPage }) => FinancialSummaryPage),
-};
-
-const navigation: Array<{ id: AdminPage; icon: string; label: string; title: string }> = [
-  { id: "network", icon: "fa-store", label: "จัดการสาขา", title: "จัดการสาขา" },
-  { id: "services", icon: "fa-scissors", label: "เมนูบริการ / ราคา", title: "เมนูบริการ / ราคา" },
-  { id: "barbers", icon: "fa-user-group", label: "จัดการช่าง", title: "จัดการช่าง" },
-  { id: "payouts", icon: "fa-money-bill-transfer", label: "จ่ายเงินช่าง", title: "จ่ายเงินช่าง" },
-  { id: "payout-history", icon: "fa-clock-rotate-left", label: "ประวัติจ่ายเงินช่าง", title: "ประวัติจ่ายเงินช่าง" },
-  { id: "daily-history", icon: "fa-receipt", label: "ประวัติรายวัน", title: "ประวัติรายวัน" },
-  { id: "advances", icon: "fa-hand-holding-dollar", label: "เบิกล่วงหน้า", title: "เบิกล่วงหน้า" },
-  { id: "summary", icon: "fa-chart-pie", label: "สรุปยอด", title: "สรุปยอด" },
-];
-
+/**
+ * Minimal Admin workspace: preserve login and existing notification functions,
+ * while keeping former Admin feature modules on disk for future redesign.
+ * Only a shared dark header and an empty workspace are rendered.
+ */
 export function AdminApp() {
   const [user, setUser] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
-  const [page, setPage] = useState<AdminPage>("network");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [loadedPages, setLoadedPages] = useState(() => new Map<AdminPage, ComponentType>([["services", ServicesPage]]));
-  const [pageLoadError, setPageLoadError] = useState("");
-  const navigationRequest = useRef(0);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [loginPending, setLoginPending] = useState(false);
+  const menu = useRef<HTMLDialogElement>(null);
+  const hamburger = useRef<HTMLButtonElement>(null);
 
   useEffect(() => watchAuth(async (nextUser) => {
     if (!nextUser) {
@@ -71,48 +50,15 @@ export function AdminApp() {
   }), []);
 
   useEffect(() => {
-    if (!user) return;
-    const detail = { user };
-    if (page === "services") window.dispatchEvent(new CustomEvent("bkk:admin:services:activate", { detail }));
-    if (page === "payouts") window.dispatchEvent(new CustomEvent("bkk:payout:activate", { detail }));
-    if (page === "payout-history") window.dispatchEvent(new CustomEvent("bkk:payout-history:activate", { detail }));
-    if (page === "daily-history") window.dispatchEvent(new CustomEvent("bkk:daily-history:activate", { detail }));
-  }, [page, user]);
-
-  useEffect(() => {
-    if (!user || loadedPages.has("network")) return;
-    void adminPageLoaders.network().then((Page) => {
-      setLoadedPages((loaded) => loaded.has("network") ? loaded : new Map(loaded).set("network", Page));
-    }).catch((error) => {
-      console.error("Admin network page preload failed:", error);
-    });
-  }, [user, loadedPages]);
-
-  useEffect(() => {
-    if (!mobileMenuOpen) return;
-    const onEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMobileMenuOpen(false);
-    };
-    window.addEventListener("keydown", onEscape);
-    return () => window.removeEventListener("keydown", onEscape);
-  }, [mobileMenuOpen]);
-
-  async function navigateToPage(nextPage: AdminPage) {
-    const request = ++navigationRequest.current;
-    setPageLoadError("");
-    try {
-      const Page = await adminPageLoaders[nextPage]();
-      if (request !== navigationRequest.current) return;
-
-      setLoadedPages((loaded) => new Map(loaded).set(nextPage, Page));
-      setPage(nextPage);
-      setMobileMenuOpen(false);
-    } catch (error) {
-      if (request !== navigationRequest.current) return;
-      console.error("Admin page load failed:", error);
-      setPageLoadError("โหลดหน้าไม่สำเร็จ กรุณาลองใหม่");
+    const dialog = menu.current;
+    if (!dialog) return;
+    if (menuOpen && !dialog.open) {
+      dialog.showModal();
+    } else if (!menuOpen && dialog.open) {
+      dialog.close();
+      hamburger.current?.focus();
     }
-  }
+  }, [menuOpen, user]);
 
   async function submitLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -153,41 +99,60 @@ export function AdminApp() {
     );
   }
 
-  const BranchNetworkPage = loadedPages.get("network");
-  const BarbersPage = loadedPages.get("barbers");
-  const PayoutPage = loadedPages.get("payouts");
-  const PayoutHistoryPage = loadedPages.get("payout-history");
-  const DailyHistoryPage = loadedPages.get("daily-history");
-  const AdvancePage = loadedPages.get("advances");
-  const FinancialSummaryPage = loadedPages.get("summary");
-
   return (
-    <div className="admin-shell">
-      <div className="admin-mobile-header"><button type="button" className="admin-menu-toggle" aria-label="เปิดเมนู" aria-expanded={mobileMenuOpen} aria-controls="admin-navigation" onClick={() => setMobileMenuOpen(true)}><i className="fa-solid fa-bars" aria-hidden="true" /></button><strong>BKK-CUTZ</strong><span>ADMIN</span></div>
-      {mobileMenuOpen && <button className="admin-menu-backdrop" type="button" aria-label="ปิดเมนู" onClick={() => setMobileMenuOpen(false)} />}
-      <aside id="admin-navigation" className={`admin-sidebar${mobileMenuOpen ? " mobile-open" : ""}`}>
-        <button type="button" className="admin-menu-close" aria-label="ปิดเมนู" onClick={() => setMobileMenuOpen(false)}><i className="fa-solid fa-xmark" aria-hidden="true" /></button>
-        <div><div className="sidebar-brand">BKK-CUTZ</div><div className="sidebar-subbrand">ADMIN PANEL</div></div>
-        <div className="sidebar-menu-title">เมนูระบบ</div>
-        <nav className="admin-nav" aria-label="เมนู Admin">
-          {navigation.map((item) => <button className={`admin-nav-button${page === item.id ? " active" : ""}`} key={item.id} type="button" aria-current={page === item.id ? "page" : undefined} onClick={() => void navigateToPage(item.id)}><span className="nav-icon" aria-hidden="true"><i className={`fa-solid ${item.icon}`} /></span><span>{item.label}</span><b aria-hidden="true"><i className="fa-solid fa-chevron-right" /></b></button>)}
-        </nav>
-        <div className="sidebar-footer"><div>STAY SHARP</div><div>LOOK FRESH</div></div>
-      </aside>
-      <main className="admin-main">
-        <div className="admin-main-inner">
-          <header className="admin-topbar"><div><div className="admin-kicker">BKK-CUTZ CONTROL</div><h1>{navigation.find((item) => item.id === page)?.title}</h1><div className="admin-email">{user.email || "Admin"}</div></div><div className="admin-header-actions"><NotificationCenter key={user.uid} userId={user.uid} /><button className="logout-button" type="button" onClick={() => void logout()} aria-label="ออกจากระบบ"><i className="fa-solid fa-right-from-bracket" aria-hidden="true" /><span>ออกจากระบบ</span></button></div></header>
-          {pageLoadError && <div className="error-box" role="alert">{pageLoadError}</div>}
-          {BranchNetworkPage && <section className={page === "network" ? "" : "hidden"}><BranchNetworkPage /></section>}
-          <section className={page === "services" ? "" : "hidden"}><ServicesPage /></section>
-          {BarbersPage && <section className={page === "barbers" ? "" : "hidden"}><BarbersPage /></section>}
-          {PayoutPage && <section className={page === "payouts" ? "" : "hidden"}><PayoutPage /></section>}
-          {PayoutHistoryPage && <section className={page === "payout-history" ? "" : "hidden"}><PayoutHistoryPage /></section>}
-          {DailyHistoryPage && <section className={page === "daily-history" ? "" : "hidden"}><DailyHistoryPage /></section>}
-          {AdvancePage && <section className={page === "advances" ? "" : "hidden"}><AdvancePage /></section>}
-          {FinancialSummaryPage && <section className={page === "summary" ? "" : "hidden"}><FinancialSummaryPage /></section>}
+    <div className="admin-reset-shell">
+
+      <header className="admin-reset-topbar">
+        <button
+          ref={hamburger}
+          type="button"
+          className="admin-reset-hamburger"
+          aria-label="เปิดเมนู"
+          aria-haspopup="dialog"
+          aria-controls="admin-reset-navigation"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen(true)}
+        >
+          <span className="admin-reset-hamburger-lines" aria-hidden="true"><span /><span /><span /></span>
+        </button>
+        <div className="admin-reset-headline">
+          
+          <h1>BKK-CUTZ</h1>
+          <div className="admin-reset-email">{user.email || "Admin"}</div>
         </div>
-      </main>
+        <div className="admin-reset-header-actions">
+          <NotificationCenter key={user.uid} userId={user.uid} />
+          <button
+            className="admin-reset-header-logout"
+            type="button"
+            onClick={() => void logout()}
+            aria-label="ออกจากระบบ"
+          >
+            <i className="fa-solid fa-right-from-bracket" aria-hidden="true" />
+            <span>ออกจากระบบ</span>
+          </button>
+        </div>
+      </header>
+
+      <main className="admin-reset-canvas" aria-label="พื้นที่ Admin สำหรับออกแบบใหม่" />
+
+      <dialog
+        ref={menu}
+        id="admin-reset-navigation"
+        className="admin-reset-menu-dialog"
+        aria-label="เมนู Admin"
+        onCancel={(event) => { event.preventDefault(); setMenuOpen(false); }}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) setMenuOpen(false);
+        }}
+      >
+        <div className="admin-reset-menu-content">
+          <button className="admin-reset-menu-close" type="button" aria-label="ปิดเมนู" onClick={() => setMenuOpen(false)}>×</button>
+          <button className="admin-reset-logout" type="button" onClick={() => void logout()}>
+            <i className="fa-solid fa-right-from-bracket" aria-hidden="true" /> ออกจากระบบ
+          </button>
+        </div>
+      </dialog>
     </div>
   );
 }
