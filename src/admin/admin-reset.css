@@ -276,3 +276,27 @@
   }
   .admin-reset-hamburger { display: none; }
 }
+
+/* First Admin navigation item; more pages can be added later without
+   crowding the mobile drawer. */
+.admin-reset-sidebar-nav { display: grid; gap: 5px; margin-top: 4px; }
+.admin-reset-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 47px;
+  padding: 0 15px;
+  border-radius: 11px;
+  text-decoration: none;
+  color: #484848;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 750;
+}
+.admin-reset-nav-item i { width: 18px; font-size: 17px; text-align: center; }
+.admin-reset-nav-item--active { background: #fdc717; color: #171717; }
+.admin-reset-nav-item:focus-visible { outline: 2px solid #cf9a00; outline-offset: 3px; }
+@media (min-width: 1024px) {
+  .admin-reset-desktop-sidebar .admin-reset-nav-item:not(.admin-reset-nav-item--active) { color: #e2e2e2; }
+  .admin-reset-desktop-sidebar .admin-reset-nav-item--active { background: #fdc717; color: #171717; }
+}
