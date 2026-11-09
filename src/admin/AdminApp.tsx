@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { User } from "firebase/auth";
 import { NotificationCenter } from "./components/NotificationCenter";
+import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { LoadingScreen } from "../shared/components/LoadingScreen";
 import { login, logout, watchAuth } from "../shared/firebase/auth";
 import { getUserProfile } from "../shared/firebase/repositories/identity";
@@ -10,7 +11,7 @@ import "./admin-reset.css";
  * Minimal Admin workspace: preserve login and existing notification functions,
  * while keeping former Admin feature modules on disk for future redesign.
  * Desktop has a permanent sidebar; smaller screens use the drawer.
- * The main workspace remains intentionally empty.
+ * The main workspace now shows a restrained, live overview of today.
  */
 export function AdminApp() {
   const [user, setUser] = useState<User | null>(null);
@@ -115,6 +116,12 @@ export function AdminApp() {
       <aside className="admin-reset-desktop-sidebar" aria-label="แถบเมนู Admin">
         <div className="admin-reset-sidebar-content">
           <div className="admin-reset-sidebar-title">เมนูระบบ</div>
+          <nav className="admin-reset-sidebar-nav" aria-label="เมนู Admin">
+            <a className="admin-reset-nav-item admin-reset-nav-item--active" href="#admin-dashboard" aria-current="page">
+              <i className="fa-solid fa-chart-pie" aria-hidden="true" />
+              <span>ภาพรวมร้าน</span>
+            </a>
+          </nav>
           <button className="admin-reset-sidebar-logout" type="button" onClick={() => void logout()}>
             <i className="fa-solid fa-right-from-bracket" aria-hidden="true" /> ออกจากระบบ
           </button>
@@ -153,7 +160,9 @@ export function AdminApp() {
         </div>
       </header>
 
-      <main className="admin-reset-canvas" aria-label="พื้นที่ Admin สำหรับออกแบบใหม่" />
+      <main id="admin-dashboard" className="admin-reset-canvas" aria-label="ภาพรวมร้าน">
+        <DashboardPage />
+      </main>
 
       <dialog
         ref={menu}
@@ -167,6 +176,12 @@ export function AdminApp() {
       >
         <div className="admin-reset-menu-content">
           <button className="admin-reset-menu-close" type="button" aria-label="ปิดเมนู" onClick={() => setMenuOpen(false)}>×</button>
+          <nav className="admin-reset-sidebar-nav" aria-label="เมนู Admin">
+            <a className="admin-reset-nav-item admin-reset-nav-item--active" href="#admin-dashboard" aria-current="page" onClick={() => setMenuOpen(false)}>
+              <i className="fa-solid fa-chart-pie" aria-hidden="true" />
+              <span>ภาพรวมร้าน</span>
+            </a>
+          </nav>
           <button className="admin-reset-logout" type="button" onClick={() => void logout()}>
             <i className="fa-solid fa-right-from-bracket" aria-hidden="true" /> ออกจากระบบ
           </button>
