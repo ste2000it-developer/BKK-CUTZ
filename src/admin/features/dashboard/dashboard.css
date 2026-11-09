@@ -69,11 +69,11 @@
 .dash-sales {
   min-width: 0;
   padding: clamp(24px, 3vw, 36px);
-  border: 1px solid #e6b90e;
+  border: none;
   border-radius: 18px;
   background: #fdc717;
   color: #171717;
-  box-shadow: 0 6px 20px rgba(154, 112, 0, .11);
+  box-shadow: none;
 }
 .dash-sales-label {
   color: #171717;
