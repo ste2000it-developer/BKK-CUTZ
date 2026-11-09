@@ -9,7 +9,8 @@ import "./admin-reset.css";
 /**
  * Minimal Admin workspace: preserve login and existing notification functions,
  * while keeping former Admin feature modules on disk for future redesign.
- * Only a shared dark header and an empty workspace are rendered.
+ * Desktop has a permanent sidebar; smaller screens use the drawer.
+ * The main workspace remains intentionally empty.
  */
 export function AdminApp() {
   const [user, setUser] = useState<User | null>(null);
@@ -60,6 +61,16 @@ export function AdminApp() {
     }
   }, [menuOpen, user]);
 
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const closeMobileDrawer = () => {
+      if (desktop.matches) setMenuOpen(false);
+    };
+    desktop.addEventListener("change", closeMobileDrawer);
+    closeMobileDrawer();
+    return () => desktop.removeEventListener("change", closeMobileDrawer);
+  }, []);
+
   async function submitLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoginPending(true);
@@ -101,6 +112,14 @@ export function AdminApp() {
 
   return (
     <div className="admin-reset-shell">
+      <aside className="admin-reset-desktop-sidebar" aria-label="แถบเมนู Admin">
+        <div className="admin-reset-sidebar-content">
+          <div className="admin-reset-sidebar-title">เมนูระบบ</div>
+          <button className="admin-reset-sidebar-logout" type="button" onClick={() => void logout()}>
+            <i className="fa-solid fa-right-from-bracket" aria-hidden="true" /> ออกจากระบบ
+          </button>
+        </div>
+      </aside>
 
       <header className="admin-reset-topbar">
         <button
