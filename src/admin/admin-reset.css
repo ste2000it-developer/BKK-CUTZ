@@ -300,3 +300,37 @@
   .admin-reset-desktop-sidebar .admin-reset-nav-item:not(.admin-reset-nav-item--active) { color: #e2e2e2; }
   .admin-reset-desktop-sidebar .admin-reset-nav-item--active { background: #fdc717; color: #171717; }
 }
+
+/* Unified dark navigation drawer on phones and tablets, matching desktop. */
+.admin-reset-shell .admin-reset-menu-dialog {
+  background: #171717;
+  color: #fff;
+  border-right: 1px solid #343434;
+  box-shadow: 14px 0 45px rgba(0, 0, 0, .24);
+}
+.admin-reset-shell .admin-reset-menu-close {
+  color: #fff;
+}
+.admin-reset-shell .admin-reset-menu-close:hover {
+  background: #303030;
+}
+.admin-reset-shell .admin-reset-menu-dialog .admin-reset-nav-item:not(.admin-reset-nav-item--active) {
+  color: #eee;
+}
+.admin-reset-shell .admin-reset-menu-dialog .admin-reset-nav-item--active {
+  color: #171717;
+  background: #fdc717;
+}
+.admin-reset-shell .admin-reset-logout {
+  border: 1px solid #444;
+  background: #252525;
+  color: #fff;
+}
+.admin-reset-shell .admin-reset-logout:hover {
+  background: #343434;
+}
+.admin-reset-shell .admin-reset-menu-dialog button:focus-visible,
+.admin-reset-shell .admin-reset-menu-dialog a:focus-visible {
+  outline: 2px solid #fdc717;
+  outline-offset: 2px;
+}
