@@ -175,7 +175,10 @@ export function AdminApp() {
         }}
       >
         <div className="admin-reset-menu-content">
-          <button className="admin-reset-menu-close" type="button" aria-label="ปิดเมนู" onClick={() => setMenuOpen(false)}>×</button>
+          <div className="admin-reset-menu-header">
+            <h2>เมนูระบบ</h2>
+            <button className="admin-reset-menu-close" type="button" aria-label="ปิดเมนู" onClick={() => setMenuOpen(false)}>×</button>
+          </div>
           <nav className="admin-reset-sidebar-nav" aria-label="เมนู Admin">
             <a className="admin-reset-nav-item admin-reset-nav-item--active" href="#admin-dashboard" aria-current="page" onClick={() => setMenuOpen(false)}>
               <i className="fa-solid fa-chart-pie" aria-hidden="true" />
