@@ -111,7 +111,7 @@ export function DashboardPage() {
       <section className="dash-overview" aria-label="ตัวเลขสำคัญวันนี้" aria-busy={!current && !error}>
         <div className="dash-sales">
           <div className="dash-sales-label">
-            <span>ยอดขายวันนี้</span>
+            <span>ยอดวันนี้</span>
             <i className="fa-solid fa-chart-line" aria-hidden="true" />
           </div>
           <strong>{current ? baht(totalSales) : "—"}</strong>
