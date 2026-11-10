@@ -77,21 +77,98 @@ export function NotificationCenter({ userId }: { userId: string }) {
     if (!modal.open) modal.showModal();
     close.current?.focus({ preventScroll: true });
 
-    // Prevent touch scroll chaining past the first/last notification.
-    // Gestures inside the list still scroll it normally.
+    // Allow the mobile sheet to be dismissed by pulling its handle/header
+    // downward, or by pulling down on the notification list when at its top.
+    // Keep regular list scrolling intact and never scroll the page behind it.
     const list = modal.querySelector<HTMLElement>(".notification-list");
+    const isMobile = window.matchMedia("(max-width: 640px)").matches;
+    const dismissDistance = 110;
+    type TouchGesture = {
+      startX: number;
+      startY: number;
+      startTime: number;
+      dragging: boolean;
+      eligible: boolean;
+      fromList: boolean;
+      distance: number;
+    };
+    let gesture: TouchGesture | null = null;
+    let animationTimer: number | undefined;
     let lastTouchY = 0;
+
+    const clearAnimation = () => {
+      if (animationTimer !== undefined) window.clearTimeout(animationTimer);
+      animationTimer = undefined;
+      modal.style.removeProperty("transition");
+      modal.style.removeProperty("transform");
+    };
+    const finishGesture = (cancel = false) => {
+      const active = gesture;
+      gesture = null;
+      if (!active?.dragging) return;
+      const speed = active.distance / Math.max(1, performance.now() - active.startTime);
+      const dismiss = !cancel && (active.distance >= dismissDistance || (active.distance >= 65 && speed > 0.65));
+      modal.style.transition = "transform 190ms ease-out";
+      modal.style.transform = dismiss ? "translate3d(0, 100%, 0)" : "translate3d(0, 0, 0)";
+      animationTimer = window.setTimeout(() => {
+        animationTimer = undefined;
+        if (dismiss) {
+          if (modal.open) modal.close();
+        } else {
+          clearAnimation();
+        }
+      }, 195);
+    };
+
     const onTouchStart = (event: TouchEvent) => {
-      if (event.touches.length === 1) lastTouchY = event.touches[0].clientY;
+      if (event.touches.length !== 1) {
+        gesture = null;
+        return;
+      }
+      const touch = event.touches[0];
+      lastTouchY = touch.clientY;
+      if (!isMobile || !modal.contains(event.target as Node)) {
+        gesture = null;
+        return;
+      }
+      const target = event.target instanceof Element ? event.target : null;
+      const fromList = Boolean(list?.contains(event.target as Node));
+      const fromGrabArea = Boolean(target?.closest(".notification-sheet-handle, .notification-heading, .notification-section-heading"));
+      const isControl = Boolean(target?.closest("button, a, input, select, textarea"));
+      gesture = {
+        startX: touch.clientX,
+        startY: touch.clientY,
+        startTime: performance.now(),
+        dragging: false,
+        eligible: !isControl && (fromGrabArea || (fromList && (list?.scrollTop ?? 0) <= 0)),
+        fromList,
+        distance: 0,
+      };
     };
     const onTouchMove = (event: TouchEvent) => {
       if (event.touches.length !== 1) {
         event.preventDefault();
         return;
       }
-      const nextY = event.touches[0].clientY;
+      const touch = event.touches[0];
+      const nextY = touch.clientY;
       const deltaY = nextY - lastTouchY;
       lastTouchY = nextY;
+
+      if (gesture?.eligible) {
+        const down = nextY - gesture.startY;
+        const across = Math.abs(touch.clientX - gesture.startX);
+        if (gesture.dragging || (down > 9 && down > across * 1.25 && (!gesture.fromList || (list?.scrollTop ?? 0) <= 0))) {
+          gesture.dragging = true;
+          gesture.distance = Math.max(0, down);
+          event.preventDefault();
+          modal.style.transition = "none";
+          modal.style.transform = `translate3d(0, ${Math.min(gesture.distance, window.innerHeight)}px, 0)`;
+          return;
+        }
+      }
+      // All areas outside the scrollable list (including the backdrop) are
+      // locked. At the ends of the list, suppress scroll chaining.
       if (!list?.contains(event.target as Node)) {
         event.preventDefault();
         return;
@@ -102,12 +179,19 @@ export function NotificationCenter({ userId }: { userId: string }) {
         event.preventDefault();
       }
     };
+    const onTouchEnd = () => finishGesture();
+    const onTouchCancel = () => finishGesture(true);
     document.addEventListener("touchstart", onTouchStart, { capture: true, passive: true });
     document.addEventListener("touchmove", onTouchMove, { capture: true, passive: false });
+    document.addEventListener("touchend", onTouchEnd, true);
+    document.addEventListener("touchcancel", onTouchCancel, true);
 
     return () => {
       document.removeEventListener("touchstart", onTouchStart, true);
       document.removeEventListener("touchmove", onTouchMove, true);
+      document.removeEventListener("touchend", onTouchEnd, true);
+      document.removeEventListener("touchcancel", onTouchCancel, true);
+      clearAnimation();
       if (modal.open) modal.close();
       root.style.overflow = previous.htmlOverflow;
       body.style.overflow = previous.bodyOverflow;
