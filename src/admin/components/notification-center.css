@@ -42,6 +42,8 @@
   color: #171717;
   box-shadow: 0 24px 70px rgba(0, 0, 0, .23);
   overflow: hidden;
+  overscroll-behavior: contain;
+  touch-action: none;
 }
 .notification-panel::backdrop { background: rgba(0, 0, 0, .56); }
 .notification-panel[open] { display: flex; flex-direction: column; }
@@ -187,6 +189,8 @@
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: #d5d5d5 transparent;
 }
