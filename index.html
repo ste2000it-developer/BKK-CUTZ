@@ -18,7 +18,16 @@
     (function () {
       var isIPad = /iPad/.test(navigator.userAgent) ||
         (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-      if (isIPad) document.documentElement.classList.add("pos-ipad");
+      if (isIPad) {
+        document.documentElement.classList.add("pos-ipad");
+        // Stop iPadOS from extending the POS web viewport beneath the
+        // system status bar; preserve edge-to-edge mode on iPhones.
+        var viewport = document.querySelector('meta[name="viewport"]');
+        if (viewport) {
+          viewport.setAttribute("content",
+            "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=contain");
+        }
+      }
     })();
   </script>
 
