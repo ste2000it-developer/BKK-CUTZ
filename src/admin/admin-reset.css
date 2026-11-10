@@ -359,3 +359,27 @@
   height: 44px;
   align-self: center;
 }
+
+/* Animate the mobile/tablet drawer itself when the hamburger is pressed. */
+@keyframes admin-reset-drawer-slide-in {
+  from { transform: translate3d(calc(-100% - 18px), 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+@keyframes admin-reset-drawer-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (max-width: 1023px) {
+  .admin-reset-shell .admin-reset-menu-dialog[open] {
+    animation: admin-reset-drawer-slide-in 280ms cubic-bezier(.22, 1, .36, 1) both;
+  }
+  .admin-reset-shell .admin-reset-menu-dialog[open]::backdrop {
+    animation: admin-reset-drawer-backdrop-in 280ms ease-out both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-reset-shell .admin-reset-menu-dialog[open],
+  .admin-reset-shell .admin-reset-menu-dialog[open]::backdrop {
+    animation: none;
+  }
+}
