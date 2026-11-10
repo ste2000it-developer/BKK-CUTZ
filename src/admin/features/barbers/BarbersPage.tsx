@@ -98,7 +98,6 @@ export function BarbersPage() {
     });
   }, [barbers, search]);
 
-  const activeCount = barbers.filter((barber) => barber.active).length;
   const rfidCount = barbers.filter((barber) => Boolean(normalizeRfidUid(barber.rfidUid))).length;
 
   function closeModal() {
@@ -213,8 +212,7 @@ export function BarbersPage() {
 
       <section className="ab-stats" aria-label="สรุปข้อมูลช่าง">
         <div className="ab-stat"><span>ช่างทั้งหมด</span><strong>{loading && !barbers.length ? "—" : barbers.length.toLocaleString("th-TH")}</strong></div>
-        <div className="ab-stat"><span>เปิดใช้งาน</span><strong>{loading && !barbers.length ? "—" : activeCount.toLocaleString("th-TH")}</strong></div>
-        <div className="ab-stat"><span>ผูก RFID</span><strong>{loading && !barbers.length ? "—" : rfidCount.toLocaleString("th-TH")}</strong></div>
+        <div className="ab-stat"><span>ผูกบัตร</span><strong>{loading && !barbers.length ? "—" : rfidCount.toLocaleString("th-TH")}</strong></div>
       </section>
 
       <section className="ab-directory" aria-labelledby="ab-directory-title">
