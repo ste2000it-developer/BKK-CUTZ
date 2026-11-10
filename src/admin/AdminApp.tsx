@@ -1,13 +1,12 @@
-import { lazy, Suspense, useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { User } from "firebase/auth";
 import { NotificationCenter } from "./components/NotificationCenter";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
+import { BarbersPage } from "./features/barbers/BarbersPage";
 import { LoadingScreen } from "../shared/components/LoadingScreen";
 import { login, logout, watchAuth } from "../shared/firebase/auth";
 import { getUserProfile } from "../shared/firebase/repositories/identity";
 import "./admin-reset.css";
-
-const BarbersPage = lazy(() => import("./features/barbers/BarbersPage").then((module) => ({ default: module.BarbersPage })));
 
 type AdminPage = "dashboard" | "barbers";
 const pageFromHash = (): AdminPage => window.location.hash === "#admin-barbers" ? "barbers" : "dashboard";
@@ -177,11 +176,7 @@ export function AdminApp() {
       </header>
 
       <main id={page === "dashboard" ? "admin-dashboard" : "admin-barbers"} className="admin-reset-canvas" aria-label={page === "dashboard" ? "ภาพรวมร้าน" : "จัดการช่าง"}>
-        {page === "dashboard" ? <DashboardPage /> : (
-          <Suspense fallback={<div className="admin-reset-page-loading" role="status">กำลังเปิดหน้าจัดการช่าง...</div>}>
-            <BarbersPage />
-          </Suspense>
-        )}
+        {page === "dashboard" ? <DashboardPage /> : <BarbersPage />}
       </main>
 
       <dialog
