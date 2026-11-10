@@ -9,6 +9,29 @@
 
   <title>BKK-CUTZ POS</title>
 
+  <!-- iPadOS Home Screen apps: opt for an opaque dark status bar instead
+       of the system's translucent strip over the POS header.
+       Keep the iPhone experience untouched. -->
+  <script>
+    (function () {
+      var isIPad = /iPad/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      if (!isIPad) return;
+      document.documentElement.classList.add("pos-ipad");
+      var settings = [
+        ["theme-color", "#111111"],
+        ["apple-mobile-web-app-capable", "yes"],
+        ["apple-mobile-web-app-status-bar-style", "black"]
+      ];
+      settings.forEach(function (entry) {
+        var meta = document.createElement("meta");
+        meta.name = entry[0];
+        meta.content = entry[1];
+        document.head.appendChild(meta);
+      });
+    })();
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
