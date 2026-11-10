@@ -56,6 +56,10 @@
 </head>
 
 <body>
+  <!-- Real, full-width top edge for iPadOS Home Screen PWAs.
+       A DOM element (not a pseudo-element) lets WebKit sample an opaque header
+       colour without moving the POS or changing iPhone layout. -->
+  <div id="posIPadTopEdge" aria-hidden="true"></div>
   <div id="posReactRoot">
     <div id="posStartupFallback" style="font-family:system-ui,sans-serif;text-align:center;padding:64px 20px;color:#253247">
       <strong style="font-size:22px">BKK-CUTZ</strong>
