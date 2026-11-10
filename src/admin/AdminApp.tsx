@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { lazy, Suspense, useEffect, useRef, useState, type FormEvent } from "react";
 import type { User } from "firebase/auth";
 import { NotificationCenter } from "./components/NotificationCenter";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
@@ -6,6 +6,11 @@ import { LoadingScreen } from "../shared/components/LoadingScreen";
 import { login, logout, watchAuth } from "../shared/firebase/auth";
 import { getUserProfile } from "../shared/firebase/repositories/identity";
 import "./admin-reset.css";
+
+const BarbersPage = lazy(() => import("./features/barbers/BarbersPage").then((module) => ({ default: module.BarbersPage })));
+
+type AdminPage = "dashboard" | "barbers";
+const pageFromHash = (): AdminPage => window.location.hash === "#admin-barbers" ? "barbers" : "dashboard";
 
 /**
  * Minimal Admin workspace: preserve login and existing notification functions,
@@ -17,6 +22,7 @@ export function AdminApp() {
   const [user, setUser] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [page, setPage] = useState<AdminPage>(pageFromHash);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -61,6 +67,12 @@ export function AdminApp() {
       hamburger.current?.focus();
     }
   }, [menuOpen, user]);
+
+  useEffect(() => {
+    const handleHash = () => setPage(pageFromHash());
+    window.addEventListener("hashchange", handleHash);
+    return () => window.removeEventListener("hashchange", handleHash);
+  }, []);
 
   useEffect(() => {
     const desktop = window.matchMedia("(min-width: 1024px)");
@@ -117,9 +129,13 @@ export function AdminApp() {
         <div className="admin-reset-sidebar-content">
           <div className="admin-reset-sidebar-title">เมนูระบบ</div>
           <nav className="admin-reset-sidebar-nav" aria-label="เมนู Admin">
-            <a className="admin-reset-nav-item admin-reset-nav-item--active" href="#admin-dashboard" aria-current="page">
+            <a className={"admin-reset-nav-item" + (page === "dashboard" ? " admin-reset-nav-item--active" : "")} href="#admin-dashboard" aria-current={page === "dashboard" ? "page" : undefined} onClick={() => setPage("dashboard")}>
               <i className="fa-solid fa-chart-pie" aria-hidden="true" />
               <span>ภาพรวมร้าน</span>
+            </a>
+            <a className={"admin-reset-nav-item" + (page === "barbers" ? " admin-reset-nav-item--active" : "")} href="#admin-barbers" aria-current={page === "barbers" ? "page" : undefined} onClick={() => setPage("barbers")}>
+              <i className="fa-solid fa-scissors" aria-hidden="true" />
+              <span>จัดการช่าง</span>
             </a>
           </nav>
           <button className="admin-reset-sidebar-logout" type="button" onClick={() => void logout()}>
@@ -160,8 +176,12 @@ export function AdminApp() {
         </div>
       </header>
 
-      <main id="admin-dashboard" className="admin-reset-canvas" aria-label="ภาพรวมร้าน">
-        <DashboardPage />
+      <main id={page === "dashboard" ? "admin-dashboard" : "admin-barbers"} className="admin-reset-canvas" aria-label={page === "dashboard" ? "ภาพรวมร้าน" : "จัดการช่าง"}>
+        {page === "dashboard" ? <DashboardPage /> : (
+          <Suspense fallback={<div className="admin-reset-page-loading" role="status">กำลังเปิดหน้าจัดการช่าง...</div>}>
+            <BarbersPage />
+          </Suspense>
+        )}
       </main>
 
       <dialog
@@ -180,9 +200,13 @@ export function AdminApp() {
             <button className="admin-reset-menu-close" type="button" aria-label="ปิดเมนู" onClick={() => setMenuOpen(false)}>×</button>
           </div>
           <nav className="admin-reset-sidebar-nav" aria-label="เมนู Admin">
-            <a className="admin-reset-nav-item admin-reset-nav-item--active" href="#admin-dashboard" aria-current="page" onClick={() => setMenuOpen(false)}>
+            <a className={"admin-reset-nav-item" + (page === "dashboard" ? " admin-reset-nav-item--active" : "")} href="#admin-dashboard" aria-current={page === "dashboard" ? "page" : undefined} onClick={() => { setPage("dashboard"); setMenuOpen(false); }}>
               <i className="fa-solid fa-chart-pie" aria-hidden="true" />
               <span>ภาพรวมร้าน</span>
+            </a>
+            <a className={"admin-reset-nav-item" + (page === "barbers" ? " admin-reset-nav-item--active" : "")} href="#admin-barbers" aria-current={page === "barbers" ? "page" : undefined} onClick={() => { setPage("barbers"); setMenuOpen(false); }}>
+              <i className="fa-solid fa-scissors" aria-hidden="true" />
+              <span>จัดการช่าง</span>
             </a>
           </nav>
           <button className="admin-reset-logout" type="button" onClick={() => void logout()}>
