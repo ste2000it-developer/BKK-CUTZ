@@ -137,19 +137,24 @@ export function WithdrawalsPage() {
     return [...names].sort((a, b) => a[1].localeCompare(b[1], "th"));
   }, [branches, current]);
 
-  const filtered = useMemo(() => {
+  const branchMatches = useMemo(() => {
     const term = search.trim().toLocaleLowerCase("th");
     return current.filter((row) =>
       (branchFilter === "all" || row.branchId === branchFilter) &&
-      (typeFilter === "all" || row.kind === typeFilter) &&
       (!term || [row.barberName, row.branchName, row.reason, row.note]
         .some((field) => field.toLocaleLowerCase("th").includes(term))),
     );
-  }, [current, branchFilter, typeFilter, search]);
+  }, [current, branchFilter, search]);
+  const filtered = useMemo(
+    () => branchMatches.filter((row) => typeFilter === "all" || row.kind === typeFilter),
+    [branchMatches, typeFilter],
+  );
 
   const total = filtered.reduce((sum, row) => sum + row.amount, 0);
-  const tipTotal = filtered.filter((row) => row.kind === "tip").reduce((sum, row) => sum + row.amount, 0);
-  const purchaseTotal = filtered.filter((row) => row.kind === "purchase").reduce((sum, row) => sum + row.amount, 0);
+  // The two breakdown shortcuts always show the full amounts for the
+  // selected branch/search, so switching tabs doesn't falsely show zero.
+  const tipTotal = branchMatches.filter((row) => row.kind === "tip").reduce((sum, row) => sum + row.amount, 0);
+  const purchaseTotal = branchMatches.filter((row) => row.kind === "purchase").reduce((sum, row) => sum + row.amount, 0);
   const chosenIndex = selectedKey ? filtered.findIndex((row) => row.key === selectedKey) : -1;
   const chosen = chosenIndex >= 0 ? filtered[chosenIndex] : null;
 
