@@ -342,6 +342,34 @@
   .notification-section-heading { padding-inline: 15px; }
 }
 
+/* Opening animation: sheets rise from the bottom; desktop dialogs ease in.
+   Animate translate (not transform) so touch-drag dismissal stays independent. */
+@keyframes admin-notification-modal-enter {
+  from { opacity: 0; translate: 0 20px; }
+  to { opacity: 1; translate: 0 0; }
+}
+@keyframes admin-notification-sheet-enter {
+  from { translate: 0 100%; }
+  to { translate: 0 0; }
+}
+@keyframes admin-notification-backdrop-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.admin-reset-shell .notification-panel[open] {
+  animation: admin-notification-modal-enter 260ms cubic-bezier(.22, 1, .36, 1) both;
+}
+.admin-reset-shell .notification-panel--sheet[open] {
+  animation: admin-notification-sheet-enter 320ms cubic-bezier(.22, 1, .36, 1) both;
+}
+.admin-reset-shell .notification-panel[open]::backdrop {
+  animation: admin-notification-backdrop-enter 280ms ease-out both;
+}
 @media (prefers-reduced-motion: reduce) {
-  .admin-reset-shell .notification-panel { transition-duration: 0ms; }
+  .admin-reset-shell .notification-panel,
+  .admin-reset-shell .notification-panel[open],
+  .admin-reset-shell .notification-panel[open]::backdrop {
+    animation: none;
+    transition: none;
+  }
 }
