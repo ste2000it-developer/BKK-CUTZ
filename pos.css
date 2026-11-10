@@ -28,6 +28,28 @@ html.pos-ipad {
   background-color: #111111;
 }
 
+/* iPadOS Home Screen app top-edge blur mitigation.
+   WebKit can apply a frosted status-bar scrim unless it sees a real,
+   opaque, fixed element across the very top of the page.
+   The element is outside React, does not affect layout, and is only
+   displayed in installed iPad apps; iPhones are unchanged. */
+#posIPadTopEdge { display: none; }
+
+@media (display-mode: standalone) {
+  @supports (-webkit-touch-callout: none) {
+    html.pos-ipad #posIPadTopEdge {
+      display: block;
+      position: fixed;
+      inset: 0 0 auto 0;
+      width: 100%;
+      height: max(6px, env(safe-area-inset-top, 0px));
+      background-color: #111111;
+      pointer-events: none;
+      z-index: 950;
+    }
+  }
+}
+
 body {
   margin: 0;
   min-height: 100vh;
