@@ -3,13 +3,15 @@ import type { User } from "firebase/auth";
 import { NotificationCenter } from "./components/NotificationCenter";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { BarbersPage } from "./features/barbers/BarbersPage";
+import { WithdrawalsPage } from "./features/withdrawals/WithdrawalsPage";
 import { LoadingScreen } from "../shared/components/LoadingScreen";
 import { login, logout, watchAuth } from "../shared/firebase/auth";
 import { getUserProfile } from "../shared/firebase/repositories/identity";
 import "./admin-reset.css";
 
-type AdminPage = "dashboard" | "barbers";
-const pageFromHash = (): AdminPage => window.location.hash === "#admin-barbers" ? "barbers" : "dashboard";
+type AdminPage = "dashboard" | "barbers" | "withdrawals";
+const pageFromHash = (): AdminPage => window.location.hash === "#admin-barbers" ? "barbers"
+  : window.location.hash === "#admin-withdrawals" ? "withdrawals" : "dashboard";
 
 /**
  * Minimal Admin workspace: preserve login and existing notification functions,
@@ -136,6 +138,10 @@ export function AdminApp() {
               <i className="fa-solid fa-scissors" aria-hidden="true" />
               <span>จัดการช่าง</span>
             </a>
+            <a className={"admin-reset-nav-item" + (page === "withdrawals" ? " admin-reset-nav-item--active" : "")} href="#admin-withdrawals" aria-current={page === "withdrawals" ? "page" : undefined} onClick={() => setPage("withdrawals")}>
+              <i className="fa-solid fa-money-bill-transfer" aria-hidden="true" />
+              <span>รายการเบิกเงิน</span>
+            </a>
           </nav>
           <button className="admin-reset-sidebar-logout" type="button" onClick={() => void logout()}>
             <i className="fa-solid fa-right-from-bracket" aria-hidden="true" /> ออกจากระบบ
@@ -175,8 +181,8 @@ export function AdminApp() {
         </div>
       </header>
 
-      <main id={page === "dashboard" ? "admin-dashboard" : "admin-barbers"} className="admin-reset-canvas" aria-label={page === "dashboard" ? "ภาพรวมร้าน" : "จัดการช่าง"}>
-        {page === "dashboard" ? <DashboardPage /> : <BarbersPage />}
+      <main id={page === "dashboard" ? "admin-dashboard" : page === "barbers" ? "admin-barbers" : "admin-withdrawals"} className="admin-reset-canvas" aria-label={page === "dashboard" ? "ภาพรวมร้าน" : page === "barbers" ? "จัดการช่าง" : "รายการเบิกเงิน"}>
+        {page === "dashboard" ? <DashboardPage /> : page === "barbers" ? <BarbersPage /> : <WithdrawalsPage />}
       </main>
 
       <dialog
@@ -202,6 +208,10 @@ export function AdminApp() {
             <a className={"admin-reset-nav-item" + (page === "barbers" ? " admin-reset-nav-item--active" : "")} href="#admin-barbers" aria-current={page === "barbers" ? "page" : undefined} onClick={() => { setPage("barbers"); setMenuOpen(false); }}>
               <i className="fa-solid fa-scissors" aria-hidden="true" />
               <span>จัดการช่าง</span>
+            </a>
+            <a className={"admin-reset-nav-item" + (page === "withdrawals" ? " admin-reset-nav-item--active" : "")} href="#admin-withdrawals" aria-current={page === "withdrawals" ? "page" : undefined} onClick={() => { setPage("withdrawals"); setMenuOpen(false); }}>
+              <i className="fa-solid fa-money-bill-transfer" aria-hidden="true" />
+              <span>รายการเบิกเงิน</span>
             </a>
           </nav>
           <button className="admin-reset-logout" type="button" onClick={() => void logout()}>
