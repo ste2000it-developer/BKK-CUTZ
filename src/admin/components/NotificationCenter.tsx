@@ -4,8 +4,16 @@ import { markAllAdminNotificationsRead, watchAdminNotifications, watchAdminUnrea
 import { notificationTime, unreadLabel } from "../../shared/domain/admin-notifications";
 import "./notification-center.css";
 
+// Include iPad portrait/landscape, even when a trackpad changes pointer media
+// queries. Small browser windows also use the compact sheet layout.
+function prefersNotificationSheet(): boolean {
+  return window.innerWidth <= 1024 ||
+    (navigator.maxTouchPoints > 1 && window.innerWidth <= 1450);
+}
+
 export function NotificationCenter({ userId }: { userId: string }) {
   const [open, setOpen] = useState(false);
+  const [sheetMode, setSheetMode] = useState(() => prefersNotificationSheet());
   const [rows, setRows] = useState<AdminNotification[]>([]);
   const [count, setCount] = useState<number | null>(null);
   const [ready, setReady] = useState(false);
@@ -17,6 +25,16 @@ export function NotificationCenter({ userId }: { userId: string }) {
   const [pushError, setPushError] = useState("");
   const dialog = useRef<HTMLDialogElement>(null);
   const bell = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const update = () => setSheetMode(prefersNotificationSheet());
+    window.addEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
+    return () => {
+      window.removeEventListener("resize", update);
+      window.removeEventListener("orientationchange", update);
+    };
+  }, []);
 
   useEffect(() => {
     setError(""); setReady(false); setCount(null);
@@ -80,7 +98,7 @@ export function NotificationCenter({ userId }: { userId: string }) {
     // downward, or by pulling down on the notification list when at its top.
     // Keep regular list scrolling intact and never scroll the page behind it.
     const list = modal.querySelector<HTMLElement>(".notification-list");
-    const isMobile = window.matchMedia("(max-width: 640px)").matches;
+    const isSheet = prefersNotificationSheet;
     const dismissDistance = 110;
     type TouchGesture = {
       startX: number;
@@ -126,7 +144,7 @@ export function NotificationCenter({ userId }: { userId: string }) {
       }
       const touch = event.touches[0];
       lastTouchY = touch.clientY;
-      if (!isMobile || !modal.contains(event.target as Node)) {
+      if (!isSheet() || !modal.contains(event.target as Node)) {
         gesture = null;
         return;
       }
@@ -251,7 +269,7 @@ export function NotificationCenter({ userId }: { userId: string }) {
     {open && <dialog
       ref={dialog}
       id="admin-notifications"
-      className="notification-panel"
+      className={"notification-panel" + (sheetMode ? " notification-panel--sheet" : "")}
       tabIndex={-1}
       aria-labelledby="admin-notification-title"
       aria-modal="true"
