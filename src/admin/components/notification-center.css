@@ -43,7 +43,7 @@
   box-shadow: 0 24px 70px rgba(0, 0, 0, .23);
   overflow: hidden;
   overscroll-behavior: contain;
-  touch-action: none;
+  touch-action: auto;
 }
 .notification-panel::backdrop { background: rgba(0, 0, 0, .56); }
 .notification-panel[open] { display: flex; flex-direction: column; }
@@ -279,16 +279,30 @@
     border-radius: 22px 22px 0 0 !important;
     overflow: hidden !important;
     box-shadow: 0 -14px 48px rgba(0, 0, 0, .15);
+    transition: transform 190ms ease-out;
+    will-change: transform;
   }
   .notification-sheet-handle {
+    display: flex;
+    flex: 0 0 24px;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    height: 24px;
+    margin: 0;
+    touch-action: none;
+  }
+  .notification-sheet-handle::before {
+    content: "";
     display: block;
-    flex: 0 0 auto;
     width: 38px;
     height: 4px;
-    margin: 10px auto 0;
+    margin-top: 10px;
     border-radius: 999px;
-    background: #ddd;
+    background: #d5d5d5;
   }
+  .notification-heading,
+  .notification-section-heading { touch-action: none; }
   .admin-reset-shell .notification-panel .notification-heading {
     padding: 16px 18px 16px !important;
   }
@@ -325,4 +339,8 @@
   .admin-reset-shell .notification-panel .notification-push { padding-inline: 15px !important; }
   .admin-reset-shell .notification-panel .notification-item { padding-inline: 15px !important; }
   .notification-section-heading { padding-inline: 15px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-reset-shell .notification-panel { transition-duration: 0ms; }
 }
