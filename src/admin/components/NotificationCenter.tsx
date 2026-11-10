@@ -49,13 +49,74 @@ export function NotificationCenter({ userId }: { userId: string }) {
     if (!open) return;
     const modal = dialog.current;
     if (!modal) return;
-    const previousOverflow = document.body.style.overflow;
-    modal.showModal();
-    document.body.style.overflow = "hidden";
-    close.current?.focus();
+
+    // overflow:hidden alone does not lock the background on iOS Safari.
+    // Freeze the page at its current position while the dialog is open.
+    const root = document.documentElement;
+    const body = document.body;
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const previous = {
+      htmlOverflow: root.style.overflow,
+      bodyOverflow: body.style.overflow,
+      bodyPosition: body.style.position,
+      bodyTop: body.style.top,
+      bodyLeft: body.style.left,
+      bodyRight: body.style.right,
+      bodyWidth: body.style.width,
+    };
+
+    root.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+
+    if (!modal.open) modal.showModal();
+    close.current?.focus({ preventScroll: true });
+
+    // Prevent touch scroll chaining past the first/last notification.
+    // Gestures inside the list still scroll it normally.
+    const list = modal.querySelector<HTMLElement>(".notification-list");
+    let lastTouchY = 0;
+    const onTouchStart = (event: TouchEvent) => {
+      if (event.touches.length === 1) lastTouchY = event.touches[0].clientY;
+    };
+    const onTouchMove = (event: TouchEvent) => {
+      if (event.touches.length !== 1) {
+        event.preventDefault();
+        return;
+      }
+      const nextY = event.touches[0].clientY;
+      const deltaY = nextY - lastTouchY;
+      lastTouchY = nextY;
+      if (!list?.contains(event.target as Node)) {
+        event.preventDefault();
+        return;
+      }
+      const atTop = list.scrollTop <= 0;
+      const atBottom = list.scrollTop + list.clientHeight >= list.scrollHeight - 1;
+      if (list.scrollHeight <= list.clientHeight || (atTop && deltaY > 0) || (atBottom && deltaY < 0)) {
+        event.preventDefault();
+      }
+    };
+    document.addEventListener("touchstart", onTouchStart, { capture: true, passive: true });
+    document.addEventListener("touchmove", onTouchMove, { capture: true, passive: false });
+
     return () => {
-      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("touchstart", onTouchStart, true);
+      document.removeEventListener("touchmove", onTouchMove, true);
       if (modal.open) modal.close();
+      root.style.overflow = previous.htmlOverflow;
+      body.style.overflow = previous.bodyOverflow;
+      body.style.position = previous.bodyPosition;
+      body.style.top = previous.bodyTop;
+      body.style.left = previous.bodyLeft;
+      body.style.right = previous.bodyRight;
+      body.style.width = previous.bodyWidth;
+      window.scrollTo(scrollX, scrollY);
     };
   }, [open]);
 
