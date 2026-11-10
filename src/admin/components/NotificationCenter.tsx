@@ -17,7 +17,6 @@ export function NotificationCenter({ userId }: { userId: string }) {
   const [pushError, setPushError] = useState("");
   const dialog = useRef<HTMLDialogElement>(null);
   const bell = useRef<HTMLButtonElement>(null);
-  const close = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setError(""); setReady(false); setCount(null);
@@ -75,7 +74,7 @@ export function NotificationCenter({ userId }: { userId: string }) {
     body.style.width = "100%";
 
     if (!modal.open) modal.showModal();
-    close.current?.focus({ preventScroll: true });
+    modal.focus({ preventScroll: true });
 
     // Allow the mobile sheet to be dismissed by pulling its handle/header
     // downward, or by pulling down on the notification list when at its top.
@@ -253,6 +252,7 @@ export function NotificationCenter({ userId }: { userId: string }) {
       ref={dialog}
       id="admin-notifications"
       className="notification-panel"
+      tabIndex={-1}
       aria-labelledby="admin-notification-title"
       aria-modal="true"
       onClose={() => { setOpen(false); bell.current?.focus(); }}
@@ -269,9 +269,6 @@ export function NotificationCenter({ userId }: { userId: string }) {
           <h2 id="admin-notification-title">การแจ้งเตือน</h2>
           <p>ความเคลื่อนไหวจากทุกสาขา</p>
         </div>
-        <button ref={close} type="button" aria-label="ปิดการแจ้งเตือน" onClick={() => dialog.current?.close()}>
-          <i className="fa-solid fa-xmark" aria-hidden="true" />
-        </button>
       </header>
       <div className="notification-push">
         <div className="notification-push-mark" aria-hidden="true"><i className="fa-regular fa-bell" /></div>
