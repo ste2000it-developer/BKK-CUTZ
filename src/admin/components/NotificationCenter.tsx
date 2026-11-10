@@ -93,11 +93,11 @@ export function NotificationCenter({ userId }: { userId: string }) {
     }
   }
 
-  const pushLabel = pushState === "enabled" ? "เปิดแจ้งเตือนมือถือแล้ว"
+  const pushLabel = pushState === "enabled" ? "ปิดแจ้งเตือน"
     : pushState === "enabling" ? "กำลังตั้งค่า..."
-    : pushState === "blocked" ? "การแจ้งเตือนถูกบล็อก"
-    : pushState === "unsupported" ? "Push ต้องใช้ HTTPS"
-    : "เปิดแจ้งเตือนบนเครื่องนี้";
+    : pushState === "blocked" ? "ถูกบล็อก"
+    : pushState === "unsupported" ? "ไม่รองรับ"
+    : "เปิดแจ้งเตือน";
 
   return <div className="notification-center">
     <button ref={bell} type="button" className="notification-bell" aria-label={"การแจ้งเตือน" + (count ? " ยังไม่อ่าน " + unreadLabel(count) + " รายการ" : "")} aria-haspopup="dialog" aria-expanded={open} aria-controls="admin-notifications" onClick={() => setOpen(true)}>
@@ -118,21 +118,55 @@ export function NotificationCenter({ userId }: { userId: string }) {
         }
       }}
     >
-      <div className="notification-heading"><div><h2 id="admin-notification-title">การแจ้งเตือน</h2><small>ทุกสาขา · 50 รายการล่าสุด</small></div><button ref={close} type="button" aria-label="ปิดการแจ้งเตือน" onClick={() => dialog.current?.close()}><i className="fa-solid fa-xmark" aria-hidden="true" /></button></div>
-      <div className="notification-push"><div><strong>แจ้งเตือนเข้าโทรศัพท์</strong><span>{pushState === "enabled" ? "เครื่องนี้จะได้รับ Push เมื่อช่างเข้างานหรือปิดร้าน" : "เปิดครั้งเดียวบนมือถือ Admin เครื่องนี้"}</span></div><button type="button" className={pushState === "enabled" ? "is-enabled" : ""} disabled={pushState === "enabling" || pushState === "unsupported" || pushState === "blocked"} onClick={() => void togglePush()}>{pushLabel}</button></div>
+      <div className="notification-sheet-handle" aria-hidden="true" />
+      <header className="notification-heading">
+        <div className="notification-heading-copy">
+          <h2 id="admin-notification-title">การแจ้งเตือน</h2>
+          <p>ความเคลื่อนไหวจากทุกสาขา</p>
+        </div>
+        <button ref={close} type="button" aria-label="ปิดการแจ้งเตือน" onClick={() => dialog.current?.close()}>
+          <i className="fa-solid fa-xmark" aria-hidden="true" />
+        </button>
+      </header>
+      <div className="notification-push">
+        <div className="notification-push-mark" aria-hidden="true"><i className="fa-regular fa-bell" /></div>
+        <div className="notification-push-copy">
+          <strong>แจ้งเตือนบนเครื่องนี้</strong>
+          <span>{pushState === "enabled" ? "เปิดรับแจ้งเตือนแล้ว" : "รับแจ้งเตือนเมื่อช่างเข้างานหรือปิดร้าน"}</span>
+        </div>
+        <button type="button" className={pushState === "enabled" ? "is-enabled" : ""} disabled={pushState === "enabling" || pushState === "unsupported" || pushState === "blocked"} onClick={() => void togglePush()}>{pushLabel}</button>
+      </div>
       {pushError && <div className="notification-status" role="alert">{pushError}</div>}
       {pushState === "blocked" && <div className="notification-status">อนุญาต Notification จากการตั้งค่าเว็บไซต์ของเบราว์เซอร์ แล้วโหลดหน้าใหม่</div>}
       {pushState === "unsupported" && <div className="notification-status">เปิดหน้า Admin ผ่าน HTTPS บนมือถือเพื่อใช้ Push Notification</div>}
       {error && <div className="notification-status" role="alert">{error} <button type="button" onClick={() => setAttempt(attempt + 1)}>ลองใหม่</button></div>}
       {saveError && <div className="notification-status" role="alert">{saveError} <button type="button" onClick={() => setReadAttempt((value) => value + 1)}>ลองบันทึกอีกครั้ง</button></div>}
-      {!ready && !error && <p className="notification-status" role="status">กำลังโหลด...</p>}
-      {ready && !rows.length && <p className="notification-status">ยังไม่มีการแจ้งเตือน</p>}
-      <div className="notification-list" role="list">{rows.map((row) => <div key={row.id} role="listitem" className={"notification-item" + (row.read ? "" : " is-unread")} aria-label={row.message + " " + row.branchName + (row.read ? " อ่านแล้ว" : " ยังไม่อ่าน")}>
-        <span className="notification-icon" aria-hidden="true">
-          <i className={`fa-solid ${row.type === "store_closed" ? "fa-store" : "fa-user-check"}`} />
-        </span><span className="notification-copy"><strong>{row.message}</strong><span>{row.branchName || row.branchId} · {notificationTime(row.eventAt)}</span></span>{!row.read && <span className="notification-dot" aria-hidden="true" />}
-      </div>)}</div>
-      <p className="notification-footer">เปิดกระดิ่งเพื่อทำเครื่องหมายว่าอ่านทั้งหมดแล้ว</p>
+      <div className="notification-section-heading">
+        <span>รายการล่าสุด</span>
+        {ready && <span className="notification-list-count">{rows.length.toLocaleString("th-TH")} รายการ</span>}
+      </div>
+      <div className="notification-list" role="list" aria-label="รายการแจ้งเตือนล่าสุด">
+        {!ready && !error && <p className="notification-empty" role="status">กำลังโหลดการแจ้งเตือน...</p>}
+        {ready && !rows.length && <div className="notification-empty">
+          <i className="fa-regular fa-bell" aria-hidden="true" />
+          <strong>ยังไม่มีการแจ้งเตือน</strong>
+          <span>ความเคลื่อนไหวของร้านจะปรากฏที่นี่</span>
+        </div>}
+        {rows.map((row) => <div key={row.id} role="listitem" className={"notification-item" + (row.read ? "" : " is-unread")} aria-label={row.message + " " + (row.branchName || row.branchId) + (row.read ? " อ่านแล้ว" : " ยังไม่อ่าน")}>
+          <span className={"notification-icon" + (row.type === "store_closed" ? " is-closing" : "")} aria-hidden="true">
+            <i className={`fa-solid ${row.type === "store_closed" ? "fa-store" : "fa-user-check"}`} />
+          </span>
+          <span className="notification-copy">
+            <strong>{row.message}</strong>
+            <span className="notification-item-meta">
+              <span className="notification-branch">{row.branchName || row.branchId}</span>
+              <span className="notification-meta-divider" aria-hidden="true">·</span>
+              <time>{notificationTime(row.eventAt)}</time>
+            </span>
+          </span>
+          {!row.read && <span className="notification-dot" aria-hidden="true" />}
+        </div>)}
+      </div>
     </dialog>}
   </div>;
 }
