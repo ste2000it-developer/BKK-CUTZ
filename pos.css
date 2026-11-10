@@ -22,6 +22,12 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Match the iPad home-screen app's top system surface to its dark POS header.
+   This intentionally leaves the phone layout and controls unchanged. */
+html.pos-ipad {
+  background-color: #111111;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -776,6 +782,19 @@ svg {
   position: absolute;
   inset: 0;
   background: rgba(10, 10, 10, .60);
+}
+
+/* The expense overlay uses a real <button>. Remove its native iPadOS
+   button border/focus ring so it cannot outline the entire viewport. */
+.app #shopExpenseModal > .modal-backdrop {
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .payment-modal-card,
