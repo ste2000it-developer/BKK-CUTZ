@@ -262,7 +262,7 @@ export function BarbersPage() {
                 <button type="button" onClick={() => openEditor(barber)} aria-label={"แก้ไข " + barber.name}>แก้ไข</button>
                 <button type="button" onClick={() => openToggle(barber)}>{barber.active ? "ปิดใช้งาน" : "เปิดใช้งาน"}</button>
               </div>
-              <span className="ab-item-arrow" aria-hidden="true"><i className="fa-solid fa-chevron-right" /></span>
+              <button className="ab-item-arrow" type="button" aria-label={"แก้ไขข้อมูล " + barber.name} onClick={() => openEditor(barber)}><i className="fa-solid fa-chevron-right" aria-hidden="true" /></button>
             </div>
           ))}
         </div>
