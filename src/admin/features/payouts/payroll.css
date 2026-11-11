@@ -437,6 +437,17 @@
 }
 .admin-reset-shell .pay-confirm-body > p.pay-confirm-warning { color: #a04837; font-size: 11px; }
 .admin-reset-shell .pay-confirm-warning i { margin-right: 5px; }
+.admin-reset-shell .pay-confirm { overflow-y: auto; overscroll-behavior: contain; }
+.admin-reset-shell .pay-confirm-error {
+  margin-top: 15px;
+  padding: 12px 13px;
+  border: 1px solid #f2d2ca;
+  border-radius: 10px;
+  background: #fff2f0;
+  color: #ac2f20;
+  font-size: 12px;
+  line-height: 1.65;
+}
 .admin-reset-shell .pay-confirm-actions {
   display: flex; align-items: center; justify-content: flex-end; gap: 9px;
   padding: 15px 23px max(18px, env(safe-area-inset-bottom, 0px));
