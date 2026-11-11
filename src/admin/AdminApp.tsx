@@ -4,14 +4,16 @@ import { NotificationCenter } from "./components/NotificationCenter";
 import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { BarbersPage } from "./features/barbers/BarbersPage";
 import { WithdrawalsPage } from "./features/withdrawals/WithdrawalsPage";
+import { PayrollPage } from "./features/payouts/PayrollPage";
 import { LoadingScreen } from "../shared/components/LoadingScreen";
 import { login, logout, watchAuth } from "../shared/firebase/auth";
 import { getUserProfile } from "../shared/firebase/repositories/identity";
 import "./admin-reset.css";
 
-type AdminPage = "dashboard" | "barbers" | "withdrawals";
+type AdminPage = "dashboard" | "barbers" | "withdrawals" | "payroll";
 const pageFromHash = (): AdminPage => window.location.hash === "#admin-barbers" ? "barbers"
-  : window.location.hash === "#admin-withdrawals" ? "withdrawals" : "dashboard";
+  : window.location.hash === "#admin-withdrawals" ? "withdrawals"
+  : window.location.hash === "#admin-payroll" ? "payroll" : "dashboard";
 
 /**
  * Minimal Admin workspace: preserve login and existing notification functions,
@@ -142,6 +144,10 @@ export function AdminApp() {
               <i className="fa-solid fa-money-bill-transfer" aria-hidden="true" />
               <span>รายการเบิกเงิน</span>
             </a>
+            <a className={"admin-reset-nav-item" + (page === "payroll" ? " admin-reset-nav-item--active" : "")} href="#admin-payroll" aria-current={page === "payroll" ? "page" : undefined} onClick={() => setPage("payroll")}>
+              <i className="fa-solid fa-wallet" aria-hidden="true" />
+              <span>จ่ายเงินช่าง</span>
+            </a>
           </nav>
           <button className="admin-reset-sidebar-logout" type="button" onClick={() => void logout()}>
             <i className="fa-solid fa-right-from-bracket" aria-hidden="true" /> ออกจากระบบ
@@ -181,8 +187,8 @@ export function AdminApp() {
         </div>
       </header>
 
-      <main id={page === "dashboard" ? "admin-dashboard" : page === "barbers" ? "admin-barbers" : "admin-withdrawals"} className="admin-reset-canvas" aria-label={page === "dashboard" ? "ภาพรวมร้าน" : page === "barbers" ? "จัดการช่าง" : "รายการเบิกเงิน"}>
-        {page === "dashboard" ? <DashboardPage /> : page === "barbers" ? <BarbersPage /> : <WithdrawalsPage />}
+      <main id={page === "dashboard" ? "admin-dashboard" : page === "barbers" ? "admin-barbers" : page === "withdrawals" ? "admin-withdrawals" : "admin-payroll"} className="admin-reset-canvas" aria-label={page === "dashboard" ? "ภาพรวมร้าน" : page === "barbers" ? "จัดการช่าง" : page === "withdrawals" ? "รายการเบิกเงิน" : "จ่ายเงินช่าง"}>
+        {page === "dashboard" ? <DashboardPage /> : page === "barbers" ? <BarbersPage /> : page === "withdrawals" ? <WithdrawalsPage /> : <PayrollPage admin={{ uid: user.uid, email: user.email }} />}
       </main>
 
       <dialog
@@ -212,6 +218,10 @@ export function AdminApp() {
             <a className={"admin-reset-nav-item" + (page === "withdrawals" ? " admin-reset-nav-item--active" : "")} href="#admin-withdrawals" aria-current={page === "withdrawals" ? "page" : undefined} onClick={() => { setPage("withdrawals"); setMenuOpen(false); }}>
               <i className="fa-solid fa-money-bill-transfer" aria-hidden="true" />
               <span>รายการเบิกเงิน</span>
+            </a>
+            <a className={"admin-reset-nav-item" + (page === "payroll" ? " admin-reset-nav-item--active" : "")} href="#admin-payroll" aria-current={page === "payroll" ? "page" : undefined} onClick={() => { setPage("payroll"); setMenuOpen(false); }}>
+              <i className="fa-solid fa-wallet" aria-hidden="true" />
+              <span>จ่ายเงินช่าง</span>
             </a>
           </nav>
           <button className="admin-reset-logout" type="button" onClick={() => void logout()}>
