@@ -21,6 +21,20 @@ type FilterStatus = "all" | "unpaid" | "paid";
 type ModalMode = "details" | "confirm" | null;
 type AdminIdentity = { uid: string; email: string | null };
 
+async function withTimeout<T>(promise: Promise<T>, reason: string): Promise<T> {
+  let handle: number | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<never>((_, reject) => {
+        handle = window.setTimeout(() => reject(new Error(reason)), 20000);
+      }),
+    ]);
+  } finally {
+    if (handle !== undefined) window.clearTimeout(handle);
+  }
+}
+
 const money = (amount: number) => "฿" + Number(amount || 0).toLocaleString("th-TH", {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -79,6 +93,7 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
   const [loading, setLoading] = useState(true);
   const [loadingCycles, setLoadingCycles] = useState(true);
   const [error, setError] = useState("");
+  const [actionError, setActionError] = useState("");
   const [message, setMessage] = useState("");
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("all");
   const [search, setSearch] = useState("");
@@ -95,11 +110,15 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
     const token = ++requestId.current;
     setLoading(true);
     setError("");
+    setActionError("");
     setMessage("");
     setSelectedId(null);
     setModalMode(null);
     try {
-      const data = await loadPayoutCycleData(selected.startKey, selected.endKey, selected.payoutDateKey);
+      const data = await withTimeout(
+        loadPayoutCycleData(selected.startKey, selected.endKey, selected.payoutDateKey),
+        "โหลดข้อมูลรอบจ่ายนานเกินไป กรุณาลองใหม่อีกครั้ง",
+      );
       if (token !== requestId.current) return;
       const paid = new Map<string, PayoutRecord>();
       data.paidPayouts.forEach((record) => {
@@ -125,9 +144,13 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
     setLoading(true);
     setLoadingCycles(true);
     setError("");
+    setActionError("");
     setMessage("");
     try {
-      const sources = await listPayoutCycleSources();
+      const sources = await withTimeout(
+        listPayoutCycleSources(),
+        "โหลดรอบจ่ายนานเกินไป กรุณาตรวจสอบการเชื่อมต่อแล้วลองใหม่",
+      );
       if (token !== requestId.current) return;
       const list = availableCycles(sources);
       setCycles(list);
@@ -145,7 +168,8 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
       setError(issue instanceof Error ? issue.message : "โหลดรอบจ่ายไม่สำเร็จ");
       setRows([]);
     } finally {
-      if (token === requestId.current || !cycle) setLoading(false);
+      // loadCycle owns its own loading state when a cycle was found.
+      if (token === requestId.current) setLoading(false);
       setLoadingCycles(false);
     }
   }
@@ -245,12 +269,15 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
     const row = selected;
     const targetCycle = cycle;
     setSavingId(row.barberId);
-    setError("");
+    setActionError("");
     setMessage("");
     try {
       // Reconcile source data before creating an irreversible financial record.
       // Existing transaction logic in savePayoutRecord also prevents duplicates.
-      const fresh = await loadPayoutCycleData(targetCycle.startKey, targetCycle.endKey, targetCycle.payoutDateKey);
+      const fresh = await withTimeout(
+        loadPayoutCycleData(targetCycle.startKey, targetCycle.endKey, targetCycle.payoutDateKey),
+        "ตรวจสอบยอดล่าสุดนานเกินไป ยังไม่ได้บันทึกจ่าย กรุณาลองใหม่",
+      );
       if (fresh.paidPayouts.some((item) => item.barberId === row.barberId)) {
         throw new PayoutAlreadyExistsError();
       }
@@ -259,8 +286,8 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
       ).find((item) => item.barberId === row.barberId);
       if (!freshRow || !matchesSnapshot(row, freshRow)) {
         setModalMode(null);
-        setMessage("ยอดของช่างมีการเปลี่ยนแปลง ระบบยังไม่ได้บันทึกจ่าย กรุณาตรวจสอบยอดใหม่");
         await loadCycle(targetCycle);
+        setMessage("ยอดของช่างมีการเปลี่ยนแปลง ระบบยังไม่ได้บันทึกจ่าย กรุณาตรวจสอบยอดใหม่");
         return;
       }
       const payoutId = targetCycle.payoutDateKey + "_" + row.barberId;
@@ -278,7 +305,7 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
         await loadCycle(targetCycle);
         setMessage("งวดนี้มีบันทึกจ่ายให้ช่างคนนี้แล้ว ระบบไม่ได้บันทึกซ้ำ");
       } else {
-        setError(issue instanceof Error ? issue.message : "บันทึกจ่ายไม่สำเร็จ");
+        setActionError(issue instanceof Error ? issue.message : "บันทึกจ่ายไม่สำเร็จ");
       }
     } finally {
       setSavingId(null);
@@ -288,20 +315,20 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
   async function exportExcel() {
     if (!cycle || loading || exporting || savingId || !rows.length) return;
     setExporting(true);
-    setError("");
+    setActionError("");
     try {
       const { downloadPayoutExcel } = await import("./exportPayout");
       await downloadPayoutExcel(cycle, rows, paidRecords);
       setMessage("ส่งออก Excel เรียบร้อยแล้ว");
     } catch (issue) {
-      setError(issue instanceof Error ? issue.message : "ส่งออก Excel ไม่สำเร็จ");
+      setActionError(issue instanceof Error ? issue.message : "ส่งออก Excel ไม่สำเร็จ");
     } finally {
       setExporting(false);
     }
   }
 
   const changeCycle = (next: number) => {
-    if (loading || next < 0 || next >= cycles.length || next === index) return;
+    if (loading || savingId || next < 0 || next >= cycles.length || next === index) return;
     setIndex(next);
     setStatusFilter("all");
     setSearch("");
@@ -335,11 +362,11 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
           <small>จ่ายวันที่ 1 และ 16 ของเดือน</small>
         </div>
         <div className="pay-cycle-controls">
-          <button type="button" aria-label="งวดก่อนหน้า" disabled={loading || index <= 0}
+          <button type="button" aria-label="งวดก่อนหน้า" disabled={loading || Boolean(savingId) || index <= 0}
             onClick={() => changeCycle(index - 1)}><i className="fa-solid fa-chevron-left" aria-hidden="true" /></button>
           <label className="pay-cycle-picker">
             <span className="pay-sr-only">เลือกรอบจ่ายเงิน</span>
-            <select aria-label="เลือกรอบจ่ายเงิน" disabled={loading || !cycles.length} value={cycle ? String(index) : ""}
+            <select aria-label="เลือกรอบจ่ายเงิน" disabled={loading || Boolean(savingId) || !cycles.length} value={cycle ? String(index) : ""}
               onChange={(event) => changeCycle(Number(event.target.value))}>
               {!cycle && <option value="">{loadingCycles ? "กำลังค้นหางวด..." : "ยังไม่มีรอบจ่าย"}</option>}
               {cycles.map((item, cycleIndex) =>
@@ -347,7 +374,7 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
             </select>
             <i className="fa-solid fa-chevron-down" aria-hidden="true" />
           </label>
-          <button type="button" aria-label="งวดถัดไป" disabled={loading || index >= cycles.length - 1}
+          <button type="button" aria-label="งวดถัดไป" disabled={loading || Boolean(savingId) || index >= cycles.length - 1}
             onClick={() => changeCycle(index + 1)}><i className="fa-solid fa-chevron-right" aria-hidden="true" /></button>
         </div>
         {cycle && <p className="pay-cycle-period">คิดผลงาน {thaiDate(cycle.startKey, true)} – {thaiDate(cycle.endKey, true)}</p>}
@@ -357,6 +384,9 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
         <i className="fa-solid fa-circle-exclamation" aria-hidden="true" />
         <span>{error}</span>
         <button type="button" disabled={loading} onClick={() => cycle ? void loadCycle(cycle) : void loadCycles()}>ลองใหม่</button>
+      </div>}
+      {actionError && <div className="pay-alert pay-alert-error" role="alert">
+        <i className="fa-solid fa-circle-exclamation" aria-hidden="true" /><span>{actionError}</span>
       </div>}
       {message && <div className="pay-alert pay-alert-success" role="status">
         <i className="fa-solid fa-circle-check" aria-hidden="true" /><span>{message}</span>
@@ -565,6 +595,7 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
                 : "กรุณายืนยันหลังจากจ่ายเงินให้ช่างจริงแล้วเท่านั้น การกดยืนยันคือการบันทึกประวัติว่าจ่ายแล้ว ไม่ใช่การโอนเงินอัตโนมัติ"}</p>
               {selected.advanceCarryoverAmount > 0 && <div className="pay-confirm-carry"><i className="fa-solid fa-circle-info" aria-hidden="true" /> ยังมียอดเบิกค้าง {money(selected.advanceCarryoverAmount)} ที่ต้องยกไปงวดถัดไป</div>}
               <p className="pay-confirm-warning"><i className="fa-solid fa-lock" aria-hidden="true" /> เมื่อบันทึกแล้วจะไม่สามารถยกเลิกหรือแก้ไขจากหน้านี้ได้</p>
+              {actionError && <div className="pay-confirm-error" role="alert">{actionError}</div>}
             </div>
             <footer className="pay-confirm-actions">
               <button type="button" className="pay-secondary" disabled={Boolean(savingId)} onClick={() => setModalMode("details")}>ย้อนกลับ</button>
