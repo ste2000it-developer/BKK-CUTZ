@@ -351,7 +351,7 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
           <button type="button" className="pay-export" disabled={!cycle || loading || exporting || Boolean(savingId) || !rows.length}
             onClick={() => void exportExcel()}>
             <i className="fa-solid fa-file-excel" aria-hidden="true" />
-            {exporting ? "กำลังส่งออก..." : "Excel"}
+            {exporting ? "กำลังส่งออก..." : "ส่งออก Excel"}
           </button>
         </div>
       </header>
