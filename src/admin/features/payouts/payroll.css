@@ -49,7 +49,13 @@
   font-size: 13px; font-weight: 750; cursor: pointer;
 }
 .admin-reset-shell .pay-icon-button { width: 41px; padding: 0; }
-.admin-reset-shell .pay-export i { color: #227047; }
+.admin-reset-shell .pay-export {
+  min-height: 46px;
+  padding: 0 18px;
+  gap: 10px;
+  font-size: 14px;
+}
+.admin-reset-shell .pay-export i { color: #227047; font-size: 17px; }
 .admin-reset-shell .pay-icon-button:hover:not(:disabled),
 .admin-reset-shell .pay-export:hover:not(:disabled) { background: #f6f6f6; }
 .admin-reset-shell .pay-head-actions button:disabled { opacity: .45; cursor: default; }
@@ -482,7 +488,7 @@
   .admin-reset-shell .pay-page-header h2 { font-size: 24px; }
   .admin-reset-shell .pay-page-header p { font-size: 12px; }
   .admin-reset-shell .pay-head-actions { gap: 6px; }
-  .admin-reset-shell .pay-export { padding: 0 10px; font-size: 12px; }
+  .admin-reset-shell .pay-export { min-height: 46px; padding: 0 14px; font-size: 13px; gap: 8px; }
   .admin-reset-shell .pay-cycle { margin-top: 21px; padding: 14px; gap: 9px; }
   .admin-reset-shell .pay-cycle-label { width: 100%; flex-direction: row; align-items: baseline; }
   .admin-reset-shell .pay-cycle-label span { font-size: 13px; }
