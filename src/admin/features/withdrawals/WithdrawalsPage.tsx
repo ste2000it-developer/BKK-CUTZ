@@ -266,24 +266,24 @@ export function WithdrawalsPage() {
   const chooseBranch = (value: string) => { setSelectedKey(null); setBranchFilter(value); };
 
   return (
-    <section className="aw-page" aria-label="รายการเบิกเงิน">
-      <header className="aw-header">
+    <section className="aw-page ui-page" aria-label="รายการเบิกเงิน">
+      <header className="aw-header ui-page-header">
         <div>
           <h2>รายการเบิกเงิน</h2>
           <p>ตรวจสอบเงินสดที่เบิกออกจากร้านได้ทุกสาขา</p>
         </div>
-        <button className="aw-refresh" type="button" disabled={loading} onClick={() => setRefresh((value) => value + 1)} aria-label="โหลดรายการใหม่" title="โหลดรายการใหม่">
+        <button className="aw-refresh ui-icon-button" type="button" disabled={loading} onClick={() => setRefresh((value) => value + 1)} aria-label="โหลดรายการใหม่" title="โหลดรายการใหม่">
           <i className="fa-solid fa-rotate-right" aria-hidden="true" />
         </button>
       </header>
 
-      <section className="aw-filters" aria-label="ค้นหารายการเบิก">
+      <section className="aw-filters ui-filter-panel" aria-label="ค้นหารายการเบิก">
         <div className="aw-filters-top">
-          <div className="aw-date-nav" ref={dateNavRoot}>
+          <div className="aw-date-nav ui-date-nav" ref={dateNavRoot}>
             <button type="button" onClick={() => chooseDate(shiftDate(dateKey, -1))} aria-label="วันก่อนหน้า">
               <i className="fa-solid fa-chevron-left" aria-hidden="true" />
             </button>
-            <button ref={dateTrigger} type="button" className="aw-date-picker"
+            <button ref={dateTrigger} type="button" className="aw-date-picker ui-date-trigger"
               aria-label="เปิดปฏิทินเลือกวันที่" aria-haspopup="dialog"
               aria-expanded={calendarOpen} aria-controls="aw-calendar-panel"
               onClick={toggleCalendar}>
@@ -331,14 +331,14 @@ export function WithdrawalsPage() {
             {branchOptions.map(([id, name]) => <option value={id} key={id}>{name}</option>)}
           </AppSelect>
         </div>
-        <div className="aw-types" role="group" aria-label="ประเภทการเบิก">
+        <div className="aw-types ui-filter-group" role="group" aria-label="ประเภทการเบิก">
           {([
             ["all", "ทุกประเภท"],
             ["tip", "เบิกทิปเงินสด"],
             ["purchase", "ซื้อของร้าน"],
           ] as const).map(([value, label]) => (
             <button key={value} type="button" aria-pressed={typeFilter === value}
-              className={typeFilter === value ? "aw-type is-active" : "aw-type"}
+              className={typeFilter === value ? "aw-type ui-filter-tab is-active" : "aw-type ui-filter-tab"}
               onClick={() => chooseType(value)}>
               {label}
             </button>
@@ -366,13 +366,13 @@ export function WithdrawalsPage() {
         </div>
       </section>
 
-      <section className="aw-history" aria-labelledby="aw-history-title">
-        <div className="aw-history-head">
+      <section className="aw-history ui-section" aria-labelledby="aw-history-title">
+        <div className="aw-history-head ui-section-header">
           <div>
             <h3 id="aw-history-title">ประวัติการเบิก</h3>
             <p>เรียงตามเวลาที่บันทึกล่าสุด</p>
           </div>
-          <label className="aw-search">
+          <label className="aw-search ui-search">
             <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
             <input type="search" aria-label="ค้นหารายการเบิก" placeholder="ค้นหาช่างหรือรายการ..." value={search} onChange={(event) => { setSearch(event.target.value); setSelectedKey(null); }} />
           </label>
@@ -394,9 +394,9 @@ export function WithdrawalsPage() {
           </div>
         )}
         {!error && filtered.length > 0 && (
-          <div className="aw-list">
+          <div className="aw-list ui-row-list">
             {filtered.map((row) => (
-              <button className="aw-item" key={row.key} type="button" onClick={() => setSelectedKey(row.key)}
+              <button className="aw-item ui-list-row" key={row.key} type="button" onClick={() => setSelectedKey(row.key)}
                 aria-label={"ดูรายละเอียด " + typeLabel(row.kind) + " ของ " + row.barberName + " " + money(row.amount)}>
                 <span className={"aw-item-icon aw-item-icon-" + row.kind}>
                   <i className={"fa-solid " + typeIcon(row.kind)} aria-hidden="true" />
@@ -419,7 +419,7 @@ export function WithdrawalsPage() {
 
       <p className="aw-footnote">ข้อมูลจาก POS และบันทึกค่าใช้จ่ายร้าน · หน้านี้ใช้สำหรับตรวจสอบเท่านั้น ไม่มีการแก้ไขยอดเงิน</p>
 
-      <dialog ref={detailDialog} className="aw-detail-dialog" aria-label="รายละเอียดการเบิกเงิน"
+      <dialog ref={detailDialog} className="aw-detail-dialog ui-dialog" aria-label="รายละเอียดการเบิกเงิน"
         onCancel={() => setSelectedKey(null)} onClose={() => setSelectedKey(null)}
         onClick={(event) => {
           const rect = event.currentTarget.getBoundingClientRect();
@@ -427,9 +427,9 @@ export function WithdrawalsPage() {
         }}>
         {chosen && (
           <div className="aw-detail">
-            <header className="aw-detail-head">
+            <header className="aw-detail-head ui-dialog-header">
               <div><span>รายละเอียดรายการ</span><h3>{typeLabel(chosen.kind)}</h3></div>
-              <button type="button" onClick={() => setSelectedKey(null)} aria-label="ปิดรายละเอียด"><i className="fa-solid fa-xmark" aria-hidden="true" /></button>
+              <button type="button" className="ui-close" onClick={() => setSelectedKey(null)} aria-label="ปิดรายละเอียด"><i className="fa-solid fa-xmark" aria-hidden="true" /></button>
             </header>
             <div className="aw-detail-scroll">
               <div className="aw-detail-amount">
@@ -447,7 +447,7 @@ export function WithdrawalsPage() {
               </dl>
               <p className="aw-detail-readonly"><i className="fa-solid fa-lock" aria-hidden="true" /> รายการนี้แสดงเพื่อการตรวจสอบ ไม่สามารถแก้ไขยอดจากหน้านี้ได้</p>
             </div>
-            <footer className="aw-detail-navigation">
+            <footer className="aw-detail-navigation ui-detail-pager">
               <button type="button" disabled={chosenIndex <= 0} onClick={() => setSelectedKey(filtered[chosenIndex - 1].key)}>
                 <i className="fa-solid fa-chevron-left" aria-hidden="true" /> ก่อนหน้า
               </button>
