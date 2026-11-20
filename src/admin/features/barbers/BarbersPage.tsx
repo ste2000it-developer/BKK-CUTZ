@@ -241,7 +241,7 @@ export function BarbersPage() {
           {loading && !barbers.length && <p className="ab-empty" role="status">กำลังโหลดรายชื่อช่าง...</p>}
           {!loading && filtered.length === 0 && <p className="ab-empty">{barbers.length ? "ไม่พบช่างที่ค้นหา" : "ยังไม่มีรายชื่อช่าง กดเพิ่มช่างเพื่อเริ่มต้น"}</p>}
           {filtered.map((barber) => (
-            <div className="ab-item" key={barber.id}>
+            <div className="ab-item ui-list-row" key={barber.id}>
               <button className="ab-item-main" type="button" onClick={() => openEditor(barber)} aria-label={"แก้ไขข้อมูล " + barber.name}>
                 <span className="ab-avatar" aria-hidden="true">{(barber.name || "?").slice(0, 1)}</span>
                 <span className="ab-item-identity">
