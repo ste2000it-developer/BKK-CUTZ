@@ -19,6 +19,20 @@
   --ui-control: 46px;
   color-scheme: light;
 }
+/* The black app bar uses matching square touch targets. */
+.admin-reset-shell .admin-reset-hamburger,
+.admin-reset-shell .admin-reset-header-actions .notification-bell {
+  width: 46px;
+  height: 46px;
+  min-height: 46px;
+  flex-basis: 46px;
+  border-radius: 11px;
+}
+.admin-reset-shell .admin-reset-header-logout {
+  min-height: 46px;
+  border-radius: 11px;
+}
+
 /* Layout rhythm and readable, consistent page headers. */
 .admin-reset-shell .ui-page {
   box-sizing: border-box;
@@ -439,6 +453,26 @@
 /* Payroll pager is nested inside its fixed footer, so do not pad it twice. */
 .admin-reset-shell .pay-slip-footer .ui-detail-pager { border: 0; padding: 0; }
 
+/* Edit-form fields match the same control geometry as search and dropdown. */
+.admin-reset-shell .ab-dialog .ab-fields > input,
+.admin-reset-shell .ab-dialog .ab-password-field input {
+  min-height: 48px;
+  border-color: var(--ui-line-strong);
+  border-radius: 11px;
+  background: #fff;
+  color: var(--ui-ink);
+}
+.admin-reset-shell .ab-dialog .ab-password-field button {
+  width: 48px;
+  height: 48px;
+}
+.admin-reset-shell .ab-dialog .ab-fields > input:focus,
+.admin-reset-shell .ab-dialog .ab-password-field input:focus {
+  border-color: #b98c0b;
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 1px;
+}
+
 /* Matching feedback and explanatory text across all four pages. */
 .admin-reset-shell .ui-page :is(.dash-error, .ab-error, .aw-message-error, .pay-alert-error) {
   border: 1px solid #f0d6d1;
@@ -502,6 +536,17 @@
   .admin-reset-shell .dash-stat { padding: 19px 17px; }
 }
 @media (max-width: 600px) {
+  .admin-reset-shell .admin-reset-hamburger,
+  .admin-reset-shell .admin-reset-header-actions .notification-bell,
+  .admin-reset-shell .admin-reset-header-logout {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    flex-basis: 44px;
+    padding: 0;
+    border-radius: 11px;
+  }
+
   .admin-reset-shell .ui-page { padding: 24px 18px 45px; }
   .admin-reset-shell .ab-directory .ab-directory-heading.ui-section-header {
     grid-template-columns: minmax(0,1fr) 44px;
