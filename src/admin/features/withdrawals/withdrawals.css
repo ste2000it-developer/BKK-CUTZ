@@ -110,40 +110,12 @@
   font-weight: 800;
   cursor: pointer;
 }
-.admin-reset-shell .aw-branch-select {
-  display: flex;
-  position: relative;
-  align-items: center;
-  gap: 10px;
-  min-height: 42px;
+.admin-reset-shell .aw-branch-select.app-select {
+  width: min(252px, 100%);
   min-width: 180px;
+  flex: 1 1 190px;
   max-width: 320px;
-  padding: 0 13px;
-  border: 1px solid #e4e4e4;
-  border-radius: 10px;
-  background: #fff;
-  color: #454545;
 }
-.admin-reset-shell .aw-branch-select > i:first-child { font-size: 13px; color: #777; }
-.admin-reset-shell .aw-branch-select > i:last-child { font-size: 10px; color: #8b8b8b; pointer-events: none; }
-.admin-reset-shell .aw-branch-select select {
-  width: 100%;
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 40px;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  appearance: none;
-  -webkit-appearance: none;
-  background: transparent;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 650;
-  color: #252525;
-  cursor: pointer;
-}
-.admin-reset-shell .aw-branch-select:focus-within { outline: 2px solid #b98c0b; outline-offset: 1px; }
 .admin-reset-shell .aw-types {
   display: flex;
   align-items: center;
