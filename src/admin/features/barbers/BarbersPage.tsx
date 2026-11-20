@@ -221,15 +221,15 @@ export function BarbersPage() {
             <h3 id="ab-directory-title">รายชื่อช่าง</h3>
             <p>{loading ? "กำลังโหลดข้อมูล..." : "แสดง " + filtered.length.toLocaleString("th-TH") + " จาก " + barbers.length.toLocaleString("th-TH") + " คน"}</p>
           </div>
+          <label className="ab-search ui-search">
+            <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
+            <span className="ab-sr-only">ค้นหาช่างด้วยชื่อ รหัสช่าง หรือ RFID</span>
+            <input type="search" placeholder="ค้นหาชื่อหรือรหัสช่าง..." value={search} onChange={(event) => setSearch(event.target.value)} />
+          </label>
           <button className="ab-refresh ui-icon-button" type="button" onClick={() => void reload()} aria-label="โหลดข้อมูลช่างใหม่" title="โหลดข้อมูลใหม่" disabled={loading}>
             <i className="fa-solid fa-rotate-right" aria-hidden="true" />
           </button>
         </div>
-        <label className="ab-search ui-search">
-          <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
-          <span className="ab-sr-only">ค้นหาช่างด้วยชื่อ รหัสช่าง หรือ RFID</span>
-          <input type="search" placeholder="ค้นหาชื่อหรือรหัสช่าง..." value={search} onChange={(event) => setSearch(event.target.value)} />
-        </label>
 
         {notice && <div className="ab-notice" role="status">{notice}</div>}
         {loadError && <div className="ab-error" role="alert">{loadError} <button type="button" onClick={() => void reload()}>ลองใหม่</button></div>}
