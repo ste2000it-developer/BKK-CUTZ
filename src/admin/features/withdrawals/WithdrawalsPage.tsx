@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { AppSelect } from "../../components/AppSelect";
 import { bangkokBusinessDate } from "../../../shared/domain/cash-closing";
 import { listBranches, type BranchRecord } from "../../../shared/firebase/repositories/branches";
 import { listBarberAdvances, type BarberAdvanceRecord } from "../../../shared/firebase/repositories/advances";
@@ -241,14 +242,11 @@ export function WithdrawalsPage() {
             </button>
           </div>
           {dateKey !== today && <button className="aw-today" type="button" onClick={() => chooseDate(today)}>วันนี้</button>}
-          <label className="aw-branch-select">
-            <i className="fa-solid fa-store" aria-hidden="true" />
-            <select aria-label="เลือกสาขา" value={branchFilter} onChange={(event) => chooseBranch(event.target.value)}>
-              <option value="all">ทุกสาขา</option>
-              {branchOptions.map(([id, name]) => <option value={id} key={id}>{name}</option>)}
-            </select>
-            <i className="fa-solid fa-chevron-down" aria-hidden="true" />
-          </label>
+          <AppSelect aria-label="เลือกสาขา" className="aw-branch-select"
+            value={branchFilter} onChange={chooseBranch}>
+            <option value="all">ทุกสาขา</option>
+            {branchOptions.map(([id, name]) => <option value={id} key={id}>{name}</option>)}
+          </AppSelect>
         </div>
         <div className="aw-types" role="group" aria-label="ประเภทการเบิก">
           {([
