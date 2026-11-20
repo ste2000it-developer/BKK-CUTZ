@@ -2,6 +2,8 @@ import { createRoot } from "react-dom/client";
 import { AdminApp } from "./AdminApp";
 import "./components/admin-form-controls.css";
 import "./components/admin-mobile.css";
+// Shared Admin design rules must load after all feature and mobile styles.
+import "./admin-ui-polish.css";
 
 const rootElement = document.getElementById("adminReactAppRoot");
 
