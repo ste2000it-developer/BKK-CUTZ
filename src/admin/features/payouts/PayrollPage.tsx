@@ -377,8 +377,7 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
               {cycles.map((item, cycleIndex) =>
                 <option key={item.payoutDateKey} value={cycleIndex}>
                   <span className="pay-cycle-choice">
-                    <strong>รอบวันที่ {Number(item.payoutDateKey.slice(-2))}</strong>
-                    <small>{thaiDate(item.payoutDateKey, true)}</small>
+                    <strong>รอบวันที่ {thaiDate(item.payoutDateKey, true)}</strong>
                   </span>
                 </option>)}
             </AppSelect>
