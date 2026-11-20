@@ -84,6 +84,10 @@ function normalizeTipWithdrawals(advances: BarberAdvanceRecord[]): Withdrawal[] 
 export function WithdrawalsPage() {
   const [today, setToday] = useState(() => bangkokBusinessDate());
   const [dateKey, setDateKey] = useState(() => bangkokBusinessDate());
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(() => bangkokBusinessDate().slice(0, 7));
+  const dateNavRoot = useRef<HTMLDivElement>(null);
+  const dateTrigger = useRef<HTMLButtonElement>(null);
   const [branchFilter, setBranchFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [search, setSearch] = useState("");
@@ -129,6 +133,42 @@ export function WithdrawalsPage() {
     }).finally(() => { if (live) setLoading(false); });
     return () => { live = false; };
   }, [dateKey, refresh]);
+
+  // A real in-app calendar avoids the hidden native date input that may only
+  // receive focus without opening its browser picker on some devices.
+  useEffect(() => {
+    if (!calendarOpen) return;
+    const onOutside = (event: PointerEvent) => {
+      if (!dateNavRoot.current?.contains(event.target as Node)) setCalendarOpen(false);
+    };
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setCalendarOpen(false);
+        dateTrigger.current?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", onOutside);
+    document.addEventListener("keydown", onEscape);
+    return () => {
+      document.removeEventListener("pointerdown", onOutside);
+      document.removeEventListener("keydown", onEscape);
+    };
+  }, [calendarOpen]);
+
+  const monthDays = useMemo(() => {
+    const [year, month] = calendarMonth.split("-").map(Number);
+    const firstWeekday = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
+    const daysCount = new Date(Date.UTC(year, month, 0)).getUTCDate();
+    const result: Array<string | null> = Array(firstWeekday).fill(null);
+    for (let day = 1; day <= daysCount; day++) {
+      result.push(`${calendarMonth}-${String(day).padStart(2, "0")}`);
+    }
+    return result;
+  }, [calendarMonth]);
+  const calendarHeading = new Intl.DateTimeFormat("th-TH-u-ca-buddhist", {
+    timeZone: "Asia/Bangkok", month: "long", year: "numeric",
+  }).format(new Date(calendarMonth + "-01T12:00:00+07:00"));
 
   const current = loadedDate === dateKey && !error ? entries : [];
   const branchOptions = useMemo(() => {
@@ -208,8 +248,19 @@ export function WithdrawalsPage() {
 
   const chooseDate = (value: string) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(value) || value > today) return;
+    setCalendarOpen(false);
     setSelectedKey(null);
     setDateKey(value);
+  };
+  const toggleCalendar = () => {
+    if (!calendarOpen) setCalendarMonth(dateKey.slice(0, 7));
+    setCalendarOpen((open) => !open);
+  };
+  const moveCalendarMonth = (delta: number) => {
+    const date = new Date(calendarMonth + "-01T12:00:00Z");
+    date.setUTCMonth(date.getUTCMonth() + delta);
+    const target = date.toISOString().slice(0, 7);
+    if (target <= today.slice(0, 7)) setCalendarMonth(target);
   };
   const chooseType = (value: TypeFilter) => { setSelectedKey(null); setTypeFilter(value); };
   const chooseBranch = (value: string) => { setSelectedKey(null); setBranchFilter(value); };
@@ -228,18 +279,50 @@ export function WithdrawalsPage() {
 
       <section className="aw-filters" aria-label="ค้นหารายการเบิก">
         <div className="aw-filters-top">
-          <div className="aw-date-nav">
+          <div className="aw-date-nav" ref={dateNavRoot}>
             <button type="button" onClick={() => chooseDate(shiftDate(dateKey, -1))} aria-label="วันก่อนหน้า">
               <i className="fa-solid fa-chevron-left" aria-hidden="true" />
             </button>
-            <label className="aw-date-picker">
+            <button ref={dateTrigger} type="button" className="aw-date-picker"
+              aria-label="เปิดปฏิทินเลือกวันที่" aria-haspopup="dialog"
+              aria-expanded={calendarOpen} aria-controls="aw-calendar-panel"
+              onClick={toggleCalendar}>
               <i className="fa-regular fa-calendar-days" aria-hidden="true" />
               <span>{dateLabel(dateKey)}</span>
-              <input type="date" aria-label="เลือกวันที่" value={dateKey} max={today} onChange={(event) => chooseDate(event.target.value)} />
-            </label>
+            </button>
             <button type="button" onClick={() => chooseDate(shiftDate(dateKey, 1))} disabled={dateKey >= today} aria-label="วันถัดไป">
               <i className="fa-solid fa-chevron-right" aria-hidden="true" />
             </button>
+            {calendarOpen && (
+              <div id="aw-calendar-panel" className="aw-calendar" role="dialog" aria-label="เลือกวันที่เบิกเงิน">
+                <div className="aw-calendar-toolbar">
+                  <button type="button" aria-label="เดือนก่อนหน้า" onClick={() => moveCalendarMonth(-1)}>
+                    <i className="fa-solid fa-chevron-left" aria-hidden="true" />
+                  </button>
+                  <strong>{calendarHeading}</strong>
+                  <button type="button" aria-label="เดือนถัดไป" disabled={calendarMonth >= today.slice(0, 7)}
+                    onClick={() => moveCalendarMonth(1)}>
+                    <i className="fa-solid fa-chevron-right" aria-hidden="true" />
+                  </button>
+                </div>
+                <div className="aw-calendar-grid" aria-label="ปฏิทินรายเดือน">
+                  {["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"].map((day, i) =>
+                    <span className="aw-calendar-weekday" key={i}>{day}</span>)}
+                  {monthDays.map((day, i) => day ? (
+                    <button key={day} type="button"
+                      className={"aw-calendar-day" + (day === dateKey ? " is-selected" : "") + (day === today ? " is-today" : "")}
+                      disabled={day > today}
+                      aria-label={dateLabel(day)} aria-pressed={day === dateKey}
+                      onClick={() => chooseDate(day)}>
+                      {Number(day.slice(-2))}
+                    </button>
+                  ) : <span className="aw-calendar-blank" aria-hidden="true" key={"blank-" + i} />)}
+                </div>
+                <button className="aw-calendar-today" type="button" onClick={() => chooseDate(today)}>
+                  <i className="fa-regular fa-calendar-check" aria-hidden="true" /> ไปวันนี้
+                </button>
+              </div>
+            )}
           </div>
           {dateKey !== today && <button className="aw-today" type="button" onClick={() => chooseDate(today)}>วันนี้</button>}
           <AppSelect aria-label="เลือกสาขา" className="aw-branch-select"
