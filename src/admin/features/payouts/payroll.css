@@ -92,16 +92,6 @@
 }
 .admin-reset-shell .pay-cycle { z-index: 5; }
 .admin-reset-shell .pay-cycle-controls > button { width: 46px; height: 48px; }
-.admin-reset-shell .pay-cycle-calendar {
-  position: absolute;
-  left: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  color: #686868;
-  font-size: 16px;
-  pointer-events: none;
-}
 .admin-reset-shell .pay-cycle-picker .app-select {
   position: relative;
   width: 100%;
@@ -118,7 +108,8 @@
   width: 100%;
   height: 46px;
   min-width: 0;
-  padding: 0 14px 0 43px;
+  position: relative;
+  padding: 0 40px;
   border: 0;
   border-radius: 0;
   background: #fff;
@@ -126,7 +117,7 @@
   font: inherit;
   font-size: 14px;
   font-weight: 800;
-  text-align: left;
+  text-align: center;
   cursor: pointer;
 }
 .admin-reset-shell .pay-cycle-picker .app-select-trigger:disabled {
@@ -143,15 +134,20 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: center;
 }
 .admin-reset-shell .pay-cycle-picker .app-select-trigger > i {
+  position: absolute;
+  right: 15px;
+  top: 50%;
   flex: 0 0 auto;
   color: #777;
   font-size: 12px;
+  transform: translateY(-50%);
   transition: transform 150ms ease;
 }
 .admin-reset-shell .pay-cycle-picker .app-select.open .app-select-trigger > i {
-  transform: rotate(180deg);
+  transform: translateY(-50%) rotate(180deg);
 }
 .admin-reset-shell .pay-cycle-picker .app-select-menu {
   position: absolute;
@@ -185,6 +181,18 @@
   font-weight: 650;
   text-align: left;
   cursor: pointer;
+}
+.admin-reset-shell .pay-cycle-picker .pay-cycle-choice { display: block; }
+.admin-reset-shell .pay-cycle-picker .pay-cycle-choice strong { font-weight: 800; }
+.admin-reset-shell .pay-cycle-picker .app-select-trigger .pay-cycle-choice small { display: none; }
+.admin-reset-shell .pay-cycle-picker .app-select-option .pay-cycle-choice {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
+}
+.admin-reset-shell .pay-cycle-picker .app-select-option .pay-cycle-choice small {
+  display: block; color: #777; font-size: 11px; font-weight: 600;
+}
+.admin-reset-shell .pay-cycle-picker .app-select-option.selected .pay-cycle-choice small {
+  color: #463a13;
 }
 .admin-reset-shell .pay-cycle-picker .app-select-option > i { color: transparent; }
 .admin-reset-shell .pay-cycle-picker .app-select-option:hover,
@@ -594,8 +602,8 @@
   .admin-reset-shell .pay-cycle-controls { width: 100%; }
   .admin-reset-shell .pay-cycle-controls > button { flex: 0 0 42px; width: 42px; height: 48px; }
   .admin-reset-shell .pay-cycle-picker { flex: 1 1 auto; min-width: 0; width: auto; }
-  .admin-reset-shell .pay-cycle-picker .app-select-trigger { font-size: 13px; padding-right: 11px; padding-left: 38px; }
-  .admin-reset-shell .pay-cycle-calendar { left: 12px; font-size: 14px; }
+  .admin-reset-shell .pay-cycle-picker .app-select-trigger { font-size: 14px; padding-inline: 34px; }
+  .admin-reset-shell .pay-cycle-picker .app-select-trigger > i { right: 12px; }
   .admin-reset-shell .pay-cycle-picker .app-select-option { font-size: 13px; }
   .admin-reset-shell .pay-cycle-period { margin-top: 3px; text-align: center; font-size: 12px; }
   .admin-reset-shell .pay-summary { min-height: 0; margin-top: 15px; border-radius: 15px; }
