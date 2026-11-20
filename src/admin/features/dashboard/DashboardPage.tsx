@@ -81,9 +81,9 @@ export function DashboardPage() {
         : "อัปเดตอัตโนมัติ";
 
   return (
-    <div className="dash-page" aria-label="ภาพรวมร้าน BKK-CUTZ">
-      <header className="dash-page-header">
-        <div className="dash-heading">
+    <div className="dash-page ui-page" aria-label="ภาพรวมร้าน BKK-CUTZ">
+      <header className="dash-page-header ui-page-header">
+        <div className="dash-heading ui-page-heading">
           <h2>ภาพรวมร้าน</h2>
           <p>{thaiDate(dateKey)}</p>
         </div>
@@ -92,7 +92,7 @@ export function DashboardPage() {
             <span className="dash-live-dot" aria-hidden="true" />
             {statusText}
           </span>
-          <button type="button" className="dash-refresh" aria-label="โหลดข้อมูลใหม่" title="โหลดข้อมูลใหม่" onClick={() => setAttempt((value) => value + 1)}>
+          <button type="button" className="dash-refresh ui-icon-button" aria-label="โหลดข้อมูลใหม่" title="โหลดข้อมูลใหม่" onClick={() => setAttempt((value) => value + 1)}>
             <i className="fa-solid fa-rotate-right" aria-hidden="true" />
           </button>
         </div>
@@ -129,8 +129,8 @@ export function DashboardPage() {
         </div>
       </section>
 
-      <section className="dash-branches" aria-labelledby="dash-branches-title">
-        <div className="dash-branches-head">
+      <section className="dash-branches ui-section" aria-labelledby="dash-branches-title">
+        <div className="dash-branches-head ui-section-header">
           <div>
             <h3 id="dash-branches-title">สถานะสาขา</h3>
             <p>{current ? workingBranches.toLocaleString("th-TH") + " สาขามีช่างอยู่ในร้าน" : "สถานะทุกสาขาในวันนี้"}</p>
@@ -142,9 +142,9 @@ export function DashboardPage() {
         {!current && error && <p className="dash-empty">ยังแสดงสถานะสาขาไม่ได้</p>}
         {current && branches.length === 0 && <p className="dash-empty">ยังไม่มีข้อมูลสาขา</p>}
         {current && branches.length > 0 && (
-          <div className="dash-branch-list">
+          <div className="dash-branch-list ui-row-list">
             {visibleBranches.map((branch) => (
-              <div className="dash-branch" key={branch.id}>
+              <div className="dash-branch ui-list-row" key={branch.id}>
                 <span className={"dash-branch-indicator dash-branch-indicator--" + branch.status} aria-hidden="true" />
                 <div className="dash-branch-info">
                   <strong>{branch.name}</strong>
@@ -159,7 +159,7 @@ export function DashboardPage() {
           </div>
         )}
         {current && branches.length > 5 && (
-          <button type="button" className="dash-show-all" onClick={() => setShowAllBranches((value) => !value)} aria-expanded={showAllBranches}>
+          <button type="button" className="dash-show-all ui-button-secondary" onClick={() => setShowAllBranches((value) => !value)} aria-expanded={showAllBranches}>
             {showAllBranches ? "แสดงน้อยลง" : "ดูทุกสาขา (" + branches.length.toLocaleString("th-TH") + ")"}
             <i className={"fa-solid " + (showAllBranches ? "fa-chevron-up" : "fa-chevron-down")} aria-hidden="true" />
           </button>
