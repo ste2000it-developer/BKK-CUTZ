@@ -501,7 +501,7 @@
   .admin-reset-shell .aw-date-nav > button { flex: 0 0 41px; width: 41px; }
   .admin-reset-shell .aw-date-picker { min-width: 0; flex: 1 1 auto; padding: 0 5px; font-size: 12px; }
   .admin-reset-shell .aw-date-picker i { font-size: 13px; }
-  .admin-reset-shell .aw-branch-select { flex: 1 1 170px; max-width: none; }
+  .admin-reset-shell .aw-branch-select.app-select { flex: 1 1 100%; width: 100%; max-width: none; min-width: 0; }
   .admin-reset-shell .aw-types { gap: 6px; margin-top: 12px; }
   .admin-reset-shell .aw-type { padding: 6px 11px; font-size: 11px; }
   .admin-reset-shell .aw-overview { padding: 22px 19px; border-radius: 15px; }
