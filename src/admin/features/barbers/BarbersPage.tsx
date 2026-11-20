@@ -198,34 +198,34 @@ export function BarbersPage() {
   }
 
   return (
-    <section className="ab-page" aria-label="จัดการช่าง">
-      <header className="ab-top">
-        <div className="ab-title">
+    <section className="ab-page ui-page" aria-label="จัดการช่าง">
+      <header className="ab-top ui-page-header">
+        <div className="ab-title ui-page-heading">
           <h2>จัดการช่าง</h2>
           <p>รายชื่อช่างและข้อมูลสำหรับเข้าใช้งาน POS ทุกสาขา</p>
         </div>
-        <button className="ab-primary ab-add" type="button" onClick={() => openEditor(null)}>
+        <button className="ab-primary ab-add ui-button-primary" type="button" onClick={() => openEditor(null)}>
           <i className="fa-solid fa-plus" aria-hidden="true" />
           <span>เพิ่มช่าง</span>
         </button>
       </header>
 
-      <section className="ab-stats" aria-label="สรุปข้อมูลช่าง">
+      <section className="ab-stats ui-metrics" aria-label="สรุปข้อมูลช่าง">
         <div className="ab-stat"><span>ช่างทั้งหมด</span><strong>{loading && !barbers.length ? "—" : barbers.length.toLocaleString("th-TH")}</strong></div>
         <div className="ab-stat"><span>ผูกบัตร</span><strong>{loading && !barbers.length ? "—" : rfidCount.toLocaleString("th-TH")}</strong></div>
       </section>
 
-      <section className="ab-directory" aria-labelledby="ab-directory-title">
-        <div className="ab-directory-heading">
+      <section className="ab-directory ui-section" aria-labelledby="ab-directory-title">
+        <div className="ab-directory-heading ui-section-header">
           <div>
             <h3 id="ab-directory-title">รายชื่อช่าง</h3>
             <p>{loading ? "กำลังโหลดข้อมูล..." : "แสดง " + filtered.length.toLocaleString("th-TH") + " จาก " + barbers.length.toLocaleString("th-TH") + " คน"}</p>
           </div>
-          <button className="ab-refresh" type="button" onClick={() => void reload()} aria-label="โหลดข้อมูลช่างใหม่" title="โหลดข้อมูลใหม่" disabled={loading}>
+          <button className="ab-refresh ui-icon-button" type="button" onClick={() => void reload()} aria-label="โหลดข้อมูลช่างใหม่" title="โหลดข้อมูลใหม่" disabled={loading}>
             <i className="fa-solid fa-rotate-right" aria-hidden="true" />
           </button>
         </div>
-        <label className="ab-search">
+        <label className="ab-search ui-search">
           <i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
           <span className="ab-sr-only">ค้นหาช่างด้วยชื่อ รหัสช่าง หรือ RFID</span>
           <input type="search" placeholder="ค้นหาชื่อหรือรหัสช่าง..." value={search} onChange={(event) => setSearch(event.target.value)} />
@@ -234,7 +234,7 @@ export function BarbersPage() {
         {notice && <div className="ab-notice" role="status">{notice}</div>}
         {loadError && <div className="ab-error" role="alert">{loadError} <button type="button" onClick={() => void reload()}>ลองใหม่</button></div>}
 
-        <div className="ab-table" aria-busy={loading}>
+        <div className="ab-table ui-row-list" aria-busy={loading}>
           <div className="ab-table-heading" aria-hidden="true">
             <span>ช่าง</span><span>PIN</span><span>RFID</span><span>สถานะ</span><span>จัดการ</span>
           </div>
@@ -268,7 +268,7 @@ export function BarbersPage() {
       <p className="ab-footnote">PIN ถูกซ่อนจากหน้ารายชื่อ กดชื่อช่างเพื่อแก้ไขข้อมูล การปิดใช้งานจะมีผลกับการเข้างานครั้งใหม่</p>
 
       <dialog
-        className="ab-dialog"
+        className="ab-dialog ui-dialog"
         ref={modal}
         aria-label={dialogMode === "toggle" ? "ยืนยันสถานะช่าง" : "ข้อมูลช่าง"}
         onCancel={(event) => { if (saving) event.preventDefault(); else setDialogMode(null); }}
@@ -280,9 +280,9 @@ export function BarbersPage() {
       >
         {dialogMode === "editor" && (
           <form className="ab-form" onSubmit={(event) => void submitBarber(event)}>
-            <div className="ab-dialog-top">
+            <div className="ab-dialog-top ui-dialog-header">
               <div><h3>{editing ? "แก้ไขข้อมูลช่าง" : "เพิ่มช่างใหม่"}</h3><p>{editing ? "รหัสช่าง " + editing.id : "ข้อมูลช่างสำหรับเข้าใช้งาน POS"}</p></div>
-              <button type="button" className="ab-close" aria-label="ปิด" onClick={closeModal} disabled={saving}><i className="fa-solid fa-xmark" /></button>
+              <button type="button" className="ab-close ui-close" aria-label="ปิด" onClick={closeModal} disabled={saving}><i className="fa-solid fa-xmark" /></button>
             </div>
             <div className="ab-fields">
               <label htmlFor="ab-name">ชื่อช่าง</label>
@@ -305,23 +305,23 @@ export function BarbersPage() {
               </label>
               {modalError && <div className="ab-error" role="alert">{modalError}</div>}
             </div>
-            <div className="ab-dialog-actions">
-              <button className="ab-secondary" type="button" onClick={closeModal} disabled={saving}>ยกเลิก</button>
-              <button className="ab-primary" type="submit" disabled={saving}>{saving ? "กำลังบันทึก..." : "บันทึกข้อมูลช่าง"}</button>
+            <div className="ab-dialog-actions ui-dialog-footer">
+              <button className="ab-secondary ui-button-secondary" type="button" onClick={closeModal} disabled={saving}>ยกเลิก</button>
+              <button className="ab-primary ui-button-primary" type="submit" disabled={saving}>{saving ? "กำลังบันทึก..." : "บันทึกข้อมูลช่าง"}</button>
             </div>
           </form>
         )}
         {dialogMode === "toggle" && pendingToggle && (
           <section className="ab-confirm">
-            <div className="ab-dialog-top">
+            <div className="ab-dialog-top ui-dialog-header">
               <div><h3>{pendingToggle.active ? "ปิดใช้งานช่าง" : "เปิดใช้งานช่าง"}</h3><p>{pendingToggle.name} · {pendingToggle.id}</p></div>
-              <button type="button" className="ab-close" aria-label="ปิด" onClick={closeModal} disabled={saving}><i className="fa-solid fa-xmark" /></button>
+              <button type="button" className="ab-close ui-close" aria-label="ปิด" onClick={closeModal} disabled={saving}><i className="fa-solid fa-xmark" /></button>
             </div>
             <p>ยืนยันว่าต้องการ{pendingToggle.active ? "ปิดใช้งาน" : "เปิดใช้งาน"}ช่างคนนี้ใช่ไหม?</p>
             {modalError && <div className="ab-error" role="alert">{modalError}</div>}
-            <div className="ab-dialog-actions">
-              <button className="ab-secondary" type="button" onClick={closeModal} disabled={saving}>ยกเลิก</button>
-              <button className="ab-primary" type="button" onClick={() => void confirmToggle()} disabled={saving}>{saving ? "กำลังบันทึก..." : "ยืนยัน"}</button>
+            <div className="ab-dialog-actions ui-dialog-footer">
+              <button className="ab-secondary ui-button-secondary" type="button" onClick={closeModal} disabled={saving}>ยกเลิก</button>
+              <button className="ab-primary ui-button-primary" type="button" onClick={() => void confirmToggle()} disabled={saving}>{saving ? "กำลังบันทึก..." : "ยืนยัน"}</button>
             </div>
           </section>
         )}
