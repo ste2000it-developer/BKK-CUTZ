@@ -337,19 +337,19 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
   };
 
   return (
-    <section className="pay-page" aria-label="จ่ายเงินช่าง">
-      <header className="pay-page-header">
+    <section className="pay-page ui-page" aria-label="จ่ายเงินช่าง">
+      <header className="pay-page-header ui-page-header">
         <div>
           <h2>จ่ายเงินช่าง</h2>
           <p>ตรวจยอดให้ครบ ก่อนบันทึกว่าจ่ายเงินแล้ว</p>
         </div>
         <div className="pay-head-actions">
-          <button type="button" className="pay-icon-button" aria-label="โหลดข้อมูลใหม่" title="โหลดข้อมูลใหม่"
+          <button type="button" className="pay-icon-button ui-icon-button" aria-label="โหลดข้อมูลใหม่" title="โหลดข้อมูลใหม่"
             disabled={loading || Boolean(savingId)}
             onClick={() => cycle ? void loadCycle(cycle) : void loadCycles()}>
             <i className="fa-solid fa-rotate-right" aria-hidden="true" />
           </button>
-          <button type="button" className="pay-export" disabled={!cycle || loading || exporting || Boolean(savingId) || !rows.length}
+          <button type="button" className="pay-export ui-button-secondary" disabled={!cycle || loading || exporting || Boolean(savingId) || !rows.length}
             onClick={() => void exportExcel()}>
             <i className="fa-solid fa-file-excel" aria-hidden="true" />
             {exporting ? "กำลังส่งออก..." : "ส่งออก Excel"}
@@ -357,12 +357,12 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
         </div>
       </header>
 
-      <section className="pay-cycle" aria-label="เลือกรอบจ่ายเงิน">
+      <section className="pay-cycle ui-filter-panel" aria-label="เลือกรอบจ่ายเงิน">
         <div className="pay-cycle-label">
           <span>รอบจ่ายเงิน</span>
           <small>เลือกช่วงที่ต้องการตรวจยอด</small>
         </div>
-        <div className="pay-cycle-controls">
+        <div className="pay-cycle-controls ui-date-nav">
           <button type="button" aria-label="งวดก่อนหน้า" disabled={loading || Boolean(savingId) || index <= 0}
             onClick={() => changeCycle(index - 1)}><i className="fa-solid fa-chevron-left" aria-hidden="true" /></button>
           <div className="pay-cycle-picker">
@@ -427,22 +427,22 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
             </div>
           </section>
 
-          <section className="pay-directory" aria-labelledby="pay-directory-title">
-            <div className="pay-directory-head">
+          <section className="pay-directory ui-section" aria-labelledby="pay-directory-title">
+            <div className="pay-directory-head ui-section-header">
               <div><h3 id="pay-directory-title">รายชื่อช่าง</h3><p>กดชื่อเพื่อดูสลิปและรายละเอียดรายวัน</p></div>
-              <label className="pay-search"><i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
+              <label className="pay-search ui-search"><i className="fa-solid fa-magnifying-glass" aria-hidden="true" />
                 <input aria-label="ค้นหาช่าง" placeholder="ค้นหาชื่อช่าง..." type="search"
                   value={search} onChange={(event) => setSearch(event.target.value)} />
               </label>
             </div>
-            <div className="pay-tabs" role="group" aria-label="กรองสถานะการจ่าย">
+            <div className="pay-tabs ui-filter-group" role="group" aria-label="กรองสถานะการจ่าย">
               {([
                 ["all", "ทั้งหมด", rows.length],
                 ["unpaid", "รอจ่าย", totals.unpaidCount],
                 ["paid", "จ่ายแล้ว", totals.paidCount],
               ] as const).map(([value, label, count]) => (
                 <button key={value} type="button" aria-pressed={statusFilter === value}
-                  className={statusFilter === value ? "is-active" : ""}
+                  className={statusFilter === value ? "ui-filter-tab is-active" : "ui-filter-tab"}
                   onClick={() => setStatusFilter(value)}>
                   {label} <span>{count.toLocaleString("th-TH")}</span>
                 </button>
@@ -457,7 +457,7 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
             </div>}
 
             {filtered.length > 0 && (
-              <div className="pay-list">
+              <div className="pay-list ui-row-list">
                 <div className="pay-list-heading" aria-hidden="true">
                   <span>ช่าง</span><span>ค่ามือ + ประกัน</span><span>ทิปคงเหลือ</span><span>หักเบิก</span><span>สุทธิจ่าย</span><span>สถานะ</span>
                 </div>
@@ -465,7 +465,7 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
                   const saved = paidRecords.get(row.barberId);
                   const amount = paidAmount(row, saved);
                   return (
-                    <button type="button" className="pay-row" key={row.barberId}
+                    <button type="button" className="pay-row ui-list-row" key={row.barberId}
                       onClick={() => { setSelectedId(row.barberId); setModalMode("details"); }}
                       aria-label={"ดูสลิป " + row.barberName + " ยอดสุทธิ " + money(amount)}>
                       <span className="pay-row-person">
@@ -492,7 +492,7 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
         </>
       )}
 
-      <dialog className="pay-dialog" ref={dialog} aria-label={modalMode === "confirm" ? "ยืนยันบันทึกการจ่ายเงิน" : "สลิปจ่ายเงินช่าง"}
+      <dialog className="pay-dialog ui-dialog" ref={dialog} aria-label={modalMode === "confirm" ? "ยืนยันบันทึกการจ่ายเงิน" : "สลิปจ่ายเงินช่าง"}
         onCancel={(event) => { if (savingId) event.preventDefault(); else { setModalMode(null); setSelectedId(null); } }}
         onClose={() => { if (!savingId) { setModalMode(null); setSelectedId(null); } }}
         onClick={(event) => {
@@ -502,9 +502,9 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
         }}>
         {selected && cycle && modalMode === "details" && (
           <div className="pay-slip">
-            <header className="pay-slip-header">
+            <header className="pay-slip-header ui-dialog-header">
               <div><span>รายละเอียดเงินช่าง</span><h3>{selected.barberName}</h3><p>ผลงาน {thaiDate(cycle.startKey, true)} – {thaiDate(cycle.endKey, true)}</p></div>
-              <button type="button" className="pay-dialog-close" aria-label="ปิดสลิป" onClick={closeModal}><i className="fa-solid fa-xmark" aria-hidden="true" /></button>
+              <button type="button" className="pay-dialog-close ui-close" aria-label="ปิดสลิป" onClick={closeModal}><i className="fa-solid fa-xmark" aria-hidden="true" /></button>
             </header>
             <div className="pay-slip-scroll">
               <div className="pay-slip-hero">
@@ -570,7 +570,7 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
               </section>
             </div>
             <footer className="pay-slip-footer">
-              <div className="pay-slip-stepper">
+              <div className="pay-slip-stepper ui-detail-pager">
                 <button type="button" disabled={selectedIndex <= 0} onClick={() => setSelectedId(filtered[selectedIndex - 1].barberId)}>
                   <i className="fa-solid fa-chevron-left" aria-hidden="true" /> คนก่อนหน้า
                 </button>
@@ -579,7 +579,7 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
                   คนถัดไป <i className="fa-solid fa-chevron-right" aria-hidden="true" />
                 </button>
               </div>
-              {!selectedPaid && <button type="button" className="pay-cta" disabled={Boolean(savingId)}
+              {!selectedPaid && <button type="button" className="pay-cta ui-button-primary" disabled={Boolean(savingId)}
                 onClick={() => setModalMode("confirm")}>
                 <i className="fa-solid fa-check" aria-hidden="true" />
                 {selected.totalAmount === 0 ? "ยืนยันรอบนี้" : "ยืนยันจ่าย " + money(selected.totalAmount)}
@@ -590,9 +590,9 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
 
         {selected && cycle && modalMode === "confirm" && (
           <div className="pay-confirm">
-            <header className="pay-slip-header">
+            <header className="pay-slip-header ui-dialog-header">
               <div><span>ตรวจสอบก่อนบันทึก</span><h3>{selected.totalAmount === 0 ? "ยืนยันรอบจ่าย" : "ยืนยันว่าจ่ายเงินแล้ว"}</h3><p>{selected.barberName} · รอบจ่าย {thaiDate(cycle.payoutDateKey, true)}</p></div>
-              <button type="button" className="pay-dialog-close" aria-label="ปิด" disabled={Boolean(savingId)} onClick={closeModal}>
+              <button type="button" className="pay-dialog-close ui-close" aria-label="ปิด" disabled={Boolean(savingId)} onClick={closeModal}>
                 <i className="fa-solid fa-xmark" aria-hidden="true" />
               </button>
             </header>
@@ -606,8 +606,8 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
               {actionError && <div className="pay-confirm-error" role="alert">{actionError}</div>}
             </div>
             <footer className="pay-confirm-actions">
-              <button type="button" className="pay-secondary" disabled={Boolean(savingId)} onClick={() => setModalMode("details")}>ย้อนกลับ</button>
-              <button type="button" className="pay-cta" disabled={Boolean(savingId)} onClick={() => void confirmPaid()}>
+              <button type="button" className="pay-secondary ui-button-secondary" disabled={Boolean(savingId)} onClick={() => setModalMode("details")}>ย้อนกลับ</button>
+              <button type="button" className="pay-cta ui-button-primary" disabled={Boolean(savingId)} onClick={() => void confirmPaid()}>
                 {savingId ? "กำลังตรวจสอบและบันทึก..." : selected.totalAmount === 0 ? "ยืนยันรอบจ่าย" : "ยืนยันว่าจ่ายแล้ว"}
               </button>
             </footer>
