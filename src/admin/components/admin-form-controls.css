@@ -239,3 +239,123 @@
     font-size: 16px !important;
   }
 }
+
+
+/* Standardized controls for the rebuilt Admin workspace.
+   AppSelect is the ONLY dropdown type: white field, yellow selection,
+   consistent 48px tap target, and the same menu on desktop and mobile. */
+.admin-reset-shell .app-select {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  z-index: 10;
+}
+.admin-reset-shell .app-select.open { z-index: 80; }
+.admin-reset-shell .app-select-trigger {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid #d5d5d5;
+  border-radius: 10px;
+  background: #fff;
+  color: #171717;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 750;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+.admin-reset-shell .app-select-trigger > span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-reset-shell .app-select-trigger > i {
+  flex: 0 0 auto;
+  color: #777;
+  font-size: 12px;
+  transition: transform 160ms ease;
+}
+.admin-reset-shell .app-select.open .app-select-trigger > i {
+  transform: rotate(180deg);
+}
+.admin-reset-shell .app-select-trigger:hover:not(:disabled) { border-color: #999; }
+.admin-reset-shell .app-select.open .app-select-trigger {
+  border-color: #927000;
+}
+.admin-reset-shell .app-select-trigger:focus-visible {
+  outline: 2px solid #fdc717;
+  outline-offset: 2px;
+}
+.admin-reset-shell .app-select-trigger:disabled {
+  color: #858585;
+  background: #f4f4f3;
+  cursor: default;
+}
+.admin-reset-shell .app-select-menu {
+  box-sizing: border-box;
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  min-width: 0;
+  max-height: min(292px, 42dvh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px;
+  border: 1px solid #d8d8d8;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(0,0,0,.13);
+}
+.admin-reset-shell .app-select-option {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 46px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: #272727;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+.admin-reset-shell .app-select-option > i {
+  flex: 0 0 auto;
+  font-size: 13px;
+  color: transparent;
+}
+.admin-reset-shell .app-select-option:hover,
+.admin-reset-shell .app-select-option:focus-visible { background: #f1f1ef; }
+.admin-reset-shell .app-select-option:focus-visible {
+  outline: 2px solid #927000;
+  outline-offset: -2px;
+}
+.admin-reset-shell .app-select-option.selected {
+  background: #fdc717;
+  color: #171717;
+  font-weight: 800;
+}
+.admin-reset-shell .app-select-option.selected > i { color: #171717; }
+@media (max-width: 780px) {
+  .admin-reset-shell .app-select-trigger { font-size: 16px; }
+  .admin-reset-shell .app-select-option { font-size: 15px; }
+}
