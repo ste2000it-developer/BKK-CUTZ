@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { AppSelect } from "../../components/AppSelect";
 import {
   buildPayoutRows,
   createPayoutWriteData,
@@ -46,6 +47,16 @@ const thaiDate = (key: string, short = false) =>
     month: short ? "short" : "long",
     year: "numeric",
   }).format(new Date(key + "T12:00:00+07:00"));
+
+function payoutWorkPeriod(cycle: PayoutCycle): string {
+  // Both payout work periods fall within one calendar month.
+  const monthYear = new Intl.DateTimeFormat("th-TH-u-ca-buddhist", {
+    timeZone: "Asia/Bangkok", month: "short", year: "numeric",
+  }).format(new Date(cycle.startKey + "T12:00:00+07:00"));
+  const start = Number(cycle.startKey.slice(-2));
+  const end = Number(cycle.endKey.slice(-2));
+  return `${start}–${end} ${monthYear}`;
+}
 
 function availableCycles(sources: Awaited<ReturnType<typeof listPayoutCycleSources>>): PayoutCycle[] {
   const cycles = new Map<string, PayoutCycle>();
@@ -358,26 +369,30 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
 
       <section className="pay-cycle" aria-label="เลือกรอบจ่ายเงิน">
         <div className="pay-cycle-label">
-          <span>รอบจ่ายเงิน</span>
-          <small>จ่ายวันที่ 1 และ 16 ของเดือน</small>
+          <span>งวดการทำงาน</span>
+          <small>เลือกช่วงที่ต้องการตรวจยอด</small>
         </div>
         <div className="pay-cycle-controls">
           <button type="button" aria-label="งวดก่อนหน้า" disabled={loading || Boolean(savingId) || index <= 0}
             onClick={() => changeCycle(index - 1)}><i className="fa-solid fa-chevron-left" aria-hidden="true" /></button>
-          <label className="pay-cycle-picker">
-            <span className="pay-sr-only">เลือกรอบจ่ายเงิน</span>
-            <select aria-label="เลือกรอบจ่ายเงิน" disabled={loading || Boolean(savingId) || !cycles.length} value={cycle ? String(index) : ""}
-              onChange={(event) => changeCycle(Number(event.target.value))}>
-              {!cycle && <option value="">{loadingCycles ? "กำลังค้นหางวด..." : "ยังไม่มีรอบจ่าย"}</option>}
+          <div className="pay-cycle-picker">
+            <i className="fa-regular fa-calendar-days pay-cycle-calendar" aria-hidden="true" />
+            <AppSelect
+              aria-label="เลือกงวดการทำงาน"
+              className="pay-cycle-dropdown"
+              value={cycle ? String(index) : ""}
+              placeholder={loadingCycles ? "กำลังโหลดงวด..." : "ยังไม่มีรอบจ่าย"}
+              disabled={loading || Boolean(savingId) || !cycles.length}
+              onChange={(value) => changeCycle(Number(value))}
+            >
               {cycles.map((item, cycleIndex) =>
-                <option key={item.payoutDateKey} value={cycleIndex}>จ่าย {thaiDate(item.payoutDateKey)}</option>)}
-            </select>
-            <i className="fa-solid fa-chevron-down" aria-hidden="true" />
-          </label>
+                <option key={item.payoutDateKey} value={cycleIndex}>{payoutWorkPeriod(item)}</option>)}
+            </AppSelect>
+          </div>
           <button type="button" aria-label="งวดถัดไป" disabled={loading || Boolean(savingId) || index >= cycles.length - 1}
             onClick={() => changeCycle(index + 1)}><i className="fa-solid fa-chevron-right" aria-hidden="true" /></button>
         </div>
-        {cycle && <p className="pay-cycle-period">คิดผลงาน {thaiDate(cycle.startKey, true)} – {thaiDate(cycle.endKey, true)}</p>}
+        {cycle && <p className="pay-cycle-period">กำหนดจ่าย <strong>{thaiDate(cycle.payoutDateKey, true)}</strong></p>}
       </section>
 
       {error && <div className="pay-alert pay-alert-error" role="alert">
