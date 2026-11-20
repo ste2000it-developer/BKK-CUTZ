@@ -48,16 +48,6 @@ const thaiDate = (key: string, short = false) =>
     year: "numeric",
   }).format(new Date(key + "T12:00:00+07:00"));
 
-function payoutWorkPeriod(cycle: PayoutCycle): string {
-  // Both payout work periods fall within one calendar month.
-  const monthYear = new Intl.DateTimeFormat("th-TH-u-ca-buddhist", {
-    timeZone: "Asia/Bangkok", month: "short", year: "numeric",
-  }).format(new Date(cycle.startKey + "T12:00:00+07:00"));
-  const start = Number(cycle.startKey.slice(-2));
-  const end = Number(cycle.endKey.slice(-2));
-  return `${start}–${end} ${monthYear}`;
-}
-
 function availableCycles(sources: Awaited<ReturnType<typeof listPayoutCycleSources>>): PayoutCycle[] {
   const cycles = new Map<string, PayoutCycle>();
   const addWorkDate = (input: unknown) => {
@@ -369,14 +359,13 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
 
       <section className="pay-cycle" aria-label="เลือกรอบจ่ายเงิน">
         <div className="pay-cycle-label">
-          <span>งวดการทำงาน</span>
+          <span>รอบจ่ายเงิน</span>
           <small>เลือกช่วงที่ต้องการตรวจยอด</small>
         </div>
         <div className="pay-cycle-controls">
           <button type="button" aria-label="งวดก่อนหน้า" disabled={loading || Boolean(savingId) || index <= 0}
             onClick={() => changeCycle(index - 1)}><i className="fa-solid fa-chevron-left" aria-hidden="true" /></button>
           <div className="pay-cycle-picker">
-            <i className="fa-regular fa-calendar-days pay-cycle-calendar" aria-hidden="true" />
             <AppSelect
               aria-label="เลือกงวดการทำงาน"
               className="pay-cycle-dropdown"
@@ -386,7 +375,12 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
               onChange={(value) => changeCycle(Number(value))}
             >
               {cycles.map((item, cycleIndex) =>
-                <option key={item.payoutDateKey} value={cycleIndex}>{payoutWorkPeriod(item)}</option>)}
+                <option key={item.payoutDateKey} value={cycleIndex}>
+                  <span className="pay-cycle-choice">
+                    <strong>รอบวันที่ {Number(item.payoutDateKey.slice(-2))}</strong>
+                    <small>{thaiDate(item.payoutDateKey, true)}</small>
+                  </span>
+                </option>)}
             </AppSelect>
           </div>
           <button type="button" aria-label="งวดถัดไป" disabled={loading || Boolean(savingId) || index >= cycles.length - 1}
