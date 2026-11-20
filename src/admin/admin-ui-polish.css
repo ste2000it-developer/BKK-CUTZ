@@ -150,6 +150,20 @@
   cursor: default;
 }
 
+/* Barber directory now places search beside the heading like the other lists.
+   On phones it becomes the full-width second row. */
+.admin-reset-shell .ab-directory .ab-directory-heading.ui-section-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(205px, 320px) var(--ui-control);
+  align-items: center;
+  gap: 12px;
+}
+.admin-reset-shell .ab-directory-heading .ui-search {
+  width: 100%;
+  margin-top: 0;
+}
+.admin-reset-shell .ab-directory-heading .ui-icon-button { justify-self: end; }
+
 /* Uniform search geometry in barber, withdrawal and payroll lists. */
 .admin-reset-shell .ui-search {
   display: flex;
@@ -425,6 +439,53 @@
 /* Payroll pager is nested inside its fixed footer, so do not pad it twice. */
 .admin-reset-shell .pay-slip-footer .ui-detail-pager { border: 0; padding: 0; }
 
+/* Matching feedback and explanatory text across all four pages. */
+.admin-reset-shell .ui-page :is(.dash-error, .ab-error, .aw-message-error, .pay-alert-error) {
+  border: 1px solid #f0d6d1;
+  border-radius: 11px;
+  background: #fff6f3;
+  color: #a12a1c;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.admin-reset-shell .ui-page :is(.ab-notice, .pay-alert-success) {
+  border-radius: 11px;
+  background: #edf7ef;
+  color: #256b45;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.admin-reset-shell .ui-page :is(.ab-empty, .aw-empty, .pay-empty, .dash-empty) {
+  color: #808080;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.admin-reset-shell .ui-page :is(.ab-footnote, .aw-footnote, .pay-footnote, .dash-footnote) {
+  margin-top: 20px;
+  color: #939393;
+  font-size: 11px;
+  line-height: 1.7;
+}
+/* Shared neutral style for the various contextual "try again" buttons. */
+.admin-reset-shell .ui-page :is(.dash-error, .ab-error, .aw-message-error, .pay-alert-error) > button {
+  min-height: 35px;
+  padding: 6px 12px;
+  border: 1px solid #eed1c9;
+  border-radius: 9px;
+  background: #fff;
+  color: #a12a1c;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+/* Avoid inconsistent tappable targets on mobile within barbers. */
+.admin-reset-shell .ab-add.ui-button-primary { min-height: var(--ui-control); }
+.admin-reset-shell .ab-dialog-actions .ui-button-primary,
+.admin-reset-shell .ab-dialog-actions .ui-button-secondary { min-height: var(--ui-control); }
+.admin-reset-shell .pay-export.ui-button-secondary { min-height: var(--ui-control); }
+
 /* Universal focus and movement: clear without visual noise. */
 .admin-reset-shell :is(button, a, input, summary):focus-visible {
   outline: 2px solid #b98c0b;
@@ -442,6 +503,21 @@
 }
 @media (max-width: 600px) {
   .admin-reset-shell .ui-page { padding: 24px 18px 45px; }
+  .admin-reset-shell .ab-directory .ab-directory-heading.ui-section-header {
+    grid-template-columns: minmax(0,1fr) 44px;
+    gap: 12px 9px;
+  }
+  .admin-reset-shell .ab-directory-heading .ui-search {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    max-width: none;
+  }
+  .admin-reset-shell .ab-directory-heading .ui-icon-button {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
   .admin-reset-shell .ui-page-header { gap: 10px; min-height: var(--ui-control); }
   .admin-reset-shell .ui-page-header h2 { font-size: 24px; }
   .admin-reset-shell .ui-page-header p { font-size: 12px; }
