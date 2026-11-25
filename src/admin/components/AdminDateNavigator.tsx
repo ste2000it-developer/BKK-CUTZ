@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import "./admin-date-navigator.css";
+import { floatingPanelPlacement, visualViewportBounds } from "./floating-panel";
 
 /** In-app Admin calendar, shared by cash withdrawal and sales history. */
 export const adminDateLabel = (dateKey: string) => new Intl.DateTimeFormat("th-TH-u-ca-buddhist", {
@@ -23,6 +24,7 @@ type Props = {
 export function AdminDateNavigator({ value, maxDate, onChange, label = "เลือกวันที่", className = "" }: Props) {
   const [open, setOpen] = useState(false);
   const [dropUp, setDropUp] = useState(false);
+  const [calendarHeight, setCalendarHeight] = useState<number | null>(null);
   const [month, setMonth] = useState(() => value.slice(0, 7));
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -63,10 +65,11 @@ export function AdminDateNavigator({ value, maxDate, onChange, label = "เล�
   const measureCalendarPlacement = () => {
     const rect = root.current?.getBoundingClientRect();
     if (!rect) return;
-    const availableHeight = window.visualViewport?.height ?? window.innerHeight;
-    const below = availableHeight - rect.bottom;
-    const calendarHeight = Math.min(442, availableHeight * .66);
-    setDropUp(below < calendarHeight + 12 && rect.top > below);
+    const viewport = visualViewportBounds();
+    const preferred = Math.min(442, (viewport.bottom - viewport.top) * .66);
+    const placement = floatingPanelPlacement(rect, viewport, preferred, 9);
+    setDropUp(placement.openAbove);
+    setCalendarHeight(placement.maxHeight);
   };
   const changeDate = (next: string) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(next) || next > maxDate) return;
@@ -101,7 +104,7 @@ export function AdminDateNavigator({ value, maxDate, onChange, label = "เล�
       </button>
 
       {open && (
-        <div className="ui-date-calendar" role="dialog" aria-label={label}>
+        <div className="ui-date-calendar" role="dialog" aria-label={label} style={calendarHeight === null ? undefined : { maxHeight: calendarHeight }}>
           <div className="ui-date-calendar-head">
             <button type="button" aria-label="เดือนก่อนหน้า" onClick={() => moveMonth(-1)}>
               <i className="fa-solid fa-chevron-left" aria-hidden="true" />
