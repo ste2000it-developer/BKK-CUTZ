@@ -1,13 +1,16 @@
 import { Children, isValidElement, useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { floatingPanelPlacement, visualViewportBounds } from "./floating-panel";
 
 type Props = { value: string; onChange: (value: string) => void; children: ReactNode; disabled?: boolean; id?: string; "aria-label"?: string; className?: string; placeholder?: string };
 
 export function AppSelect({ value, onChange, children, disabled, id, "aria-label": label, className = "", placeholder = "เลือก" }: Props) {
   const [open, setOpen] = useState(false);
   const [dropUp, setDropUp] = useState(false);
+  const [menuHeight, setMenuHeight] = useState<number | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const openedWithKeyboard = useRef(false);
+  const initialKeyboardKey = useRef<string | null>(null);
   const listId = useId();
   const options = Children.toArray(children).flatMap((child): { value: string; label: ReactNode }[] => {
     if (Array.isArray(child)) return [];
@@ -17,10 +20,12 @@ export function AppSelect({ value, onChange, children, disabled, id, "aria-label
   const measurePlacement = () => {
     const rect = root.current?.getBoundingClientRect();
     if (!rect) return;
-    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
-    const menuHeight = Math.min(options.length * 48 + 12, 292, viewportHeight * .42);
-    const below = viewportHeight - rect.bottom;
-    setDropUp(below < menuHeight + 12 && rect.top > below);
+    const viewport = visualViewportBounds();
+    const availableHeight = viewport.bottom - viewport.top;
+    const preferred = Math.min(options.length * 48 + 12, 292, availableHeight * .42);
+    const placement = floatingPanelPlacement(rect, viewport, preferred, 7);
+    setDropUp(placement.openAbove);
+    setMenuHeight(placement.maxHeight);
   };
   useEffect(() => {
     if (!open) return;
@@ -29,11 +34,27 @@ export function AppSelect({ value, onChange, children, disabled, id, "aria-label
     // Mouse/touch should leave focus on the trigger. Moving focus on
     // every pointer open makes the selected item show a keyboard focus ring.
     // Keyboard navigation still starts at the selected option.
+    const menu = root.current?.querySelector<HTMLDivElement>(".app-select-menu");
+    const buttons = Array.from(menu?.querySelectorAll<HTMLButtonElement>("[role=option]") || []);
+    const selectedIndex = Math.max(0, options.findIndex((option) => option.value === value));
+    const selected = buttons[selectedIndex];
+
+    // Show the active option even in long menus. Scroll the menu itself,
+    // never the entire Admin page.
+    if (menu && selected) {
+      const panel = menu.getBoundingClientRect();
+      const item = selected.getBoundingClientRect();
+      if (item.top < panel.top) menu.scrollTop -= panel.top - item.top;
+      else if (item.bottom > panel.bottom) menu.scrollTop += item.bottom - panel.bottom;
+    }
     if (openedWithKeyboard.current) {
-      const buttons = root.current?.querySelectorAll<HTMLButtonElement>("[role=option]");
-      buttons?.[Math.max(0, options.findIndex((option) => option.value === value))]?.focus();
+      const focusIndex = initialKeyboardKey.current === "Home" ? 0
+        : initialKeyboardKey.current === "End" ? buttons.length - 1
+        : selectedIndex;
+      buttons[focusIndex]?.focus();
     }
     openedWithKeyboard.current = false;
+    initialKeyboardKey.current = null;
     return () => document.removeEventListener("pointerdown", outside);
   }, [open]);
   return <div ref={root} className={`app-select${open ? " open" : ""}${dropUp ? " drop-up" : ""} ${className}`} onBlur={(event) => {
@@ -42,7 +63,7 @@ export function AppSelect({ value, onChange, children, disabled, id, "aria-label
     if (event.key === "Escape" && open) { event.preventDefault(); setOpen(false); trigger.current?.focus(); }
     if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
       event.preventDefault();
-      if (!open) { openedWithKeyboard.current = true; measurePlacement(); setOpen(true); return; }
+      if (!open) { openedWithKeyboard.current = true; initialKeyboardKey.current = event.key; measurePlacement(); setOpen(true); return; }
       const buttons = Array.from(root.current?.querySelectorAll<HTMLButtonElement>("[role=option]") || []);
       if (!buttons.length) return;
       const current = buttons.indexOf(document.activeElement as HTMLButtonElement);
@@ -52,10 +73,10 @@ export function AppSelect({ value, onChange, children, disabled, id, "aria-label
       buttons[next]?.focus();
     }
   }}>
-    <button ref={trigger} id={id} type="button" className="app-select-trigger" disabled={disabled} aria-label={label} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} onClick={(event) => { openedWithKeyboard.current = event.detail === 0; if (!open) measurePlacement(); setOpen(!open); }}>
+    <button ref={trigger} id={id} type="button" className="app-select-trigger" disabled={disabled} aria-label={label} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} onClick={(event) => { openedWithKeyboard.current = event.detail === 0; if (!open) { initialKeyboardKey.current = null; measurePlacement(); } setOpen(!open); }}>
       <span>{options.find((option) => option.value === value)?.label || placeholder}</span><i className="fa-solid fa-chevron-down" aria-hidden="true" />
     </button>
-    {open && <div id={listId} className="app-select-menu" role="listbox" aria-label={label}>
+    {open && <div id={listId} className="app-select-menu" role="listbox" aria-label={label} style={menuHeight === null ? undefined : { maxHeight: menuHeight }}>
       {options.map((option) => <button key={option.value} type="button" role="option" aria-selected={option.value === value} tabIndex={-1} className={`app-select-option${option.value === value ? " selected" : ""}`} onClick={() => {
         onChange(option.value); setOpen(false); trigger.current?.focus();
       }}>{option.label}<i className="fa-solid fa-check" aria-hidden="true" /></button>)}
