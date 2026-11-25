@@ -4,6 +4,7 @@ type Props = { value: string; onChange: (value: string) => void; children: React
 
 export function AppSelect({ value, onChange, children, disabled, id, "aria-label": label, className = "", placeholder = "เลือก" }: Props) {
   const [open, setOpen] = useState(false);
+  const [dropUp, setDropUp] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const openedWithKeyboard = useRef(false);
@@ -13,6 +14,14 @@ export function AppSelect({ value, onChange, children, disabled, id, "aria-label
     if (!isValidElement<{ value: string | number; children: ReactNode }>(child)) return [];
     return [{ value: String(child.props.value), label: child.props.children }];
   });
+  const measurePlacement = () => {
+    const rect = root.current?.getBoundingClientRect();
+    if (!rect) return;
+    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+    const menuHeight = Math.min(options.length * 48 + 12, 292, viewportHeight * .42);
+    const below = viewportHeight - rect.bottom;
+    setDropUp(below < menuHeight + 12 && rect.top > below);
+  };
   useEffect(() => {
     if (!open) return;
     const outside = (event: PointerEvent) => { if (!root.current?.contains(event.target as Node)) setOpen(false); };
@@ -27,20 +36,23 @@ export function AppSelect({ value, onChange, children, disabled, id, "aria-label
     openedWithKeyboard.current = false;
     return () => document.removeEventListener("pointerdown", outside);
   }, [open]);
-  return <div ref={root} className={`app-select${open ? " open" : ""} ${className}`} onBlur={(event) => {
+  return <div ref={root} className={`app-select${open ? " open" : ""}${dropUp ? " drop-up" : ""} ${className}`} onBlur={(event) => {
     if (!event.currentTarget.contains(event.relatedTarget)) setOpen(false);
   }} onKeyDown={(event) => {
-    if (event.key === "Escape") { event.preventDefault(); setOpen(false); trigger.current?.focus(); }
+    if (event.key === "Escape" && open) { event.preventDefault(); setOpen(false); trigger.current?.focus(); }
     if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
       event.preventDefault();
-      if (!open) { openedWithKeyboard.current = true; setOpen(true); return; }
+      if (!open) { openedWithKeyboard.current = true; measurePlacement(); setOpen(true); return; }
       const buttons = Array.from(root.current?.querySelectorAll<HTMLButtonElement>("[role=option]") || []);
+      if (!buttons.length) return;
       const current = buttons.indexOf(document.activeElement as HTMLButtonElement);
-      const next = event.key === "Home" ? 0 : event.key === "End" ? buttons.length - 1 : (current + (event.key === "ArrowDown" ? 1 : -1) + buttons.length) % buttons.length;
+      const selected = Math.max(0, options.findIndex((option) => option.value === value));
+      const origin = current >= 0 ? current : selected;
+      const next = event.key === "Home" ? 0 : event.key === "End" ? buttons.length - 1 : (origin + (event.key === "ArrowDown" ? 1 : -1) + buttons.length) % buttons.length;
       buttons[next]?.focus();
     }
   }}>
-    <button ref={trigger} id={id} type="button" className="app-select-trigger" disabled={disabled} aria-label={label} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} onClick={(event) => { openedWithKeyboard.current = event.detail === 0; setOpen(!open); }}>
+    <button ref={trigger} id={id} type="button" className="app-select-trigger" disabled={disabled} aria-label={label} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} onClick={(event) => { openedWithKeyboard.current = event.detail === 0; if (!open) measurePlacement(); setOpen(!open); }}>
       <span>{options.find((option) => option.value === value)?.label || placeholder}</span><i className="fa-solid fa-chevron-down" aria-hidden="true" />
     </button>
     {open && <div id={listId} className="app-select-menu" role="listbox" aria-label={label}>
