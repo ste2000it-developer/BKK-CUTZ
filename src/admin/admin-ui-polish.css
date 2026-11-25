@@ -307,6 +307,11 @@
 }
 .admin-reset-shell .ui-date-nav > button:first-child { border-radius: 10px 0 0 10px; }
 .admin-reset-shell .ui-date-nav > button:last-of-type { border-radius: 0 10px 10px 0; }
+/* The payout arrows flank a standalone rounded dropdown, not a joined input. */
+.admin-reset-shell .pay-cycle-controls.ui-date-nav > button:first-child,
+.admin-reset-shell .pay-cycle-controls.ui-date-nav > button:last-of-type {
+  border-radius: 10px;
+}
 .admin-reset-shell .ui-date-nav .pay-cycle-picker,
 .admin-reset-shell .ui-date-nav .aw-date-picker { min-height: 48px; }
 .admin-reset-shell .pay-cycle-picker .app-select-trigger {
