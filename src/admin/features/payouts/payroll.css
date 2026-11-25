@@ -73,8 +73,8 @@
 .admin-reset-shell .pay-cycle-label small { font-size: 11px; color: #888; }
 .admin-reset-shell .pay-cycle-controls {
   justify-content: center;
-  align-items: flex-start;
-  gap: 0;
+  align-items: center;
+  gap: 7px;
 }
 .admin-reset-shell .pay-cycle-controls > button {
   display: grid; place-items: center;
@@ -82,15 +82,15 @@
   border: 1px solid #e2e2e2; background: #f9f9f9;
   color: #454545; cursor: pointer;
 }
-.admin-reset-shell .pay-cycle-controls > button:first-child { border-radius: 10px 0 0 10px; }
-.admin-reset-shell .pay-cycle-controls > button:last-child { border-radius: 0 10px 10px 0; }
+.admin-reset-shell .pay-cycle-controls > button:first-child,
+.admin-reset-shell .pay-cycle-controls > button:last-child { border-radius: 10px; }
 .admin-reset-shell .pay-cycle-controls > button:disabled { color: #c9c9c9; cursor: default; }
 .admin-reset-shell .pay-cycle-controls > button:hover:not(:disabled) { background: #eee; }
 .admin-reset-shell .pay-cycle-picker {
   position: relative;
   width: min(342px, 43vw);
   min-height: 48px;
-  height: auto;
+  height: 48px;
   min-width: 0;
   background: #fff;
 }
@@ -98,32 +98,16 @@
 .admin-reset-shell .pay-cycle-controls > button { width: 46px; height: 48px; }
 /* The shared AppSelect styles all Admin dropdown menus.
    Payouts need only a centered label between left/right arrows. */
-.admin-reset-shell .pay-cycle-picker .app-select { height: auto; min-height: 48px; }
-.admin-reset-shell .pay-cycle-picker .app-select-menu {
-  /* Keep the menu inside the payout period card. Opening it expands
-     the card instead of covering the period description and yellow totals. */
-  position: static;
-  top: auto;
-  left: auto;
-  right: auto;
-  width: 100%;
-  max-height: min(260px, 36dvh);
-  margin-top: 8px;
-  overflow-y: auto;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, .09);
-}
-.admin-reset-shell .pay-cycle-picker .app-select-option {
-  min-height: 46px;
-}
+.admin-reset-shell .pay-cycle-picker .app-select { height: 48px; }
+/* The popup menu intentionally inherits all appearance, spacing, scrolling
+   and selection styles from shared AppSelect (same as the branch filter). */
 .admin-reset-shell .pay-cycle-picker .app-select-trigger {
   position: relative;
   justify-content: center;
   height: 48px;
   padding: 0 38px;
-  border: 0;
-  border-top: 1px solid #e2e2e2;
-  border-bottom: 1px solid #e2e2e2;
-  border-radius: 0;
+  border: 1px solid #d5d5d5;
+  border-radius: 10px;
   font-size: 14px;
   text-align: center;
 }
@@ -140,7 +124,9 @@
 .admin-reset-shell .pay-cycle-picker .app-select.open .app-select-trigger > i {
   transform: translateY(-50%) rotate(180deg);
 }
-.admin-reset-shell .pay-cycle-picker .pay-cycle-choice { display: block; text-align: center; }
+.admin-reset-shell .pay-cycle-picker .pay-cycle-choice { display: block; }
+.admin-reset-shell .pay-cycle-picker .app-select-trigger .pay-cycle-choice { text-align: center; }
+.admin-reset-shell .pay-cycle-picker .app-select-option .pay-cycle-choice { text-align: left; }
 .admin-reset-shell .pay-cycle-picker .pay-cycle-choice strong { font-weight: 800; }
 .admin-reset-shell .pay-cycle-period {
   width: 100%;
