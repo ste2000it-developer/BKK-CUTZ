@@ -6,6 +6,7 @@ export function AppSelect({ value, onChange, children, disabled, id, "aria-label
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  const openedWithKeyboard = useRef(false);
   const listId = useId();
   const options = Children.toArray(children).flatMap((child): { value: string; label: ReactNode }[] => {
     if (Array.isArray(child)) return [];
@@ -16,8 +17,14 @@ export function AppSelect({ value, onChange, children, disabled, id, "aria-label
     if (!open) return;
     const outside = (event: PointerEvent) => { if (!root.current?.contains(event.target as Node)) setOpen(false); };
     document.addEventListener("pointerdown", outside);
-    const buttons = root.current?.querySelectorAll<HTMLButtonElement>("[role=option]");
-    buttons?.[Math.max(0, options.findIndex((option) => option.value === value))]?.focus();
+    // Mouse/touch should leave focus on the trigger. Moving focus on
+    // every pointer open makes the selected item show a keyboard focus ring.
+    // Keyboard navigation still starts at the selected option.
+    if (openedWithKeyboard.current) {
+      const buttons = root.current?.querySelectorAll<HTMLButtonElement>("[role=option]");
+      buttons?.[Math.max(0, options.findIndex((option) => option.value === value))]?.focus();
+    }
+    openedWithKeyboard.current = false;
     return () => document.removeEventListener("pointerdown", outside);
   }, [open]);
   return <div ref={root} className={`app-select${open ? " open" : ""} ${className}`} onBlur={(event) => {
@@ -26,14 +33,14 @@ export function AppSelect({ value, onChange, children, disabled, id, "aria-label
     if (event.key === "Escape") { event.preventDefault(); setOpen(false); trigger.current?.focus(); }
     if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
       event.preventDefault();
-      if (!open) { setOpen(true); return; }
+      if (!open) { openedWithKeyboard.current = true; setOpen(true); return; }
       const buttons = Array.from(root.current?.querySelectorAll<HTMLButtonElement>("[role=option]") || []);
       const current = buttons.indexOf(document.activeElement as HTMLButtonElement);
       const next = event.key === "Home" ? 0 : event.key === "End" ? buttons.length - 1 : (current + (event.key === "ArrowDown" ? 1 : -1) + buttons.length) % buttons.length;
       buttons[next]?.focus();
     }
   }}>
-    <button ref={trigger} id={id} type="button" className="app-select-trigger" disabled={disabled} aria-label={label} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} onClick={() => setOpen(!open)}>
+    <button ref={trigger} id={id} type="button" className="app-select-trigger" disabled={disabled} aria-label={label} aria-haspopup="listbox" aria-expanded={open} aria-controls={listId} onClick={(event) => { openedWithKeyboard.current = event.detail === 0; setOpen(!open); }}>
       <span>{options.find((option) => option.value === value)?.label || placeholder}</span><i className="fa-solid fa-chevron-down" aria-hidden="true" />
     </button>
     {open && <div id={listId} className="app-select-menu" role="listbox" aria-label={label}>
