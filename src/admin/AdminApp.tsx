@@ -5,15 +5,17 @@ import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { BarbersPage } from "./features/barbers/BarbersPage";
 import { WithdrawalsPage } from "./features/withdrawals/WithdrawalsPage";
 import { PayrollPage } from "./features/payouts/PayrollPage";
+import { SalesHistoryPage } from "./features/sales/SalesHistoryPage";
 import { LoadingScreen } from "../shared/components/LoadingScreen";
 import { login, logout, watchAuth } from "../shared/firebase/auth";
 import { getUserProfile } from "../shared/firebase/repositories/identity";
 import "./admin-reset.css";
 
-type AdminPage = "dashboard" | "barbers" | "withdrawals" | "payroll";
+type AdminPage = "dashboard" | "barbers" | "withdrawals" | "payroll" | "sales";
 const pageFromHash = (): AdminPage => window.location.hash === "#admin-barbers" ? "barbers"
   : window.location.hash === "#admin-withdrawals" ? "withdrawals"
-  : window.location.hash === "#admin-payroll" ? "payroll" : "dashboard";
+  : window.location.hash === "#admin-payroll" ? "payroll"
+  : window.location.hash === "#admin-sales" ? "sales" : "dashboard";
 
 /**
  * Minimal Admin workspace: preserve login and existing notification functions,
@@ -140,6 +142,10 @@ export function AdminApp() {
               <i className="fa-solid fa-scissors" aria-hidden="true" />
               <span>จัดการช่าง</span>
             </a>
+            <a className={"admin-reset-nav-item" + (page === "sales" ? " admin-reset-nav-item--active" : "")} href="#admin-sales" aria-current={page === "sales" ? "page" : undefined} onClick={() => setPage("sales")}>
+              <i className="fa-solid fa-receipt" aria-hidden="true" />
+              <span>ประวัติการขาย</span>
+            </a>
             <a className={"admin-reset-nav-item" + (page === "withdrawals" ? " admin-reset-nav-item--active" : "")} href="#admin-withdrawals" aria-current={page === "withdrawals" ? "page" : undefined} onClick={() => setPage("withdrawals")}>
               <i className="fa-solid fa-money-bill-transfer" aria-hidden="true" />
               <span>รายการเบิกเงิน</span>
@@ -187,8 +193,22 @@ export function AdminApp() {
         </div>
       </header>
 
-      <main id={page === "dashboard" ? "admin-dashboard" : page === "barbers" ? "admin-barbers" : page === "withdrawals" ? "admin-withdrawals" : "admin-payroll"} className="admin-reset-canvas" aria-label={page === "dashboard" ? "ภาพรวมร้าน" : page === "barbers" ? "จัดการช่าง" : page === "withdrawals" ? "รายการเบิกเงิน" : "จ่ายเงินช่าง"}>
-        {page === "dashboard" ? <DashboardPage /> : page === "barbers" ? <BarbersPage /> : page === "withdrawals" ? <WithdrawalsPage /> : <PayrollPage admin={{ uid: user.uid, email: user.email }} />}
+      <main id={
+        page === "dashboard" ? "admin-dashboard"
+          : page === "barbers" ? "admin-barbers"
+          : page === "withdrawals" ? "admin-withdrawals"
+          : page === "payroll" ? "admin-payroll" : "admin-sales"
+      } className="admin-reset-canvas" aria-label={
+        page === "dashboard" ? "ภาพรวมร้าน"
+          : page === "barbers" ? "จัดการช่าง"
+          : page === "withdrawals" ? "รายการเบิกเงิน"
+          : page === "payroll" ? "จ่ายเงินช่าง" : "ประวัติการขาย"
+      }>
+        {page === "dashboard" ? <DashboardPage />
+          : page === "barbers" ? <BarbersPage />
+          : page === "withdrawals" ? <WithdrawalsPage />
+          : page === "payroll" ? <PayrollPage admin={{ uid: user.uid, email: user.email }} />
+          : <SalesHistoryPage />}
       </main>
 
       <dialog
@@ -214,6 +234,10 @@ export function AdminApp() {
             <a className={"admin-reset-nav-item" + (page === "barbers" ? " admin-reset-nav-item--active" : "")} href="#admin-barbers" aria-current={page === "barbers" ? "page" : undefined} onClick={() => { setPage("barbers"); setMenuOpen(false); }}>
               <i className="fa-solid fa-scissors" aria-hidden="true" />
               <span>จัดการช่าง</span>
+            </a>
+            <a className={"admin-reset-nav-item" + (page === "sales" ? " admin-reset-nav-item--active" : "")} href="#admin-sales" aria-current={page === "sales" ? "page" : undefined} onClick={() => { setPage("sales"); setMenuOpen(false); }}>
+              <i className="fa-solid fa-receipt" aria-hidden="true" />
+              <span>ประวัติการขาย</span>
             </a>
             <a className={"admin-reset-nav-item" + (page === "withdrawals" ? " admin-reset-nav-item--active" : "")} href="#admin-withdrawals" aria-current={page === "withdrawals" ? "page" : undefined} onClick={() => { setPage("withdrawals"); setMenuOpen(false); }}>
               <i className="fa-solid fa-money-bill-transfer" aria-hidden="true" />
