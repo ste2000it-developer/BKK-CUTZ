@@ -73,6 +73,11 @@
   background: #fff;
   box-shadow: 0 18px 44px rgba(0,0,0,.17);
 }
+/* Place the calendar above the input on short displays or near the bottom edge. */
+.admin-reset-shell .ui-date-control.drop-up .ui-date-calendar {
+  top: auto;
+  bottom: calc(100% + 9px);
+}
 .admin-reset-shell .ui-date-calendar-head {
   display: grid;
   grid-template-columns: 40px minmax(0,1fr) 40px;
