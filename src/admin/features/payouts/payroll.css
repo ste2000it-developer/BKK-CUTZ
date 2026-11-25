@@ -62,6 +62,7 @@
 .admin-reset-shell .pay-cycle {
   position: relative;
   justify-content: flex-start;
+  align-items: flex-start;
   flex-wrap: wrap;
   min-height: 83px;
   margin-top: 26px; padding: 15px 20px;
@@ -70,7 +71,11 @@
 .admin-reset-shell .pay-cycle-label { display: flex; flex-direction: column; gap: 4px; margin-right: auto; }
 .admin-reset-shell .pay-cycle-label span { font-size: 14px; font-weight: 850; }
 .admin-reset-shell .pay-cycle-label small { font-size: 11px; color: #888; }
-.admin-reset-shell .pay-cycle-controls { justify-content: center; gap: 0; }
+.admin-reset-shell .pay-cycle-controls {
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0;
+}
 .admin-reset-shell .pay-cycle-controls > button {
   display: grid; place-items: center;
   width: 41px; height: 42px; padding: 0;
@@ -84,7 +89,8 @@
 .admin-reset-shell .pay-cycle-picker {
   position: relative;
   width: min(342px, 43vw);
-  height: 48px;
+  min-height: 48px;
+  height: auto;
   min-width: 0;
   background: #fff;
 }
@@ -92,7 +98,23 @@
 .admin-reset-shell .pay-cycle-controls > button { width: 46px; height: 48px; }
 /* The shared AppSelect styles all Admin dropdown menus.
    Payouts need only a centered label between left/right arrows. */
-.admin-reset-shell .pay-cycle-picker .app-select { height: 100%; }
+.admin-reset-shell .pay-cycle-picker .app-select { height: auto; min-height: 48px; }
+.admin-reset-shell .pay-cycle-picker .app-select-menu {
+  /* Keep the menu inside the payout period card. Opening it expands
+     the card instead of covering the period description and yellow totals. */
+  position: static;
+  top: auto;
+  left: auto;
+  right: auto;
+  width: 100%;
+  max-height: min(260px, 36dvh);
+  margin-top: 8px;
+  overflow-y: auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .09);
+}
+.admin-reset-shell .pay-cycle-picker .app-select-option {
+  min-height: 46px;
+}
 .admin-reset-shell .pay-cycle-picker .app-select-trigger {
   position: relative;
   justify-content: center;
@@ -122,7 +144,7 @@
 .admin-reset-shell .pay-cycle-picker .pay-cycle-choice strong { font-weight: 800; }
 .admin-reset-shell .pay-cycle-period {
   width: 100%;
-  margin: -4px 0 0;
+  margin: 3px 0 0;
   color: #777;
   font-size: 12px;
   line-height: 1.5;
