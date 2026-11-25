@@ -330,7 +330,7 @@ export function SalesHistoryPage() {
                 <div><span>เหตุผล</span><strong>{selected.voidReason || "ไม่ระบุเหตุผล"}</strong></div>
                 {(selected.voidedByBarberName || selected.voidedByEmail) &&
                   <div><span>ผู้ยกเลิก</span><strong>{selected.voidedByBarberName || selected.voidedByEmail}</strong></div>}
-                {selected.voidedAt && <div><span>เวลายกเลิก</span><strong>{
+                {Boolean(selected.voidedAt) && <div><span>เวลายกเลิก</span><strong>{
                   typeof selected.voidedAt === "object" && selected.voidedAt !== null &&
                   "toDate" in selected.voidedAt && typeof selected.voidedAt.toDate === "function"
                     ? dateTime(selected.voidedAt.toDate()) : dateTime(selected.voidedAt)
