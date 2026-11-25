@@ -227,7 +227,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 40px;
+  min-height: 42px;
   padding: 6px 15px;
   border: 1px solid var(--ui-line);
   border-radius: 999px;
@@ -387,6 +387,17 @@
 .admin-reset-shell .ui-list-row { border-bottom: 1px solid #ededed; }
 .admin-reset-shell button.ui-list-row:hover,
 .admin-reset-shell .ab-item:hover { background: #fafaf7; }
+
+/* Metadata stays readable on compact screens without turning into huge cards. */
+.admin-reset-shell .ui-list-row :is(
+  .aw-item-body > span, .aw-item-body > small,
+  .sales-row-main > span, .sales-row-main > small,
+  .pay-row-person-name > small,
+  .ab-item-rfid, .dash-branch-info > span
+) {
+  font-size: 12px;
+  line-height: 1.55;
+}
 
 /* Active/paid status is the same status family. */
 .admin-reset-shell .ab-status,
@@ -638,7 +649,7 @@
     min-height: 44px;
   }
   .admin-reset-shell .ui-filter-group .ui-filter-tab {
-    min-height: 40px;
+    min-height: 44px;
     font-size: 12px;
     padding-inline: 12px;
   }
@@ -654,6 +665,7 @@
   }
   .admin-reset-shell .ui-dialog-header { padding: 18px 18px 15px; }
   .admin-reset-shell .ui-dialog-header h3 { font-size: 20px; }
+  .admin-reset-shell .ui-close { flex-basis: 44px; width: 44px; height: 44px; }
   .admin-reset-shell .ui-detail-pager {
     gap: 7px;
     padding: 12px 18px max(16px, env(safe-area-inset-bottom, 0px));
