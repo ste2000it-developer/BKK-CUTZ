@@ -55,160 +55,7 @@
   background: #fff;
 }
 .admin-reset-shell .aw-filters-top { justify-content: flex-start; flex-wrap: wrap; gap: 10px; }
-.admin-reset-shell .aw-date-nav { display: flex; align-items: center; position: relative; min-width: 0; z-index: 9; }
-.admin-reset-shell .aw-date-nav > button:not(.aw-date-picker) {
-  display: grid;
-  place-items: center;
-  flex: 0 0 38px;
-  width: 38px;
-  height: 42px;
-  padding: 0;
-  border: 1px solid #e4e4e4;
-  background: #f9f9f9;
-  color: #343434;
-  cursor: pointer;
-}
-.admin-reset-shell .aw-date-nav > button:first-child { border-radius: 10px 0 0 10px; }
-.admin-reset-shell .aw-date-nav > button:last-of-type { border-radius: 0 10px 10px 0; }
-.admin-reset-shell .aw-date-nav > button:not(.aw-date-picker):disabled { color: #c4c4c4; cursor: default; }
-.admin-reset-shell .aw-date-nav > button:not(.aw-date-picker):not(:disabled):hover { background: #f0f0f0; }
-.admin-reset-shell .aw-date-picker {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1 1 auto;
-  gap: 10px;
-  min-height: 42px;
-  min-width: 206px;
-  padding: 0 14px;
-  border: 1px solid #e4e4e4;
-  border-left: 0;
-  border-right: 0;
-  border-radius: 0;
-  background: #fff;
-  color: #252525;
-  font: inherit;
-  font-weight: 750;
-  font-size: 13px;
-  line-height: 1.4;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.admin-reset-shell .aw-date-picker > i { color: #555; font-size: 15px; }
-.admin-reset-shell .aw-date-picker[aria-expanded="true"],
-.admin-reset-shell .aw-date-picker:focus-visible {
-  outline: 2px solid #b98c0b;
-  outline-offset: -2px;
-}
-.admin-reset-shell .aw-calendar {
-  position: absolute;
-  top: calc(100% + 9px);
-  left: 38px;
-  z-index: 40;
-  width: 336px;
-  max-width: calc(100vw - 32px);
-  max-height: min(448px, 72dvh);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 14px;
-  border: 1px solid #dfdfdf;
-  border-radius: 15px;
-  background: #fff;
-  box-shadow: 0 18px 44px rgba(0,0,0,.17);
-}
-.admin-reset-shell .aw-calendar-toolbar {
-  display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) 40px;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 13px;
-}
-.admin-reset-shell .aw-calendar-toolbar > strong {
-  font-size: 15px;
-  font-weight: 800;
-  text-align: center;
-}
-.admin-reset-shell .aw-calendar-toolbar > button {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: 1px solid #e5e5e5;
-  border-radius: 10px;
-  background: #f8f8f8;
-  color: #343434;
-  cursor: pointer;
-}
-.admin-reset-shell .aw-calendar-toolbar > button:disabled {
-  opacity: .35;
-  cursor: default;
-}
-.admin-reset-shell .aw-calendar-toolbar > button:hover:not(:disabled) { background: #f0f0f0; }
-.admin-reset-shell .aw-calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 4px;
-  align-items: center;
-}
-.admin-reset-shell .aw-calendar-weekday {
-  display: grid;
-  place-items: center;
-  height: 29px;
-  color: #868686;
-  font-size: 12px;
-  font-weight: 750;
-}
-.admin-reset-shell .aw-calendar-day {
-  display: grid;
-  place-items: center;
-  width: 100%;
-  min-height: 37px;
-  padding: 0;
-  border: 1px solid transparent;
-  border-radius: 9px;
-  background: #fff;
-  color: #242424;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.admin-reset-shell .aw-calendar-day:hover:not(:disabled) { background: #f1f1ef; }
-.admin-reset-shell .aw-calendar-day.is-today:not(.is-selected) {
-  border-color: #d4a527;
-  color: #745200;
-}
-.admin-reset-shell .aw-calendar-day.is-selected,
-.admin-reset-shell .aw-calendar-day.is-selected:hover {
-  border-color: #fdc717;
-  background: #fdc717;
-  color: #171717;
-  font-weight: 850;
-}
-.admin-reset-shell .aw-calendar-day:disabled {
-  color: #c8c8c8;
-  cursor: default;
-}
-.admin-reset-shell .aw-calendar-today {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  width: 100%;
-  min-height: 42px;
-  margin-top: 12px;
-  padding: 0 14px;
-  border: 1px solid #e8d79a;
-  border-radius: 10px;
-  background: #fff9e2;
-  color: #775600;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 800;
-  cursor: pointer;
-}
-.admin-reset-shell .aw-calendar-today:hover { background: #ffefb2; }
+/* Date control and popover now use shared AdminDateNavigator styles. */
 .admin-reset-shell .aw-today {
   min-height: 42px;
   padding: 0 14px;
@@ -608,11 +455,6 @@
   .admin-reset-shell .aw-header p { font-size: 12px; }
   .admin-reset-shell .aw-filters { margin-top: 22px; padding: 12px; border-radius: 13px; }
   .admin-reset-shell .aw-filters-top { gap: 9px; }
-  .admin-reset-shell .aw-date-nav { flex: 1 1 auto; width: 100%; }
-  .admin-reset-shell .aw-date-nav > button:not(.aw-date-picker) { flex: 0 0 41px; width: 41px; }
-  .admin-reset-shell .aw-date-picker { min-width: 0; flex: 1 1 auto; padding: 0 5px; font-size: 12px; }
-  .admin-reset-shell .aw-date-picker i { font-size: 13px; }
-  .admin-reset-shell .aw-calendar { left: 0; width: 100%; max-width: 100%; }
   .admin-reset-shell .aw-branch-select.app-select { flex: 1 1 100%; width: 100%; max-width: none; min-width: 0; }
   .admin-reset-shell .aw-types { gap: 6px; margin-top: 12px; }
   .admin-reset-shell .aw-type { padding: 6px 11px; font-size: 11px; }
@@ -654,7 +496,6 @@
 }
 @media (max-width: 370px) {
   .admin-reset-shell .aw-page { padding-inline: 14px; }
-  .admin-reset-shell .aw-date-picker { font-size: 11px; gap: 6px; }
   .admin-reset-shell .aw-detail-navigation { padding-inline: 12px; }
 }
 @media (prefers-reduced-motion: no-preference) {
