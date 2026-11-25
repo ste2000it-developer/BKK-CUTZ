@@ -1,3 +1,4 @@
+import { useAdminDialog } from "../../components/useAdminDialog";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AppSelect } from "../../components/AppSelect";
 import { AdminDateNavigator } from "../../components/AdminDateNavigator";
@@ -154,37 +155,7 @@ export function WithdrawalsPage() {
   const chosenIndex = selectedKey ? filtered.findIndex((row) => row.key === selectedKey) : -1;
   const chosen = chosenIndex >= 0 ? filtered[chosenIndex] : null;
 
-  useEffect(() => {
-    const dialog = detailDialog.current;
-    if (!dialog) return;
-    if (!chosen) {
-      if (dialog.open) dialog.close();
-      return;
-    }
-    if (!dialog.open) dialog.showModal();
-
-    const body = document.body, html = document.documentElement;
-    const old = {
-      bodyPosition: body.style.position, bodyTop: body.style.top,
-      bodyWidth: body.style.width, bodyOverflow: body.style.overflow,
-      htmlOverflow: html.style.overflow,
-    };
-    const scroll = window.scrollY;
-    html.style.overflow = "hidden";
-    body.style.position = "fixed";
-    body.style.top = "-" + scroll + "px";
-    body.style.width = "100%";
-    body.style.overflow = "hidden";
-    return () => {
-      if (dialog.open) dialog.close();
-      body.style.position = old.bodyPosition;
-      body.style.top = old.bodyTop;
-      body.style.width = old.bodyWidth;
-      body.style.overflow = old.bodyOverflow;
-      html.style.overflow = old.htmlOverflow;
-      window.scrollTo(0, scroll);
-    };
-  }, [Boolean(chosen)]);
+  useAdminDialog(detailDialog, Boolean(chosen));
 
   useEffect(() => {
     if (!chosen) return;
