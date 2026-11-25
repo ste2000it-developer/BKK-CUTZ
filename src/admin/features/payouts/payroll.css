@@ -572,6 +572,46 @@
   .admin-reset-shell .pay-confirm-actions { padding: 12px 18px max(18px, env(safe-area-inset-bottom, 0px)); }
   .admin-reset-shell .pay-confirm-actions .pay-secondary { flex-basis: 88px; }
 }
+/* Small phone: keep the full payout round legible rather than squeezing
+   the selector between two arrows. The round label stays centered. */
+@media (max-width: 480px) {
+  .admin-reset-shell .pay-page-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .admin-reset-shell .pay-page-header > div:first-child {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .admin-reset-shell .pay-head-actions {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .admin-reset-shell .pay-cycle-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+  .admin-reset-shell .pay-cycle-picker {
+    order: -1;
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+  }
+  .admin-reset-shell .pay-cycle-picker .app-select-trigger {
+    font-size: 14px;
+    padding-inline: 38px;
+  }
+  .admin-reset-shell .pay-cycle-controls > button {
+    flex: 0 0 48px;
+    width: 48px;
+    height: 44px;
+    min-height: 44px;
+  }
+  .admin-reset-shell .pay-cycle-period { margin-top: 2px; }
+}
 @media (max-width: 370px) {
   .admin-reset-shell .pay-page { padding-inline: 14px; }
   .admin-reset-shell .pay-summary-main > strong { font-size: 33px; }
