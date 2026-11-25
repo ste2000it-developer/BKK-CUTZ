@@ -319,6 +319,13 @@
   background: #fff;
   box-shadow: 0 14px 34px rgba(0,0,0,.13);
 }
+/* The same menu opens above the control when room below is limited. */
+.admin-shell .app-select.drop-up .app-select-menu,
+.admin-reset-shell .app-select.drop-up .app-select-menu {
+  top: auto;
+  bottom: calc(100% + 7px);
+}
+
 .admin-reset-shell .app-select-option {
   box-sizing: border-box;
   display: flex;
