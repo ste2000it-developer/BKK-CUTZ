@@ -1,3 +1,4 @@
+import { useAdminDialog } from "../../components/useAdminDialog";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AppSelect } from "../../components/AppSelect";
 import { AdminDateNavigator, adminDateLabel } from "../../components/AdminDateNavigator";
@@ -119,21 +120,7 @@ export function SalesHistoryPage() {
   const selected = selectedIndex >= 0 ? filtered[selectedIndex] : null;
   const selectedVoided = selected ? isVoidedTransaction(selected) : false;
 
-  useEffect(() => {
-    const modal = dialog.current;
-    if (!modal) return;
-    if (!selected) {
-      if (modal.open) modal.close();
-      return;
-    }
-    if (!modal.open) modal.showModal();
-    const before = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = "hidden";
-    return () => {
-      if (modal.open) modal.close();
-      document.documentElement.style.overflow = before;
-    };
-  }, [Boolean(selected)]);
+  useAdminDialog(dialog, Boolean(selected));
 
   useEffect(() => {
     if (!selected) return;
