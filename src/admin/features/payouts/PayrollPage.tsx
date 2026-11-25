@@ -1,3 +1,4 @@
+import { useAdminDialog } from "../../components/useAdminDialog";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AppSelect } from "../../components/AppSelect";
 import {
@@ -208,40 +209,7 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
   const selectedAmount = selected ? paidAmount(selected, selectedPaid) : 0;
   const modalOpen = modalMode !== null;
 
-  useEffect(() => {
-    const node = dialog.current;
-    if (!node) return;
-    if (!modalOpen) {
-      if (node.open) node.close();
-      return;
-    }
-    if (!node.open) node.showModal();
-
-    const body = document.body;
-    const html = document.documentElement;
-    const before = {
-      position: body.style.position,
-      top: body.style.top,
-      width: body.style.width,
-      bodyOverflow: body.style.overflow,
-      htmlOverflow: html.style.overflow,
-    };
-    const scrollY = window.scrollY;
-    html.style.overflow = "hidden";
-    body.style.position = "fixed";
-    body.style.top = "-" + scrollY + "px";
-    body.style.width = "100%";
-    body.style.overflow = "hidden";
-    return () => {
-      if (node.open) node.close();
-      body.style.position = before.position;
-      body.style.top = before.top;
-      body.style.width = before.width;
-      body.style.overflow = before.bodyOverflow;
-      html.style.overflow = before.htmlOverflow;
-      window.scrollTo(0, scrollY);
-    };
-  }, [modalOpen]);
+  useAdminDialog(dialog, modalOpen);
 
   useEffect(() => {
     if (!modalOpen || modalMode !== "details") return;
