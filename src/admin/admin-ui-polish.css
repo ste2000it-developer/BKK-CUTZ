@@ -275,6 +275,8 @@
 /* Period/date controls use the same arrow dimensions and group height.
    The payout center label remains centered, as requested. */
 .admin-reset-shell .ui-filter-panel {
+  position: relative;
+  padding: 16px 18px;
   border: 1px solid var(--ui-line);
   border-radius: var(--ui-radius-lg);
   background: var(--ui-surface);
@@ -318,19 +320,43 @@
   height: 48px;
 }
 
+/* Date reset shortcuts on the two daily history pages are identical. */
+.admin-reset-shell :is(.aw-today, .sales-today) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-height: var(--ui-control);
+  padding: 0 14px;
+  border: 1px solid #efd36d;
+  border-radius: 10px;
+  background: #fff8db;
+  color: #6b4d12;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.admin-reset-shell :is(.aw-today, .sales-today):hover {
+  background: #fff0b9;
+}
+
 /* Display cards: big yellow summary, neutral small metrics. */
 .admin-reset-shell .dash-sales,
 .admin-reset-shell .aw-overview,
-.admin-reset-shell .pay-summary-main {
+.admin-reset-shell .pay-summary-main,
+.admin-reset-shell .sales-revenue {
   background: var(--ui-accent);
   color: var(--ui-ink);
 }
 .admin-reset-shell .dash-sales,
 .admin-reset-shell .aw-overview,
-.admin-reset-shell .pay-summary { border-radius: var(--ui-radius-lg); }
+.admin-reset-shell .pay-summary,
+.admin-reset-shell .sales-revenue { border-radius: var(--ui-radius-lg); }
 .admin-reset-shell .dash-sales strong,
 .admin-reset-shell .aw-overview-main > strong,
-.admin-reset-shell .pay-summary-main > strong {
+.admin-reset-shell .pay-summary-main > strong,
+.admin-reset-shell .sales-revenue > strong {
   font-size: clamp(36px, 4.2vw, 52px);
   font-weight: 850;
   line-height: 1.23;
@@ -338,7 +364,8 @@
   font-variant-numeric: tabular-nums;
 }
 .admin-reset-shell .dash-stat,
-.admin-reset-shell .ab-stat {
+.admin-reset-shell .ab-stat,
+.admin-reset-shell .sales-metric {
   border: 1px solid var(--ui-line);
   border-radius: 14px;
   background: #fff;
@@ -347,9 +374,11 @@
 .admin-reset-shell .dash-stat {
   padding: clamp(20px, 2.1vw, 26px);
 }
-.admin-reset-shell .ab-stat { padding: 20px 22px; }
+.admin-reset-shell .ab-stat,
+.admin-reset-shell .sales-metric { padding: 20px 22px; }
 .admin-reset-shell .ab-stat > span,
-.admin-reset-shell .dash-stat-label {
+.admin-reset-shell .dash-stat-label,
+.admin-reset-shell .sales-metric > span {
   color: var(--ui-muted);
   font-size: 13px;
   font-weight: 700;
@@ -361,7 +390,8 @@
 
 /* Active/paid status is the same status family. */
 .admin-reset-shell .ab-status,
-.admin-reset-shell .pay-status {
+.admin-reset-shell .pay-status,
+.admin-reset-shell .sales-state {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -374,9 +404,11 @@
   white-space: nowrap;
 }
 .admin-reset-shell .ab-status--active,
-.admin-reset-shell .pay-status.is-paid { color: #267a4c; background: #eaf6ee; }
+.admin-reset-shell .pay-status.is-paid,
+.admin-reset-shell .sales-state.is-active { color: #267a4c; background: #eaf6ee; }
 .admin-reset-shell .ab-status--inactive { color: #777; background: #f1f1f1; }
 .admin-reset-shell .pay-status.is-unpaid { color: #956b22; background: #fff2d6; }
+.admin-reset-shell .sales-state.is-voided { color: #a34e3d; background: #fff0ea; }
 
 /* Modal treatment and actions: one radius, close control and spacing. */
 .admin-reset-shell .ui-dialog {
@@ -455,6 +487,26 @@
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
+/* One motion language for all edit/detail sheets, including the new receipt. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes ui-admin-dialog-in {
+    from { translate: 0 22px; opacity: .3; }
+    to { translate: 0 0; opacity: 1; }
+  }
+  @keyframes ui-admin-sheet-in {
+    from { translate: 0 100%; }
+    to { translate: 0 0; }
+  }
+  .admin-reset-shell .ui-dialog[open] {
+    animation: ui-admin-dialog-in 250ms cubic-bezier(.22,1,.36,1) both;
+  }
+  @media (max-width: 600px) {
+    .admin-reset-shell .ui-dialog[open] {
+      animation: ui-admin-sheet-in 300ms cubic-bezier(.22,1,.36,1) both;
+    }
+  }
+}
+
 /* Payroll pager is nested inside its fixed footer, so do not pad it twice. */
 .admin-reset-shell .pay-slip-footer .ui-detail-pager { border: 0; padding: 0; }
 
@@ -478,8 +530,8 @@
   outline-offset: 1px;
 }
 
-/* Matching feedback and explanatory text across all four pages. */
-.admin-reset-shell .ui-page :is(.dash-error, .ab-error, .aw-message-error, .pay-alert-error) {
+/* Matching feedback and explanatory text across all five pages. */
+.admin-reset-shell .ui-page :is(.dash-error, .ab-error, .aw-message-error, .pay-alert-error, .sales-error) {
   border: 1px solid #f0d6d1;
   border-radius: 11px;
   background: #fff6f3;
@@ -494,19 +546,19 @@
   font-size: 13px;
   line-height: 1.65;
 }
-.admin-reset-shell .ui-page :is(.ab-empty, .aw-empty, .pay-empty, .dash-empty) {
+.admin-reset-shell .ui-page :is(.ab-empty, .aw-empty, .pay-empty, .dash-empty, .sales-empty) {
   color: #808080;
   font-size: 13px;
   line-height: 1.65;
 }
-.admin-reset-shell .ui-page :is(.ab-footnote, .aw-footnote, .pay-footnote, .dash-footnote) {
+.admin-reset-shell .ui-page :is(.ab-footnote, .aw-footnote, .pay-footnote, .dash-footnote, .sales-footnote) {
   margin-top: 20px;
   color: #939393;
   font-size: 11px;
   line-height: 1.7;
 }
 /* Shared neutral style for the various contextual "try again" buttons. */
-.admin-reset-shell .ui-page :is(.dash-error, .ab-error, .aw-message-error, .pay-alert-error) > button {
+.admin-reset-shell .ui-page :is(.dash-error, .ab-error, .aw-message-error, .pay-alert-error, .sales-error) > button {
   min-height: 35px;
   padding: 6px 12px;
   border: 1px solid #eed1c9;
@@ -553,6 +605,9 @@
   }
 
   .admin-reset-shell .ui-page { padding: 24px 18px 45px; }
+  .admin-reset-shell .ui-filter-panel { padding: 12px; }
+  .admin-reset-shell .sales-metric { padding: 15px 14px; }
+
   .admin-reset-shell .ab-directory .ab-directory-heading.ui-section-header {
     grid-template-columns: minmax(0,1fr) 44px;
     gap: 12px 9px;
