@@ -1,0 +1,132 @@
+/* Shared history date selector – same calendar on every Admin page. */
+.admin-reset-shell .ui-date-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 0 1 376px;
+  width: min(376px, 100%);
+  min-width: 0;
+  height: 48px;
+  z-index: 15;
+}
+.admin-reset-shell .ui-date-control > button:not(.ui-date-trigger) {
+  display: grid;
+  place-items: center;
+  width: 43px;
+  height: 48px;
+  flex: 0 0 43px;
+  border: 1px solid #e4e4e4;
+  border-radius: 10px 0 0 10px;
+  padding: 0;
+  background: #f8f8f7;
+  color: #343434;
+  font: inherit;
+  cursor: pointer;
+}
+.admin-reset-shell .ui-date-control > button:nth-of-type(3) {
+  border-radius: 0 10px 10px 0;
+}
+.admin-reset-shell .ui-date-control > button:disabled { color: #c6c6c6; cursor: default; }
+.admin-reset-shell .ui-date-control > button:hover:not(:disabled):not(.ui-date-trigger) { background: #efefee; }
+.admin-reset-shell .ui-date-control .ui-date-trigger {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  height: 48px;
+  min-width: 0;
+  padding: 0 9px;
+  border: 1px solid #e4e4e4;
+  border-left: 0;
+  border-right: 0;
+  border-radius: 0;
+  background: #fff;
+  color: #252525;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.admin-reset-shell .ui-date-control .ui-date-trigger i { color: #5b5b5b; font-size: 14px; }
+.admin-reset-shell .ui-date-control .ui-date-trigger span {
+  min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+.admin-reset-shell .ui-date-control .ui-date-trigger[aria-expanded="true"] {
+  outline: 2px solid #b98c0b;
+  outline-offset: -2px;
+}
+.admin-reset-shell .ui-date-calendar {
+  position: absolute;
+  top: calc(100% + 9px);
+  left: 0;
+  z-index: 100;
+  box-sizing: border-box;
+  width: min(336px, 100%);
+  max-height: min(442px, 66dvh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 14px;
+  border: 1px solid #dedede;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 18px 44px rgba(0,0,0,.17);
+}
+.admin-reset-shell .ui-date-calendar-head {
+  display: grid;
+  grid-template-columns: 40px minmax(0,1fr) 40px;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 13px;
+}
+.admin-reset-shell .ui-date-calendar-head strong {
+  font-size: 15px; font-weight: 850; text-align: center;
+}
+.admin-reset-shell .ui-date-calendar-head > button {
+  display: grid; place-items: center;
+  width: 40px; height: 40px;
+  padding: 0; border: 1px solid #e5e5e5; border-radius: 10px;
+  background: #f8f8f8; color: #343434; cursor: pointer;
+}
+.admin-reset-shell .ui-date-calendar-head > button:disabled { opacity: .35; cursor: default; }
+.admin-reset-shell .ui-date-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7,minmax(0,1fr));
+  gap: 4px;
+  align-items: center;
+}
+.admin-reset-shell .ui-date-calendar-weekday {
+  display: grid; place-items: center;
+  height: 29px; color: #868686;
+  font-size: 12px; font-weight: 750;
+}
+.admin-reset-shell .ui-date-calendar-day {
+  display: grid; place-items: center;
+  width: 100%; min-height: 37px;
+  padding: 0; border: 1px solid transparent; border-radius: 9px;
+  background: #fff; color: #242424;
+  font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
+}
+.admin-reset-shell .ui-date-calendar-day:hover:not(:disabled) { background: #f1f1ef; }
+.admin-reset-shell .ui-date-calendar-day.is-today:not(.is-selected) {
+  border-color: #d4a527; color: #745200;
+}
+.admin-reset-shell .ui-date-calendar-day.is-selected,
+.admin-reset-shell .ui-date-calendar-day.is-selected:hover {
+  border-color: #fdc717; background: #fdc717;
+  color: #171717; font-weight: 850;
+}
+.admin-reset-shell .ui-date-calendar-day:disabled { color: #c8c8c8; cursor: default; }
+.admin-reset-shell .ui-date-calendar-today {
+  display: flex; justify-content: center; align-items: center; gap: 9px;
+  width: 100%; min-height: 42px; margin-top: 12px;
+  border: 1px solid #e8d79a; border-radius: 10px;
+  background: #fff9e2; color: #775600;
+  font: inherit; font-size: 13px; font-weight: 800; cursor: pointer;
+}
+.admin-reset-shell .ui-date-calendar-today:hover { background: #ffefb2; }
+@media(max-width:600px) {
+  .admin-reset-shell .ui-date-control { flex: 1 1 100%; width: 100%; }
+  .admin-reset-shell .ui-date-calendar { width: 100%; }
+}
