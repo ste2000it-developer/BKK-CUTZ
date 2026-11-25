@@ -127,7 +127,8 @@
 .admin-reset-shell .pay-cycle-picker .pay-cycle-choice { display: block; }
 .admin-reset-shell .pay-cycle-picker .app-select-trigger .pay-cycle-choice { text-align: center; }
 .admin-reset-shell .pay-cycle-picker .app-select-option .pay-cycle-choice { text-align: left; }
-.admin-reset-shell .pay-cycle-picker .pay-cycle-choice strong { font-weight: 800; }
+.admin-reset-shell .pay-cycle-picker .app-select-trigger .pay-cycle-choice strong { font-weight: 800; }
+.admin-reset-shell .pay-cycle-picker .app-select-option .pay-cycle-choice strong { font-weight: inherit; }
 .admin-reset-shell .pay-cycle-period {
   width: 100%;
   margin: 3px 0 0;
