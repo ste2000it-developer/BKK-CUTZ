@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { AppSelect } from "./AppSelect";
 import { AdminDateNavigator, adminDateLabel, shiftAdminDate } from "./AdminDateNavigator";
+import { floatingPanelPlacement } from "./floating-panel";
 
 describe("Admin shared UI contracts", () => {
   it("renders the same date navigator on all daily history pages", () => {
@@ -45,4 +46,21 @@ describe("Admin shared UI contracts", () => {
     expect(html).not.toContain("<select");
     expect(select("a")).toContain("สาขา A");
   });
+  it("positions both dropdowns and calendars inside their available viewport", () => {
+    const viewport = { top: 0, bottom: 750 };
+    const nearTop = floatingPanelPlacement({ top: 90, bottom: 138 }, viewport, 292, 7);
+    expect(nearTop).toEqual({ openAbove: false, maxHeight: 292 });
+
+    const nearBottom = floatingPanelPlacement({ top: 650, bottom: 698 }, viewport, 292, 7);
+    expect(nearBottom).toEqual({ openAbove: true, maxHeight: 292 });
+
+    const cramped = floatingPanelPlacement({ top: 165, bottom: 213 }, { top: 0, bottom: 320 }, 290);
+    expect(cramped.openAbove).toBe(true);
+    expect(cramped.maxHeight).toBeLessThanOrEqual(146);
+
+    // Visual viewport may be offset while the mobile keyboard is visible.
+    const offset = floatingPanelPlacement({ top: 420, bottom: 468 }, { top: 300, bottom: 550 }, 270);
+    expect(offset).toEqual({ openAbove: true, maxHeight: 101 });
+  });
+
 });
