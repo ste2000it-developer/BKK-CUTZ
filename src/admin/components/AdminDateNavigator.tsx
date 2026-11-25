@@ -22,6 +22,7 @@ type Props = {
 
 export function AdminDateNavigator({ value, maxDate, onChange, label = "เลือกวันที่", className = "" }: Props) {
   const [open, setOpen] = useState(false);
+  const [dropUp, setDropUp] = useState(false);
   const [month, setMonth] = useState(() => value.slice(0, 7));
   const root = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
@@ -59,6 +60,14 @@ export function AdminDateNavigator({ value, maxDate, onChange, label = "เล�
     month: "long", year: "numeric", timeZone: "Asia/Bangkok",
   }).format(new Date(month + "-01T12:00:00+07:00"));
 
+  const measureCalendarPlacement = () => {
+    const rect = root.current?.getBoundingClientRect();
+    if (!rect) return;
+    const availableHeight = window.visualViewport?.height ?? window.innerHeight;
+    const below = availableHeight - rect.bottom;
+    const calendarHeight = Math.min(442, availableHeight * .66);
+    setDropUp(below < calendarHeight + 12 && rect.top > below);
+  };
   const changeDate = (next: string) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(next) || next > maxDate) return;
     setOpen(false);
@@ -72,7 +81,7 @@ export function AdminDateNavigator({ value, maxDate, onChange, label = "เล�
   };
 
   return (
-    <div ref={root} className={"ui-date-nav ui-date-control " + className} role="group" aria-label={label}>
+    <div ref={root} className={"ui-date-nav ui-date-control" + (dropUp ? " drop-up" : "") + " " + className} role="group" aria-label={label}>
       <button type="button" aria-label="วันก่อนหน้า" onClick={() => changeDate(shiftAdminDate(value, -1))}>
         <i className="fa-solid fa-chevron-left" aria-hidden="true" />
       </button>
@@ -80,7 +89,7 @@ export function AdminDateNavigator({ value, maxDate, onChange, label = "เล�
         aria-label={"เปิดปฏิทิน: " + adminDateLabel(value)}
         aria-expanded={open} aria-haspopup="dialog"
         onClick={() => {
-          if (!open) setMonth(value.slice(0, 7));
+          if (!open) { setMonth(value.slice(0, 7)); measureCalendarPlacement(); }
           setOpen((current) => !current);
         }}>
         <i className="fa-regular fa-calendar-days" aria-hidden="true" />
