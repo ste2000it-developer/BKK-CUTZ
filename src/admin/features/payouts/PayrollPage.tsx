@@ -385,7 +385,7 @@ export function PayrollPage({ admin }: { admin: AdminIdentity }) {
           <button type="button" aria-label="งวดถัดไป" disabled={loading || Boolean(savingId) || index >= cycles.length - 1}
             onClick={() => changeCycle(index + 1)}><i className="fa-solid fa-chevron-right" aria-hidden="true" /></button>
         </div>
-        {cycle && <p className="pay-cycle-period">กำหนดจ่าย <strong>{thaiDate(cycle.payoutDateKey, true)}</strong></p>}
+        {cycle && <p className="pay-cycle-period">ช่วงผลงาน <strong>{thaiDate(cycle.startKey, true)} – {thaiDate(cycle.endKey, true)}</strong></p>}
       </section>
 
       {error && <div className="pay-alert pay-alert-error" role="alert">
